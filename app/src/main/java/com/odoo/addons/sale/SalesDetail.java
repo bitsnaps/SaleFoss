@@ -437,7 +437,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Void aVoid)  {
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
         }
