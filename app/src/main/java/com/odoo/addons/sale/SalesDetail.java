@@ -140,7 +140,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 finish();
             }
             if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
-               // deremark after test!!!
                 OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
@@ -471,21 +470,21 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             try {
                 Thread.sleep(1000);
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
-                SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
+                //SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-                //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
-                StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
+               //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
+               // StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
 
-                ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
+                //ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
 
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);
-                    int pricelist = customer.getInt("pricelist_id");
+                    //int pricelist = customer.getInt("pricelist_id");
                     HashMap<String, Object> context = new HashMap<>();
-                    context.put("partner_id", customer.getInt("id"));
+                    //context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
-                    context.put("pricelist", pricelist);
+                    //context.put("pricelist", pricelist);
 
                     // Fill in row values for insert in the local DB
                     OValues values = new OValues();
@@ -501,17 +500,21 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("price_unit", false);
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    if (stockMove.isEmptyTable()) {
-                        ODomain domainProdTemplate = new ODomain();
-                        stockMove.quickSyncRecords(domainProdTemplate);
-                    }
-                    else {
+                    String sql="";
+                    //if (stockMove.isEmptyTable()) {
+                    //    ODomain domainProdTemplate = new ODomain();
+                    //}
+                    //else {
+                    sql = "SELECT * FROM product_product WHERE product_tmpl_id = " + product.getInt("id");
 
-                        ODataRow row = stockMove.browse(product.getInt("id"));
-                        values.put("price_subtotal", row.getFloat("price_unit") * qty);
+                    List<ODataRow> records = productProduct.query(sql);
+                    for(ODataRow row: records){
+                            // code of block
+
                     }
-//                                values.put("price_subtotal", 23.43 * qty); //res.getDouble("product_uos_qty");
-                    //values.put("price_subtotal", product.getFloat("lst_price") * qty); //res.getDouble("product_uos_qty");
+
+                    values.put("price_unit", product.getFloat("lst_price"));
+                    values.put("price_subtotal", product.getFloat("lst_price") * qty); //res.getDouble("product_uos_qty");
 
                     JSONArray tax_id = new JSONArray();
                     tax_id.put(6);
