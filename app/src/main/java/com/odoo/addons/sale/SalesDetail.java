@@ -497,23 +497,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
-                    values.put("price_unit", false);
+                    values.put("price_unit", product.getFloat("lst_price"));
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    String sql="";
-                    //if (stockMove.isEmptyTable()) {
-                    //    ODomain domainProdTemplate = new ODomain();
-                    //}
-                    //else {
-                    sql = "SELECT * FROM product_product WHERE product_tmpl_id = " + product.getInt("id");
-
-                    List<ODataRow> records = productProduct.query(sql);
-                    for(ODataRow row: records){
-                            // code of block
-
-                    }
-
-                    values.put("price_unit", product.getFloat("lst_price"));
                     values.put("price_subtotal", product.getFloat("lst_price") * qty); //res.getDouble("product_uos_qty");
 
                     JSONArray tax_id = new JSONArray();
