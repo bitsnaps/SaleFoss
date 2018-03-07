@@ -53,21 +53,6 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             ODomain domain = new ODomain();
             SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
 
-            Log.i(TAG, "<< sale.order >> - sync: Start!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//            AccountPaymentTerm accountPaymentTerm = new AccountPaymentTerm(getApplicationContext(), null); // with null works
-//            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), null);
-//            ProductProduct prod = new ProductProduct(getApplicationContext(), null);
-//            StockMove stock = new StockMove(getApplicationContext(), null);
-//            ProductTemplate prodTemplate = new ProductTemplate(getApplicationContext(), null);
-
-
-//            saleOrder.quickSyncRecords(domain);
-//            accountPaymentTerm.quickSyncRecords(domain);
-//            prod.quickSyncRecords(domain);
-//            stock.quickSyncRecords(domain);
-
-            //prodTemplate.quickSyncRecords(domain);
-
             List<Integer> newIds = new ArrayList<>();
             for (ODataRow row : saleOrder.select(new String[]{}, "name = ? and id != ?", new String[]{"/", "0"})) {
                 newIds.add(row.getInt("id"));

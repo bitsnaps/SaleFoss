@@ -404,6 +404,7 @@ public class SaleOrder extends OModel {
                     ODomain domainProdTemplate = new ODomain();
 
                     // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
+
                     Log.i(TAG, "<< DB Odoo loading to your device >>");
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null);
                     ProductProduct prodProd = new ProductProduct(mContext, null);

@@ -21,6 +21,11 @@ import com.odoo.App;
 import com.odoo.BuildConfig;
 import com.odoo.OdooActivity;
 import com.odoo.R;
+import com.odoo.addons.sale.models.AccountPaymentTerm;
+import com.odoo.addons.sale.models.ProductProduct;
+import com.odoo.addons.sale.models.ProductTemplate;
+import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.config.FirstLaunchConfig;
 import com.odoo.core.auth.OdooAccountManager;
@@ -28,6 +33,7 @@ import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.Odoo;
 import com.odoo.core.rpc.handler.OdooVersionException;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.listeners.IDatabaseListListener;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.IOdooLoginCallback;
@@ -389,6 +395,27 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     ResCompany company = new ResCompany(OdooLogin.this, mUser);
                     company.quickCreateRecord(company_details);
                     Thread.sleep(500);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                try {
+                    Thread.sleep(1000);
+                    ODomain domainProdTemplate = new ODomain();
+
+                    // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
+
+                    Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
+                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
+                    ProductTemplate prodTemplate = new ProductTemplate(OdooLogin.this, mUser);
+                    //StockMove stock = new StockMove(OdooLogin.this, null);
+
+                    salesOrderLine.quickSyncRecords(domainProdTemplate);
+                    prodProd.quickSyncRecords(domainProdTemplate);
+                    prodTemplate.quickSyncRecords(domainProdTemplate);
+                    paymentTerm.quickSyncRecords(domainProdTemplate);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
