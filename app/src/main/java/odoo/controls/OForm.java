@@ -146,10 +146,7 @@ public class OForm extends LinearLayout {
 
     private void initForm() {
         findAllFields(this);
-        //
-        OModel modelNew = new OModel(mContext, mModel, null);
-        model = OModel.get(mContext, mModel, modelNew.getUser().toString());
-        //model = OModel.get(mContext, mModel, null);
+        model = OModel.get(mContext, mModel, null);
         setOrientation(VERTICAL);
         for (String key : mFormFieldControls.keySet()) {
             View v = mFormFieldControls.get(key);
