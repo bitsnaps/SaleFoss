@@ -94,7 +94,7 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:fieldName="payment_term"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 app:fieldTextSize="@dimen/text_size_xmedium"

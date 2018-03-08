@@ -98,18 +98,6 @@ public class Sales extends BaseFragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-            // saleOrder.syncDataFromOdoo();
-            //((SaleOrder) db()).syncDataFromOdoo();
-
-/*
-        Log.i(TAG, "Sync Starting: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        if (inNetwork()) {
-            ((SaleOrder) db()).syncDataFromOdoo();
-        } else {
-            Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
-        }
-
-*/
         initAdapter();
     }
 

@@ -104,13 +104,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         currencyObj = sale.currency();
         partner = new ResPartner(this, null);
         products = new ProductProduct(this, null);
-        // Init() works too bad!
-        try {
-            init();
-        } catch (Exception e){
-            Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
-        }
-        initAdapter();  // Original
+
+        init(); // initialization Form
+        initAdapter(); // Line order on the form
     }
 
     private void init() {
@@ -159,7 +155,13 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             taxesAmt.setText(String.format("%.2f", record.getFloat("amount_tax")));
             total_amt.setText(String.format("%.2f", record.getFloat("amount_total")));
 
-            mForm.initForm(record); //  Original - Call inin for Form - here is erro and axception for first launch
+            try {
+                mForm.initForm(record); //  Original - Call inin for Form - here is error and exception for first launch
+            } catch (Exception e){
+                Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
+            }
+
+            mForm.initForm(record); //  Original - Call inin for Form - here is error and exception for first launch
 
         }
         mSOType = txvType.getText().toString();
@@ -490,11 +492,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     OValues values = new OValues();
                     values.put("product_id", product.getInt("id"));
                     values.put("name", product.get("name_template")); // it is // mine
-
-                    //OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
-                    //OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
-                    //OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));
-
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
                     values.put("price_unit", product.getFloat("lst_price"));

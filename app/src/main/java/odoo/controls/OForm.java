@@ -42,6 +42,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.utils.DomainFilterParser;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public class OForm extends LinearLayout {
     public static final String TAG = OForm.class.getSimpleName();
     private Boolean mEditable = false;
     private String mModel;
-    private OModel model = null;
+    private OModel model = null; // is original
     private HashMap<String, OField> mFormFieldControls = new HashMap<>();
     private Context mContext = null;
     private ODataRow mRecord = null;
@@ -146,7 +147,9 @@ public class OForm extends LinearLayout {
     private void initForm() {
         findAllFields(this);
         //
-        model = OModel.get(mContext, mModel, null);
+        OModel modelNew = new OModel(mContext, mModel, null);
+        model = OModel.get(mContext, mModel, modelNew.getUser().toString());
+        //model = OModel.get(mContext, mModel, null);
         setOrientation(VERTICAL);
         for (String key : mFormFieldControls.keySet()) {
             View v = mFormFieldControls.get(key);
@@ -155,7 +158,7 @@ public class OForm extends LinearLayout {
                 c.setFormView(this);
                 c.setEditable(mEditable);
                 c.useTemplate(autoUIGenerate);
-                c.setModel(model);
+                c.setModel(model); // acting error for sale.oder
                 if (model.getColumn(c.getFieldName()) != null) {
                     OColumn column = model.getColumn(c.getFieldName());
                     if (column != null) {
