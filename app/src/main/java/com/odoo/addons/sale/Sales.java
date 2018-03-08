@@ -338,10 +338,20 @@ public class Sales extends BaseFragment implements
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
-        Bundle extras = row.getPrimaryBundleData();
-        extras.putString("type", mType.toString());
-        IntentUtils.startActivity(getActivity(), SalesDetail.class, extras);
+        sheet.dismiss();
+        if (data instanceof Cursor) {
+            try {
+                ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+                Bundle extras = row.getPrimaryBundleData();
+                extras.putString("type", mType.toString());
+                IntentUtils.startActivity(getActivity(), SalesDetail.class, extras);
+            } catch (Exception e) {
+                e.printStackTrace();
+                sheet.dismiss();
+                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
+                        .show();
+            }
+        }
     }
 
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {

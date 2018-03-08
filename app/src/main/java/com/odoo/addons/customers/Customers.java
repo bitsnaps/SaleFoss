@@ -230,7 +230,14 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
         if (data instanceof Cursor) {
-            loadActivity(OCursorUtils.toDatarow((Cursor) data));
+            try {
+                loadActivity(OCursorUtils.toDatarow((Cursor) data));
+            } catch (Exception e) {
+                e.printStackTrace();
+                sheet.dismiss();
+                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
+                        .show();
+            }
         }
     }
 
