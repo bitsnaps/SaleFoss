@@ -177,6 +177,19 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 
     @Override
     public void onItemClick(View view, final int position) {
+        final ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
+        if (row.getInt(OColumn.ROW_ID) == 0) {
+            CustomerQuickCreator customerQuickCreater =
+                    new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
+                        @Override
+                        public void recordCreated(ODataRow row) {
+                            loadActivity(row);
+                        }
+                    });
+            customerQuickCreater.execute(row);
+        } else
+            loadActivity(row);
+ /*
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         if (row.getInt(OColumn.ROW_ID) == 0) {
             CustomerQuickCreator customerQuickCreater =
@@ -193,6 +206,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
             customerQuickCreater.execute(row);
         } else
             showSheet((Cursor) mAdapter.getItem(position));
+            */
     }
 
     private void showSheet(Cursor data) {
@@ -229,16 +243,38 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        if (data instanceof Cursor) {
-            try {
-                loadActivity(OCursorUtils.toDatarow((Cursor) data));
+        if (data instanceof Cursor){
+            ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+
+        try {
+                if (row.getInt(OColumn.ROW_ID) == 0) {
+                    CustomerQuickCreator customerQuickCreater =
+                            new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
+                                @Override
+                                public void recordCreated(ODataRow row) {
+                                    loadActivity(row);
+                                }
+                            });
+                    customerQuickCreater.execute(row);
+                } else
+                    loadActivity(row);
             } catch (Exception e) {
                 e.printStackTrace();
-                sheet.dismiss();
+                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
+                        .show();
+            }}
+        /*
+        if (data instanceof Cursor) {
+            try {
+                final ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+                loadActivity(row);
+            } catch (Exception e) {
+                e.printStackTrace();
                 Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
                         .show();
             }
         }
+*/
     }
 
     @Override

@@ -338,7 +338,6 @@ public class Sales extends BaseFragment implements
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        sheet.dismiss();
         if (data instanceof Cursor) {
             try {
                 ODataRow row = OCursorUtils.toDatarow((Cursor) data);

@@ -82,7 +82,7 @@
                     app:defaultFieldValue="now()"
                     app:showLabel="true"
                     app:iconResource="@drawable/ic_action_time_clock"
-                    app:parsePattern="MMM dd yyyy, hh:MM a"
+                    app:parsePattern="MMM dd yyyy, HH:mm:ss"
                     app:fieldTextSize="@dimen/text_size_medium"
                     app:fieldTextAppearance="?android:textAppearanceSmall"
                     android:layout_height="wrap_content" />
