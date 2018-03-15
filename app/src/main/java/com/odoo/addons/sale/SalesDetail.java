@@ -283,6 +283,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         @Override
         protected Boolean doInBackground(OValues... params) {
             int new_id=0;
+            int product_ids=0;
+            String sql = "";
             try {
                 Thread.sleep(500);
                 OValues values = params[0];
@@ -293,7 +295,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("name", nameOrder);
                     values.put("state", "draft");
                 }
-
                 if (record == null) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -309,9 +310,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("amount_tax",0 );
                     values.put("currency_id", currencyObj.get("_id"));
                     values.put("order_line_count", " (" + objects.size() + " lines)");
-                    (untaxedAmt.getText().toString()).replace(",",".");
-                    values.put("amount_untaxed",untaxedAmt.getText().toString().replace(",","."));
-                    values.put("amount_total", total_amt.getText().toString().replace(",","."));
+                    values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
+                    values.put("amount_total", total_amt.getText().toString().replace(",", "."));
 
                     new_id = sale.insert(values);
 
@@ -323,7 +323,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         val_lines.put("product_uom_qty", row.get("product_uom_qty"));
                         val_lines.put("price_unit", row.get("price_unit"));
                         val_lines.put("price_subtotal", row.get("price_subtotal"));
-                        val_lines.put("product_id", row.get("product_id"));
+
+                        sql = "SELECT _id FROM product_product WHERE id = ?";
+                        List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
+                        for(ODataRow row_New: records){
+                            product_ids = row_New.getInt("_id");
+                        }
+                        val_lines.put("product_id", product_ids);
+
                         lineOrder.insert(val_lines);
                     }
                 } else {
@@ -334,6 +341,40 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         }
                     });
                     Thread.sleep(500);
+
+                    values.put("amount_tax",0 );
+                    values.put("order_line_count", " (" + objects.size() + " lines)");
+                    values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
+                    values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+
+                    sale.update(record.getInt("_id"), values);
+
+                    sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                    List<ODataRow> rec = lineOrder.query(sql,
+                            new String[]{record.getInt("_id").toString()});
+                    for(ODataRow row: rec){
+                        lineOrder.delete(row.getInt("_id"));
+                    }
+
+                    for (Object line : objects) {
+                        ODataRow row = (ODataRow) line;
+                        OValues val_lines = new OValues();
+
+                        val_lines.put("order_id", record.getInt("_id"));
+                        val_lines.put("name", row.get("name"));
+                        val_lines.put("product_uom_qty", row.get("product_uom_qty"));
+                        val_lines.put("price_unit", row.get("price_unit"));
+                        val_lines.put("price_subtotal", row.get("price_subtotal"));
+
+                        sql = "SELECT _id FROM product_product WHERE id = ?";
+                        List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
+                        for(ODataRow row_New: records){
+                            product_ids = row_New.getInt("_id");
+                        }
+                        val_lines.put("product_id", product_ids);
+
+                        lineOrder.insert(val_lines);
+                    }
                     //sale.insert(values);
 //                    sale.getServerDataHelper().updateOnServer(data, record.getInt("id"));
 //                    sale.quickCreateRecord(record);
@@ -416,8 +457,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected Void doInBackground(ODataRow... params) {
-             sale.onPartnerIdChange(params[0]);  // Original
-             return null;
+            sale.onPartnerIdChange(params[0]);  // Original
+            return null;
         }
 
         @Override
@@ -457,8 +498,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
                 //SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-               //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
-               // StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
+                //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
+                // StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
 
                 //ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
 
@@ -507,27 +548,27 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(List<ODataRow> row) {
-         try{
-            super.onPostExecute(row);
-            if (row != null) {
-                objects.clear();
-                objects.addAll(row);
-                mAdapter.notifyDataSetChanged(objects);  //original
-                float total = 0.0f;
-                for (ODataRow rec : row) {
-                    total += rec.getFloat("price_subtotal");
+            try{
+                super.onPostExecute(row);
+                if (row != null) {
+                    objects.clear();
+                    objects.addAll(row);
+                    mAdapter.notifyDataSetChanged(objects);  //original
+                    float total = 0.0f;
+                    for (ODataRow rec : row) {
+                        total += rec.getFloat("price_subtotal");
+                    }
+                    total_amt.setText(String.format("%.2f", total));
+                    untaxedAmt.setText(total_amt.getText());
                 }
-                total_amt.setText(String.format("%.2f", total));
-                untaxedAmt.setText(total_amt.getText());
+                progressDialog.dismiss();
+                if (warning != null) {
+                    OAlert.showWarning(SalesDetail.this, warning.trim());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                progressDialog.dismiss();
             }
-            progressDialog.dismiss();
-            if (warning != null) {
-                OAlert.showWarning(SalesDetail.this, warning.trim());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            progressDialog.dismiss();
-        }
         }
     }
 
