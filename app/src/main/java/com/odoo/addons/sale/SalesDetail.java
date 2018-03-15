@@ -284,6 +284,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         protected Boolean doInBackground(OValues... params) {
             int new_id=0;
             int product_ids=0;
+            String sql = "";
             try {
                 Thread.sleep(500);
                 OValues values = params[0];
@@ -323,7 +324,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         val_lines.put("price_unit", row.get("price_unit"));
                         val_lines.put("price_subtotal", row.get("price_subtotal"));
 
-                        String sql = "SELECT _id FROM product_product WHERE id = ?";
+                        sql = "SELECT _id FROM product_product WHERE id = ?";
                         List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
                         for(ODataRow row_New: records){
                             product_ids = row_New.getInt("_id");
@@ -348,26 +349,32 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                     sale.update(record.getInt("_id"), values);
 
+                    sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                    List<ODataRow> rec = lineOrder.query(sql,
+                            new String[]{record.getInt("_id").toString()});
+                    for(ODataRow row: rec){
+                        lineOrder.delete(row.getInt("_id"));
+                    }
+
                     for (Object line : objects) {
                         ODataRow row = (ODataRow) line;
                         OValues val_lines = new OValues();
-                        val_lines.put("order_id", new_id);
+
+                        val_lines.put("order_id", record.getInt("_id"));
                         val_lines.put("name", row.get("name"));
                         val_lines.put("product_uom_qty", row.get("product_uom_qty"));
                         val_lines.put("price_unit", row.get("price_unit"));
                         val_lines.put("price_subtotal", row.get("price_subtotal"));
-                        val_lines.put("product_id", row.get("product_id"));
 
-                        String sql = "SELECT _id FROM product_product WHERE id = ?";
+                        sql = "SELECT _id FROM product_product WHERE id = ?";
                         List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
                         for(ODataRow row_New: records){
                             product_ids = row_New.getInt("_id");
                         }
+                        val_lines.put("product_id", product_ids);
 
                         lineOrder.insert(val_lines);
                     }
-
-
                     //sale.insert(values);
 //                    sale.getServerDataHelper().updateOnServer(data, record.getInt("id"));
 //                    sale.quickCreateRecord(record);
