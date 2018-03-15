@@ -73,8 +73,9 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             //for (Object local : productTemplate.select()) {
             for (Object local : productProduct.select()) {
                 ODataRow product = (ODataRow) local;
+
                 if (lineValues.containsKey(product.getString("id") + "")) {
-                    localItems.add(0, product);
+                   localItems.add(0, product);
                 } else {
                     localItems.add(product);
                 }
