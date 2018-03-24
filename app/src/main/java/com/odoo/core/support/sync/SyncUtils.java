@@ -58,6 +58,7 @@ public class SyncUtils {
 
     public void requestSync(String authority) {
         requestSync(authority, null);
+
     }
 
     public void requestSync(String authority, Bundle bundle) {

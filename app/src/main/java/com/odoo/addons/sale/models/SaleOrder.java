@@ -54,6 +54,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.odoo.core.support.addons.fragment.BaseFragment;
+
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
@@ -222,11 +224,6 @@ public class SaleOrder extends OModel {
         return " (No lines)";
     }
 
-    @Override
-    public void onSyncFinished(){
-        this.syncDataFromOdoo();
-        // code of block
-    }
 
     public void cancelOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
@@ -304,9 +301,9 @@ public class SaleOrder extends OModel {
                     OArguments args = new OArguments();
                     args.add(new JSONArray().put(quotation.getInt("id")));
                     args.add(new JSONObject());
-                    getServerDataHelper().callMethod("action_button_confirm", args);
+                    getServerDataHelper().callMethod("action_confirm", args);
                     OValues values = new OValues();
-                    values.put("state", "manual");
+                    values.put("state", "sale");
                     values.put("state_title", getStateTitle(values));
                     values.put("_is_dirty", "false");
                     update(quotation.getInt(OColumn.ROW_ID), values);
@@ -383,7 +380,7 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
-    public void syncDataFromOdoo() {
+    public void syncLocalDataBase() {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -401,20 +398,18 @@ public class SaleOrder extends OModel {
             protected Void doInBackground(Void... params) {
                 try {
                     Thread.sleep(1000);
-                    ODomain domainProdTemplate = new ODomain();
+                    ODomain domain = new ODomain();
 
                     // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
 
-                    Log.i(TAG, "<< DB Odoo loading to your device >>");
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null);
-                    ProductProduct prodProd = new ProductProduct(mContext, null);
-                    ProductTemplate prodTemplate = new ProductTemplate(mContext, null);
-                    StockMove stock = new StockMove(mContext, null);
+                    Log.i(TAG, "<< Update records in local DB where id=0 >>");
 
-                    salesOrderLine.quickSyncRecords(domainProdTemplate);
-                    prodProd.quickSyncRecords(domainProdTemplate);
-                    prodTemplate.quickSyncRecords(domainProdTemplate);
-                    stock.quickSyncRecords(domainProdTemplate);
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser() );
+                    SaleOrder saleOrder = new SaleOrder(mContext, getUser());
+
+                    domain.add("id", "=", "0");
+                    salesOrderLine.quickSyncRecords(domain);
+                    saleOrder.quickSyncRecords(domain);
 
                 } catch (Exception e) {
                     e.printStackTrace();

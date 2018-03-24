@@ -56,6 +56,7 @@ import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 
@@ -291,7 +292,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 // Creating oneToMany order lines
 
                 if (values.getString("name").equals("/")) { // it means New record will create !!!
-                    String nameOrder = sale.newNameSaleOrder("OFFLINE/SO");
+                    String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
                     values.put("name", nameOrder);
                     values.put("state", "draft");
                 }
@@ -307,11 +308,15 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("state_title", sale.getStateTitle(values));
                     values.put("user_id", sale.getUser().getUserId());
                     values.put("currency_symbol", currencyObj.getString("name"));
-                    values.put("amount_tax",0 );
+                    values.put("amount_tax","0");
                     values.put("currency_id", currencyObj.get("_id"));
                     values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+                    values.put("_is_dirty", "false");
+                    values.put("_write_date", ODateUtils.getUTCDate());
+                    //values.put("payment_term", "false");
+
 
                     new_id = sale.insert(values);
 
@@ -333,6 +338,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                         lineOrder.insert(val_lines);
                     }
+
+                    //ODataRow recordNewRec = sale.browse(new_id);
+                    //sale.update(recordNewRec.getInt(OColumn.ROW_ID), values);
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -342,7 +350,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     });
                     Thread.sleep(500);
 
-                    values.put("amount_tax",0 );
+                    values.put("amount_tax","0" );
                     values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));

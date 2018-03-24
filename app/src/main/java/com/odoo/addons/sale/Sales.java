@@ -48,6 +48,7 @@ import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -237,8 +238,22 @@ public class Sales extends BaseFragment implements
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(SaleOrder.AUTHORITY);
-            setSwipeRefreshing(true);
+
+            try {
+                Thread.sleep(1000);
+                syncLocalDatatoOdoo();
+                //SaleOrder sale = new SaleOrder(getContext(), null);
+
+                //setSwipeRefreshing(true);
+                //parent().sync().requestSync(SaleOrder.AUTHORITY);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Whooops!!!!! refresh crashed!", Toast.LENGTH_LONG)
+                        .show();
+            }
+            //parent().sync().requestSync(SaleOrder.AUTHORITY);
+            //setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
@@ -347,8 +362,8 @@ public class Sales extends BaseFragment implements
             } catch (Exception e) {
                 e.printStackTrace();
                 sheet.dismiss();
-                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
-                        .show();
+                //Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
+                //        .show();
             }
         }
     }
@@ -393,6 +408,54 @@ public class Sales extends BaseFragment implements
                 IntentUtils.startActivity(getActivity(), SalesDetail.class, bundle);
                 break;
         }
+    }
+
+    private void syncLocalDatatoOdoo() {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(getContext());
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
+                dialog.setCancelable(false); // original false
+                setSwipeRefreshing(true);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(1000);
+                    ODomain domain = new ODomain();
+
+                    // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
+
+                    Log.i(TAG, "<< Update records in local DB where id=0 >>");
+
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(getContext(), null);
+
+                    domain.add("id", "=", "0");
+                    salesOrderLine.quickSyncRecords(domain);
+                    saleOrder.quickSyncRecords(domain);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                hideRefreshingProgress();
+                dialog.dismiss();
+
+            }
+        }.execute();
     }
 
 
