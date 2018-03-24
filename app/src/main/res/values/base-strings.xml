@@ -78,6 +78,7 @@
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>
     <string name="toast_buy_a_new_smartphone">Buy a new smartphone for you!!!</string>
     <string name="toast_network_required">Network required</string>
+    <string name="toast_has_partner_name">Please choose partner name!</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Updating password</string>

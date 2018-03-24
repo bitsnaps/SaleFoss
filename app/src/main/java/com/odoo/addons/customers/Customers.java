@@ -260,21 +260,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                     loadActivity(row);
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
-                        .show();
-            }}
-        /*
-        if (data instanceof Cursor) {
-            try {
-                final ODataRow row = OCursorUtils.toDatarow((Cursor) data);
-                loadActivity(row);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
-                        .show();
+//                Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
+//                        .show();
             }
         }
-*/
     }
 
     @Override
@@ -282,12 +271,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         switch (item.getItemId()) {
-/*            case R.id.menu_customer_opportunity:
-                requestOpportunity(row.getInt(OColumn.ROW_ID), row.getString("name"));
-                break;
-            case R.id.menu_customer_leads:
-                requestLeads(Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
-                break; */
             case R.id.menu_customer_location:
                 String address = ((ResPartner) db()).getAddress(row);
                 if (!address.equals("false") && !TextUtils.isEmpty(address))
@@ -308,12 +291,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 else
                     Toast.makeText(getActivity(), _s(R.string.label_no_email_found), Toast.LENGTH_LONG).show();
                 break;
-/*            case R.id.menu_customer_schedule_call:
-                Bundle extra = row.getPrimaryBundleData();
-                extra.putInt(PhoneCallDetail.KEY_OPPORTUNITY_ID, -1);
-                extra.putBoolean(PhoneCallDetail.KEY_LOG_CALL_REQUEST, true);
-                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
-                break;*/
         }
     }
 

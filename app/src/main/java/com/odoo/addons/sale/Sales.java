@@ -238,22 +238,25 @@ public class Sales extends BaseFragment implements
     @Override
     public void onRefresh() {
         if (inNetwork()) {
+            SaleOrder sale = new SaleOrder(getContext(), null);
+            String sql = "SELECT name FROM sale_order WHERE id = 0";
+            List<ODataRow> have_id_zero_records = sale.query(sql);
+            int have_zero = have_id_zero_records.size();
 
             try {
                 Thread.sleep(1000);
-                syncLocalDatatoOdoo();
-                //SaleOrder sale = new SaleOrder(getContext(), null);
-
-                //setSwipeRefreshing(true);
-                //parent().sync().requestSync(SaleOrder.AUTHORITY);
+                if (have_zero != 0) {
+                    syncLocalDatatoOdoo();
+                } else {
+                    setSwipeRefreshing(true);
+                    parent().sync().requestSync(SaleOrder.AUTHORITY);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(getActivity(), "Whooops!!!!! refresh crashed!", Toast.LENGTH_LONG)
                         .show();
             }
-            //parent().sync().requestSync(SaleOrder.AUTHORITY);
-            //setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
@@ -362,8 +365,6 @@ public class Sales extends BaseFragment implements
             } catch (Exception e) {
                 e.printStackTrace();
                 sheet.dismiss();
-                //Toast.makeText(getActivity(), _s(R.string.toast_buy_a_new_smartphone), Toast.LENGTH_LONG)
-                //        .show();
             }
         }
     }
@@ -453,6 +454,8 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
                 hideRefreshingProgress();
                 dialog.dismiss();
+                Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
+                        .show();
 
             }
         }.execute();

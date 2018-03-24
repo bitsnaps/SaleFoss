@@ -242,8 +242,12 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
                         // Original
-                        SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
-                        saleOrderOperation.execute(values);
+                        if(values.get("partner_name") != "false") {
+                            SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
+                            saleOrderOperation.execute(values);
+                        } else{
+                            Toast.makeText(this, R.string.toast_has_partner_name, Toast.LENGTH_LONG).show();
+                        }
 
                     } else {
                         Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
@@ -338,9 +342,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                         lineOrder.insert(val_lines);
                     }
-
-                    //ODataRow recordNewRec = sale.browse(new_id);
-                    //sale.update(recordNewRec.getInt(OColumn.ROW_ID), values);
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -383,9 +384,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                         lineOrder.insert(val_lines);
                     }
-                    //sale.insert(values);
-//                    sale.getServerDataHelper().updateOnServer(data, record.getInt("id"));
-//                    sale.quickCreateRecord(record);
                 }
                 return true;
             } catch (Exception e) {
@@ -504,31 +502,18 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             try {
                 Thread.sleep(1000);
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
-                //SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-                //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
-                // StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
-
-                //ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
 
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);
-                    //int pricelist = customer.getInt("pricelist_id");
                     HashMap<String, Object> context = new HashMap<>();
-                    //context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
-                    //context.put("pricelist", pricelist);
 
                     // Fill in row values for insert in the local DB
                     OValues values = new OValues();
                     values.put("product_id", product.getInt("id"));
                     values.put("name", product.get("name_template")); // it is // mine
-
-                    //OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
-                    //OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
-                    //OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));
-
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
                     values.put("price_unit", product.getFloat("lst_price"));

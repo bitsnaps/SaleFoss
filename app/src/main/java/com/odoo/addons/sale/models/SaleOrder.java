@@ -123,36 +123,12 @@ public class SaleOrder extends OModel {
             ResPartner partner = new ResPartner(mContext, getUser());
             AccountPaymentTerm term = new AccountPaymentTerm(mContext, getUser());
             ODataRow customer = partner.browse(row.getInt(OColumn.ROW_ID));
-//            App app = (App) mContext.getApplicationContext();
-/*
-            //if (app.inNetwork()) {  // Original
-            if (app.inNetwork() && !app.inNetwork()) {
-                ServerDataHelper helper = getServerDataHelper();
-                OArguments args = new OArguments();
-                args.add(new JSONArray());
-                args.add(customer.getInt("id"));
-                JSONObject res = ((JSONObject) helper.callMethod("onchange_partner_id", args)).getJSONObject("value");
-                if (res.has("partner_invoice_id"))
-                    data.put("partner_invoice_id", res.get("partner_invoice_id"));
-                if (res.has("partner_shipping_id"))
-                    data.put("partner_shipping_id", res.get("partner_shipping_id"));
-                if (res.has("pricelist_id"))
-                    data.put("pricelist_id", res.get("pricelist_id"));
-                if (res.has("payment_term") && !res.getString("payment_term").equals("false"))
-                    data.put("payment_term", term.selectRowId(res.getInt("payment_term")));
-                if (res.has("fiscal_position")) {
-                    data.put("fiscal_position", res.get("fiscal_position"));
-                }
-                partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
-            } else {
-*/
                 data.put("partner_invoice_id", customer.get("partner_invoice_id"));
                 data.put("partner_shipping_id", customer.get("partner_shipping_id"));
                 data.put("pricelist_id", customer.get("pricelist_id"));
                 data.put("payment_term", customer.get("payment_term"));
                 data.put("fiscal_position", customer.get("fiscal_position"));
                 partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
