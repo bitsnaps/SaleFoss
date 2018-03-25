@@ -112,7 +112,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         try {
             init();
         } catch (Exception e){
-            Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            //Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
         }
         initAdapter();  // Original
     }

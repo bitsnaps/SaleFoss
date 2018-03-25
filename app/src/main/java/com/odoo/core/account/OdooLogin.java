@@ -404,7 +404,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
-                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+                    //SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -412,8 +412,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_20));
                         }
                     });
-
-                    salesOrderLine.quickSyncRecords(domain);
+                    resPartner.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -429,8 +428,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_60));
                         }
                     });
-
-                    resPartner.quickSyncRecords(domain);
+                    salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -438,7 +436,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_80));
                         }
                     });
-
                     paymentTerm.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
@@ -447,7 +444,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
                         }
                     });
-                    sale.quickSyncRecords(domain);
+//                    sale.quickSyncRecords(domain);
 
                     Thread.sleep(500);
                 } catch (Exception e) {

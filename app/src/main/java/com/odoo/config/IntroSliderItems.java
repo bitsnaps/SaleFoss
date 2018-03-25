@@ -62,6 +62,10 @@ public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListene
                 R.drawable.saas_support, this)
                 .putExtra("sub_title", "Odoo Saas Support"));
 
+        items.add(new SliderItem("No network, that's not a problem", "All the data automatically synchronized with server when you re-connect to internet",
+                R.drawable.no_network, this)
+                .putExtra("sub_title", "Works offline"));
+
         items.add(new SliderItem("Let's Start", "",
                 R.drawable.odoo_shaded, this)
                 .putExtra("sub_title", "Start exploring Odoo CRM"));
@@ -73,11 +77,12 @@ public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListene
     public View getCustomView(Context context, SliderItem item, ViewGroup parent) {
         mContext = context;
         View view = LayoutInflater.from(context).inflate(R.layout.base_intro_slider_view, parent, false);
+/*
         OControls.setText(view, R.id.big_title, item.getTitle());
         OControls.setImage(view, R.id.slider_image, item.getImagePath());
         OControls.setText(view, R.id.sub_title, item.getExtras().get("sub_title").toString());
         OControls.setText(view, R.id.description, item.getContent());
-/*
+
         if (item.getImagePath() == R.drawable.odoo_shaded) {
             OControls.setGone(view, R.id.description);
             OControls.setVisible(view, R.id.btnSliderFinish);
@@ -93,10 +98,10 @@ public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListene
 
     @Override
     public void onClick(View v) {
-        /*
+  /*
         if (v.getId() == R.id.btnSliderFinish) {
             ((Activity) mContext).finish();
         }
-        */
+*/
     }
 }

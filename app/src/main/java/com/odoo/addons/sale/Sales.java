@@ -250,6 +250,8 @@ public class Sales extends BaseFragment implements
                 } else {
                     setSwipeRefreshing(true);
                     parent().sync().requestSync(SaleOrder.AUTHORITY);
+                    Toast.makeText(getActivity(), "Database synchronization!", Toast.LENGTH_SHORT)
+                            .show();
                 }
 
             } catch (Exception e) {
@@ -283,6 +285,8 @@ public class Sales extends BaseFragment implements
     @Override
     public void onSearchViewClose() {
         //Nothing to do
+
+
     }
 
     @Override
@@ -309,6 +313,8 @@ public class Sales extends BaseFragment implements
         else
             onDoubleClick(position);
     }
+
+
 
     private void showSheet(Cursor data) {
         OBottomSheet bottomSheet = new OBottomSheet(getActivity());
@@ -433,8 +439,8 @@ public class Sales extends BaseFragment implements
                     ODomain domain = new ODomain();
 
                     // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
-
-                    Log.i(TAG, "<< Update records in local DB where id=0 >>");
+                    ProductProduct product = new ProductProduct(getContext(), null);
+                    product.quickSyncRecords(domain);
 
                     SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), null); // getuser
                     SaleOrder saleOrder = new SaleOrder(getContext(), null);
