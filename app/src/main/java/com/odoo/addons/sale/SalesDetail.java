@@ -101,7 +101,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         setContentView(R.layout.sale_detail);
         OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
-        sale = new SaleOrder(this, null);
+        sale = new SaleOrder(this,  null);
         extra = getIntent().getExtras();
         mType = Type.valueOf(extra.getString("type"));
         currencyObj = sale.currency();
@@ -311,7 +311,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     Thread.sleep(500);
 
                     values.put("state_title", sale.getStateTitle(values));
-                    values.put("user_id", sale.getUser().getUserId());
+                    values.put("user_id", sale.getUser().getUserId().toString());
                     values.put("currency_symbol", currencyObj.getString("name"));
                     values.put("amount_tax","0");
                     values.put("currency_id", currencyObj.get("_id"));

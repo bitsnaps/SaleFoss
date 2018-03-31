@@ -438,14 +438,15 @@ public class Sales extends BaseFragment implements
                     Thread.sleep(1000);
                     ODomain domain = new ODomain();
 
-                    // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
-                    ProductProduct product = new ProductProduct(getContext(), null);
-                    product.quickSyncRecords(domain);
 
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), null); // getuser
-                    SaleOrder saleOrder = new SaleOrder(getContext(), null);
+                    //ProductProduct product = new ProductProduct(getContext(), null);
+                    //product.quickSyncRecords(domain);
+
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
+                    SaleOrder saleOrder = new SaleOrder(getContext(), db().getUser());
 
                     domain.add("id", "=", "0");
+
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 

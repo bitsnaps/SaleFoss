@@ -23,11 +23,11 @@
     <string name="status_login_success">Login Success</string>
     <string name="status_logout_success">Logout Success</string>
     <string name="status_creating_account">Creating account</string>
-    <string name="status_db_load_20">Loding Database 20%...</string>
-    <string name="status_db_load_40">Loding Database 40%...</string>
-    <string name="status_db_load_60">Loding Database 60%...</string>
-    <string name="status_db_load_80">Loding Database 80%...</string>
-    <string name="status_db_load_95">Loding Database 95%...</string>
+    <string name="status_db_load_20">Loading Database 20%...</string>
+    <string name="status_db_load_40">Loading Database 40%...</string>
+    <string name="status_db_load_60">Loading Database 60%...</string>
+    <string name="status_db_load_80">Loading Database 80%...</string>
+    <string name="status_db_load_95">Loading Database 95%...</string>
     <string name="status_redirecting">Redirecting&#8230;</string>
     <string name="label_select_user">Login to User</string>
     <string name="label_accounts">Accounts</string>
