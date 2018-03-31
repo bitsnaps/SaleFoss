@@ -245,6 +245,8 @@ public class Sales extends BaseFragment implements
 
             try {
                 Thread.sleep(1000);
+                syncProduct(); // Try on time till one error
+
                 if (have_zero != 0) {
                     syncLocalDatatoOdoo();
                 } else {
@@ -440,6 +442,7 @@ public class Sales extends BaseFragment implements
 
 
                     //ProductProduct product = new ProductProduct(getContext(), null);
+                    //int total = product.count("id != ?", new String[]{"0"});
                     //product.quickSyncRecords(domain);
 
                     SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
@@ -468,5 +471,47 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
+    private void syncProduct() {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+/*                dialog = new ProgressDialog(getContext());
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
+                dialog.setCancelable(false); // original false
+                setSwipeRefreshing(true);
+                dialog.show();
+*/
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(1000);
+                    ODomain domain = new ODomain();
+                    ProductProduct product = new ProductProduct(getContext(), null);
+                    product.quickSyncRecords(domain);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+/*
+                hideRefreshingProgress();
+                dialog.dismiss();
+                Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
+                        .show();
+*/
+            }
+        }.execute();
+    }
 
 }

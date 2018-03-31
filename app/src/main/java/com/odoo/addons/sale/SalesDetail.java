@@ -94,6 +94,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private String mSOType = "";
     private LinearLayout layoutAddItem = null;
     private Type mType;
+    private boolean saveWithProductLines = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -359,33 +360,36 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                     sale.update(record.getInt("_id"), values);
 
-                    sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
-                    List<ODataRow> rec = lineOrder.query(sql,
-                            new String[]{record.getInt("_id").toString()});
-                    for(ODataRow row: rec){
-                        lineOrder.delete(row.getInt("_id"));
-                    }
-
-                    for (Object line : objects) {
-                        ODataRow row = (ODataRow) line;
-                        OValues val_lines = new OValues();
-
-                        val_lines.put("order_id", record.getInt("_id"));
-                        val_lines.put("name", row.get("name"));
-                        val_lines.put("product_uom_qty", row.get("product_uom_qty"));
-                        val_lines.put("price_unit", row.get("price_unit"));
-                        val_lines.put("price_subtotal", row.get("price_subtotal"));
-
-                        sql = "SELECT _id FROM product_product WHERE id = ?";
-                        List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
-                        for(ODataRow row_New: records){
-                            product_ids = row_New.getInt("_id");
+                    if (saveWithProductLines) {
+                        sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                        List<ODataRow> rec = lineOrder.query(sql,
+                                new String[]{record.getInt("_id").toString()});
+                        for (ODataRow row : rec) {
+                            lineOrder.delete(row.getInt("_id"));
                         }
-                        val_lines.put("product_id", product_ids);
 
-                        lineOrder.insert(val_lines);
+                        for (Object line : objects) {
+                            ODataRow row = (ODataRow) line;
+                            OValues val_lines = new OValues();
+
+                            val_lines.put("order_id", record.getInt("_id"));
+                            val_lines.put("name", row.get("name"));
+                            val_lines.put("product_uom_qty", row.get("product_uom_qty"));
+                            val_lines.put("price_unit", row.get("price_unit"));
+                            val_lines.put("price_subtotal", row.get("price_subtotal"));
+
+                            sql = "SELECT _id FROM product_product WHERE id = ?";
+                            List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
+                            for (ODataRow row_New : records) {
+                                product_ids = row_New.getInt("_id");
+                            }
+                            val_lines.put("product_id", product_ids);
+
+                            lineOrder.insert(val_lines);
+                        }
                     }
                 }
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -520,7 +524,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("price_unit", product.getFloat("lst_price"));
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    values.put("price_subtotal", product.getFloat("lst_price") * qty); //res.getDouble("product_uos_qty");
+                    values.put("price_subtotal", product.getFloat("lst_price") * qty);
 
                     JSONArray tax_id = new JSONArray();
                     tax_id.put(6);
@@ -569,6 +573,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+            saveWithProductLines = true;
+
         if (requestCode == REQUEST_ADD_ITEMS && resultCode == Activity.RESULT_OK) {
             lineValues.clear();
             for (String key : data.getExtras().keySet()) {
