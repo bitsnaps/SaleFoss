@@ -151,8 +151,10 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
             if (mType == Type.Quotation) {
-                actionBar.setTitle(R.string.label_quotation);
+                actionBar.setTitle(R.string.label_quotation); //
                 txvType.setText(R.string.label_quotation);
+                //mForm.setEditable(false); // eleminate if need to edit line
+                //layoutAddItem.setVisibility(View.GONE); // eleminate if need to edit line
                 if (record.getString("state").equals("cancel"))
                     layoutAddItem.setVisibility(View.GONE);
             } else {
@@ -260,10 +262,11 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 if (record != null) {
                     if (extra != null && record.getFloat("amount_total") > 0) {
                         if (app.inNetwork()) {
+// Close session and
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                        }
+                         }
                     } else {
                         OAlert.showWarning(this, R.string.label_no_order_line + "");
                     }
@@ -321,11 +324,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
                     values.put("_is_dirty", "false");
                     values.put("_write_date", ODateUtils.getUTCDate());
-                    //values.put("payment_term", "false");
-
 
                     new_id = sale.insert(values);
-
                     for (Object line : objects) {
                         ODataRow row = (ODataRow) line;
                         OValues val_lines = new OValues();
@@ -341,7 +341,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                             product_ids = row_New.getInt("_id");
                         }
                         val_lines.put("product_id", product_ids);
-
                         lineOrder.insert(val_lines);
                     }
                 } else {
@@ -352,7 +351,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         }
                     });
                     Thread.sleep(500);
-
                     values.put("amount_tax","0" );
                     values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
