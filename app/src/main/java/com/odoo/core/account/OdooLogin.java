@@ -405,7 +405,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
-
+                    Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -428,6 +428,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_60));
                         }
                     });
+                    Thread.sleep(2000);
                     //salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
@@ -436,7 +437,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_80));
                         }
                     });
-//                    paymentTerm.quickSyncRecords(domain);
+                    Thread.sleep(2000);
+                    //                    paymentTerm.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -445,9 +447,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
                     domain.add("user_id", "=", mUser.getUserId());
+                    Thread.sleep(1000);
                     //sale.quickSyncRecords(domain);
 
-                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

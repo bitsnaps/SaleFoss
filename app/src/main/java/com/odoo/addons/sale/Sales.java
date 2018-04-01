@@ -254,7 +254,7 @@ public class Sales extends BaseFragment implements
                 Thread.sleep(1000);
                 if (have_zero != 0) {
                     syncLocalDatatoOdoo(have_id_zero_records);
-                    //syncProduct(); // Try on time till one error
+                    syncProduct(); // Try on time till one error
                 } else {
                     setSwipeRefreshing(true);
                     parent().sync().requestSync(SaleOrder.AUTHORITY);
