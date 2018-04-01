@@ -253,8 +253,8 @@ public class Sales extends BaseFragment implements
             try {
                 Thread.sleep(1000);
                 if (have_zero != 0) {
-                    syncLocalDatatoOdoo(have_id_zero_records, sale);
-                    syncProduct(); // Try on time till one error
+                    syncLocalDatatoOdoo(have_id_zero_records);
+                    //syncProduct(); // Try on time till one error
                 } else {
                     setSwipeRefreshing(true);
                     parent().sync().requestSync(SaleOrder.AUTHORITY);
@@ -316,9 +316,9 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onItemClick(View view, int position) {
-        if (mType == Type.Quotation)
-            showSheet((Cursor) mAdapter.getItem(position));
-        else
+//        if (mType == Type.Quotation)
+//            showSheet((Cursor) mAdapter.getItem(position));
+ //       else
             onDoubleClick(position);
     }
 
@@ -425,7 +425,7 @@ public class Sales extends BaseFragment implements
         }
     }
 
-    private void syncLocalDatatoOdoo(final List<ODataRow> quotation, final SaleOrder sale) {
+    private void syncLocalDatatoOdoo(final List<ODataRow> quotation) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -447,6 +447,7 @@ public class Sales extends BaseFragment implements
 
                     Thread.sleep(1000);
                     ODomain domain = new ODomain();
+
                     SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
                     SaleOrder saleOrder = new SaleOrder(getContext(), db().getUser());
 
@@ -455,8 +456,22 @@ public class Sales extends BaseFragment implements
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
+                    for(final ODataRow qUpdate:quotation) {
 
-                    } catch (Exception e) {
+                        OArguments args = new OArguments();
+                        args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
+                        args.add(new JSONObject());
+                        saleOrder.getServerDataHelper().callMethod("action_confirm", args);
+                        saleOrder.getServerDataHelper().callMethod("action_done", args);
+
+                        OValues values = new OValues();
+                        values.put("state", "done");
+                        values.put("state_title",saleOrder.getStateTitle(values));
+                        values.put("_is_dirty", "false");
+                        saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                    }
+
+                } catch (Exception e) {
                         e.printStackTrace();
                     }
                 return null;
