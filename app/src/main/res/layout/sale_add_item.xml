@@ -32,7 +32,6 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:ellipsize="end"
-            android:fontFamily="@string/font_normal"
             android:gravity="center_vertical"
             android:hint="@string/label_search"
             android:singleLine="true"
@@ -62,7 +61,9 @@
 
     <ListView
         android:id="@+id/searchable_items"
+        style="@style/Widget.AppCompat.ListView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></ListView>
+        android:layout_height="wrap_content"
+        android:headerDividersEnabled="true"></ListView>
 
 </LinearLayout>
