@@ -36,23 +36,14 @@ import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
-import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.rpc.helper.OArguments;
-import com.odoo.core.rpc.helper.ODomain;
-import com.odoo.core.rpc.helper.ORecordValues;
-import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
-import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
@@ -61,7 +52,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -151,13 +141,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
             if (mType == Type.Quotation) {
-                actionBar.setTitle(R.string.label_quotation_not_sync); //label_quotation - Original
+                actionBar.setTitle(R.string.label_quotation); //label_quotation - Original
                 txvType.setText(R.string.label_quotation);
-                mForm.setEditable(false); // eleminate if need to edit line
-                layoutAddItem.setVisibility(View.GONE); // eleminate if need to edit line
-                if (record.getString("state").equals("cancel"))
+                mForm.setEditable(true); // eleminate if need to edit line
+                layoutAddItem.setVisibility(View.VISIBLE); // eleminate if need to edit line
+                if (record.getString("state").equals("cancel")) {
                     actionBar.setTitle(R.string.label_quotation); //Original there was nothing
                     layoutAddItem.setVisibility(View.GONE);
+                }
             } else {
                 layoutAddItem.setVisibility(View.GONE);
                 actionBar.setTitle(R.string.label_sale_orders);
@@ -214,14 +205,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         OField name = (OField) mForm.findViewById(R.id.fname);
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
-            menu.findItem(R.id.menu_sale_save).setVisible(false);
+            menu.findItem(R.id.menu_sale_save).setVisible(true);
             // Operation on Sale Ordermenu_sale_confirm_sale
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
         if (extra != null && record != null && record.getString("state").equals("cancel")) {
-            menu.findItem(R.id.menu_sale_save).setVisible(true).setTitle("Copy Quotation");
+            menu.findItem(R.id.menu_sale_save).setVisible(false).setTitle("Copy Quotation"); //Original true
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             mForm.setEditable(true);
         } else {

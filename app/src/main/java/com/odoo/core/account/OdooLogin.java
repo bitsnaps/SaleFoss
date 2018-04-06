@@ -23,10 +23,8 @@ import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.config.FirstLaunchConfig;
@@ -401,10 +399,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     ODomain domain = new ODomain();
 
                     AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
-                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
-                    ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -412,7 +409,10 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_20));
                         }
                     });
-                    resPartner.quickSyncRecords(domain);
+//                    ODomain domainPartner = new ODomain();
+//                    ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
+//                    domainPartner.add("customer", "=", "true");
+//                    resPartner.quickSyncRecords(domainPartner);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -420,6 +420,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_40));
                         }
                     });
+                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
                     prodProd.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
@@ -437,7 +438,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_80));
                         }
                     });
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                     //                    paymentTerm.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
@@ -446,8 +447,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
                         }
                     });
-                    domain.add("user_id", "=", mUser.getUserId());
-                    Thread.sleep(1000);
+                    //domain.add("user_id", "=", mUser.getUserId());
+                    Thread.sleep(2000);
                     //sale.quickSyncRecords(domain);
 
                 } catch (Exception e) {
