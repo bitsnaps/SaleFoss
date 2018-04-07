@@ -218,14 +218,16 @@ public class SaleOrder extends OModel {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+                    OArguments args = new OArguments();
                     if (type == Sales.Type.SaleOrder) {
-                        OArguments args = new OArguments();
                         args.add(new JSONArray().put(quotation.getInt("id")));
                         args.add(new JSONObject());
                         getServerDataHelper().callMethod("action_cancel", args);
                     } else {
-                        getServerDataHelper().executeWorkFlow(quotation.getInt("id"), "cancel");
+                        getServerDataHelper().callMethod("action_cancel", args);
+                        //getServerDataHelper().executeWorkFlow(quotation.getInt("id"), "cancel");
                     }
+
                     OValues values = new OValues();
                     values.put("state", "cancel");
                     values.put("state_title", getStateTitle(values));
@@ -274,12 +276,15 @@ public class SaleOrder extends OModel {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+
                     OArguments args = new OArguments();
                     args.add(new JSONArray().put(quotation.getInt("id")));
                     args.add(new JSONObject());
                     getServerDataHelper().callMethod("action_confirm", args);
+                    getServerDataHelper().callMethod("action_done", args);
+
                     OValues values = new OValues();
-                    values.put("state", "sale");
+                    values.put("state", "done");
                     values.put("state_title", getStateTitle(values));
                     values.put("_is_dirty", "false");
                     update(quotation.getInt(OColumn.ROW_ID), values);
@@ -428,6 +433,8 @@ public class SaleOrder extends OModel {
                 nameOrder = pream + "00" + nameOrder;
             } else if (nameOrder.length() == 2){
                 nameOrder = pream + "0" + nameOrder;
+            } else if (nameOrder.length() >= 3){
+                nameOrder = pream + nameOrder;
             }
         }
         else {

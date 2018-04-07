@@ -151,9 +151,12 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
             if (mType == Type.Quotation) {
-                actionBar.setTitle(R.string.label_quotation);
+                actionBar.setTitle(R.string.label_quotation_not_sync); //label_quotation - Original
                 txvType.setText(R.string.label_quotation);
+                mForm.setEditable(false); // eleminate if need to edit line
+                layoutAddItem.setVisibility(View.GONE); // eleminate if need to edit line
                 if (record.getString("state").equals("cancel"))
+                    actionBar.setTitle(R.string.label_quotation); //Original there was nothing
                     layoutAddItem.setVisibility(View.GONE);
             } else {
                 layoutAddItem.setVisibility(View.GONE);
@@ -211,7 +214,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         OField name = (OField) mForm.findViewById(R.id.fname);
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
-            // Operation on Sale Order
+            menu.findItem(R.id.menu_sale_save).setVisible(false);
+            // Operation on Sale Ordermenu_sale_confirm_sale
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
@@ -241,14 +245,15 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
+
                     if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
                         // Original
-                        if(values.get("partner_name") != "false") {
+                        if(values.get("partner_name") != "false" && objects.size() > 0) {
                             SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
                             saleOrderOperation.execute(values);
                         } else{
-                            Toast.makeText(this, R.string.toast_has_partner_name, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
                         }
 
                     } else {
@@ -260,10 +265,11 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 if (record != null) {
                     if (extra != null && record.getFloat("amount_total") > 0) {
                         if (app.inNetwork()) {
+// Close session and
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                        }
+                         }
                     } else {
                         OAlert.showWarning(this, R.string.label_no_order_line + "");
                     }
@@ -321,11 +327,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
                     values.put("_is_dirty", "false");
                     values.put("_write_date", ODateUtils.getUTCDate());
-                    //values.put("payment_term", "false");
-
 
                     new_id = sale.insert(values);
-
                     for (Object line : objects) {
                         ODataRow row = (ODataRow) line;
                         OValues val_lines = new OValues();
@@ -341,7 +344,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                             product_ids = row_New.getInt("_id");
                         }
                         val_lines.put("product_id", product_ids);
-
                         lineOrder.insert(val_lines);
                     }
                 } else {
@@ -352,7 +354,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         }
                     });
                     Thread.sleep(500);
-
                     values.put("amount_tax","0" );
                     values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));

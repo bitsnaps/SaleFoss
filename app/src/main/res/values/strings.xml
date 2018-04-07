@@ -23,6 +23,7 @@
     <string name="label_opp">Opportunity</string>
     <string name="label_opportunities">Opportunities</string>
     <string name="label_quotation">Quotations</string>
+    <string name="label_quotation_not_sync">Closed Session</string>
     <string name="label_opportunity">Opportunity</string>
     <string name="label_sale_orders">Sales Orders</string>
     <string name="label_sync_data">Syncronaze data</string>
