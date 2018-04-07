@@ -24,6 +24,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +56,7 @@ import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 
@@ -78,6 +80,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private OForm mForm;
     private ODataRow record;
     private SaleOrder sale;
+    private SalesOrderLine lineOrder;
     private ActionBar actionBar;
     private ExpandableListControl mList;
     private ExpandableListControl.ExpandableListAdapter mAdapter;
@@ -91,6 +94,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private String mSOType = "";
     private LinearLayout layoutAddItem = null;
     private Type mType;
+    private boolean saveWithProductLines = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,21 +102,24 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         setContentView(R.layout.sale_detail);
         OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
-        sale = new SaleOrder(this, null);
+        sale = new SaleOrder(this,  null);
         extra = getIntent().getExtras();
         mType = Type.valueOf(extra.getString("type"));
         currencyObj = sale.currency();
         partner = new ResPartner(this, null);
         products = new ProductProduct(this, null);
+        lineOrder = new SalesOrderLine(this, null);
         // Init() works too bad!
         try {
             init();
         } catch (Exception e){
-            Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            //Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
         }
         initAdapter();  // Original
     }
 
+    @Nullable
     private void init() {
         mForm = (OForm) findViewById(R.id.saleForm);
         mForm.setEditable(true);
@@ -236,9 +243,13 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 if (values != null) {
                     if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
-
-                        SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
-                        saleOrderOperation.execute(values);
+                        // Original
+                        if(values.get("partner_name") != "false") {
+                            SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
+                            saleOrderOperation.execute(values);
+                        } else{
+                            Toast.makeText(this, R.string.toast_has_partner_name, Toast.LENGTH_LONG).show();
+                        }
 
                     } else {
                         Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
@@ -278,53 +289,19 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected Boolean doInBackground(OValues... params) {
+            int new_id=0;
+            int product_ids=0;
+            String sql = "";
             try {
                 Thread.sleep(500);
                 OValues values = params[0];
                 // Creating oneToMany order lines
-                JSONArray order_line = new JSONArray();
-                for (Object line : objects) {
-                    JSONArray o_line = new JSONArray();
-                    ODataRow row = (ODataRow) line;
-                    String product_id = row.getString("product_id");
-                    o_line.put((lineIds.containsKey(product_id)) ? 1 : 0);
-                    o_line.put((lineIds.containsKey(product_id)) ? lineIds.get(product_id) : false);
-                    if (lineIds.containsKey(product_id)) {
-                        JSONObject line_data = new JSONObject();
-                        line_data.put("product_uom_qty", row.get("product_uom_qty"));
-                        line_data.put("product_uos_qty", row.get("product_uos_qty"));
-                        o_line.put(line_data);
-                    } else
-                        o_line.put(JSONUtils.toJSONObject(row));
-                    order_line.put(o_line);
-                    lineIds.remove(product_id);
-                }
-                if (lineIds.size() > 0) {
-                    for (String key : lineIds.keySet()) {
-                        JSONArray o_line = new JSONArray();
-                        o_line.put(2);
-                        o_line.put(lineIds.get(key));
-                        o_line.put(false);
-                        order_line.put(o_line);
-                    }
-                }
-                Thread.sleep(500);
-                ORecordValues data = new ORecordValues();
 
                 if (values.getString("name").equals("/")) { // it means New record will create !!!
-                    String nameOrder = sale.newNameSaleOrder("OFFLINE/SO");
+                    String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
                     values.put("name", nameOrder);
-                    data.put("name", nameOrder);
+                    values.put("state", "draft");
                 }
-                else {
-                    data.put("name", values.getString("name"));
-                }
-
-                data.put("partner_id", partner.selectServerId(values.getInt("partner_id")));
-                data.put("date_order", values.getString("date_order"));
-                data.put("payment_term", values.get("payment_term"));
-                data.put("order_line", order_line);
-
                 if (record == null) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -332,15 +309,41 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                             mDialog.setMessage("Creating " + mSOType);
                         }
                     });
-                    Thread.sleep(500); ///
-                    //int new_id = sale. insert(values);
-                    int new_id = sale.getServerDataHelper().createOnServer(data); /// want to go on server!! we need
-                    values.put("id", new_id);
-                    ODataRow record = new ODataRow();
-                    record.put("id", new_id);
-                    sale.quickCreateRecord(record); /// want to go on server!! we need
-                    //sale.insert(values); //
+                    Thread.sleep(500);
 
+                    values.put("state_title", sale.getStateTitle(values));
+                    values.put("user_id", sale.getUser().getUserId().toString());
+                    values.put("currency_symbol", currencyObj.getString("name"));
+                    values.put("amount_tax","0");
+                    values.put("currency_id", currencyObj.get("_id"));
+                    values.put("order_line_count", " (" + objects.size() + " lines)");
+                    values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
+                    values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+                    values.put("_is_dirty", "false");
+                    values.put("_write_date", ODateUtils.getUTCDate());
+                    //values.put("payment_term", "false");
+
+
+                    new_id = sale.insert(values);
+
+                    for (Object line : objects) {
+                        ODataRow row = (ODataRow) line;
+                        OValues val_lines = new OValues();
+                        val_lines.put("order_id", new_id);
+                        val_lines.put("name", row.get("name"));
+                        val_lines.put("product_uom_qty", row.get("product_uom_qty"));
+                        val_lines.put("price_unit", row.get("price_unit"));
+                        val_lines.put("price_subtotal", row.get("price_subtotal"));
+
+                        sql = "SELECT _id FROM product_product WHERE id = ?";
+                        List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
+                        for(ODataRow row_New: records){
+                            product_ids = row_New.getInt("_id");
+                        }
+                        val_lines.put("product_id", product_ids);
+
+                        lineOrder.insert(val_lines);
+                    }
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -349,10 +352,44 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         }
                     });
                     Thread.sleep(500);
-                    //sale.insert(values);
-                    sale.getServerDataHelper().updateOnServer(data, record.getInt("id"));
-                    sale.quickCreateRecord(record);
+
+                    values.put("amount_tax","0" );
+                    values.put("order_line_count", " (" + objects.size() + " lines)");
+                    values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
+                    values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+
+                    sale.update(record.getInt("_id"), values);
+
+                    if (saveWithProductLines) {
+                        sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                        List<ODataRow> rec = lineOrder.query(sql,
+                                new String[]{record.getInt("_id").toString()});
+                        for (ODataRow row : rec) {
+                            lineOrder.delete(row.getInt("_id"));
+                        }
+
+                        for (Object line : objects) {
+                            ODataRow row = (ODataRow) line;
+                            OValues val_lines = new OValues();
+
+                            val_lines.put("order_id", record.getInt("_id"));
+                            val_lines.put("name", row.get("name"));
+                            val_lines.put("product_uom_qty", row.get("product_uom_qty"));
+                            val_lines.put("price_unit", row.get("price_unit"));
+                            val_lines.put("price_subtotal", row.get("price_subtotal"));
+
+                            sql = "SELECT _id FROM product_product WHERE id = ?";
+                            List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
+                            for (ODataRow row_New : records) {
+                                product_ids = row_New.getInt("_id");
+                            }
+                            val_lines.put("product_id", product_ids);
+
+                            lineOrder.insert(val_lines);
+                        }
+                    }
                 }
+
                 return true;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -470,37 +507,24 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             try {
                 Thread.sleep(1000);
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
-                //SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-               //ProductTemplate prodTempl = new ProductTemplate(SalesDetail.this, sale.getUser());
-               // StockMove stockMove = new StockMove(SalesDetail.this, sale.getUser());
-
-                //ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
 
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);
-                    //int pricelist = customer.getInt("pricelist_id");
                     HashMap<String, Object> context = new HashMap<>();
-                    //context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
-                    //context.put("pricelist", pricelist);
 
                     // Fill in row values for insert in the local DB
                     OValues values = new OValues();
                     values.put("product_id", product.getInt("id"));
                     values.put("name", product.get("name_template")); // it is // mine
-
-                    //OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
-                    //OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
-                    //OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));
-
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
                     values.put("price_unit", product.getFloat("lst_price"));
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    values.put("price_subtotal", product.getFloat("lst_price") * qty); //res.getDouble("product_uos_qty");
+                    values.put("price_subtotal", product.getFloat("lst_price") * qty);
 
                     JSONArray tax_id = new JSONArray();
                     tax_id.put(6);
@@ -522,33 +546,36 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(List<ODataRow> row) {
-         try{
-            super.onPostExecute(row);
-            if (row != null) {
-                objects.clear();
-                objects.addAll(row);
-                mAdapter.notifyDataSetChanged(objects);  //original
-                float total = 0.0f;
-                for (ODataRow rec : row) {
-                    total += rec.getFloat("price_subtotal");
+            try{
+                super.onPostExecute(row);
+                if (row != null) {
+                    objects.clear();
+                    objects.addAll(row);
+                    mAdapter.notifyDataSetChanged(objects);  //original
+                    float total = 0.0f;
+                    for (ODataRow rec : row) {
+                        total += rec.getFloat("price_subtotal");
+                    }
+                    total_amt.setText(String.format("%.2f", total));
+                    untaxedAmt.setText(total_amt.getText());
                 }
-                total_amt.setText(String.format("%.2f", total));
-                untaxedAmt.setText(total_amt.getText());
+                progressDialog.dismiss();
+                if (warning != null) {
+                    OAlert.showWarning(SalesDetail.this, warning.trim());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                progressDialog.dismiss();
             }
-            progressDialog.dismiss();
-            if (warning != null) {
-                OAlert.showWarning(SalesDetail.this, warning.trim());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            progressDialog.dismiss();
-        }
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+            saveWithProductLines = true;
+
         if (requestCode == REQUEST_ADD_ITEMS && resultCode == Activity.RESULT_OK) {
             lineValues.clear();
             for (String key : data.getExtras().keySet()) {

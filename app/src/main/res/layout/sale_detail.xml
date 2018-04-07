@@ -82,7 +82,7 @@
                     app:defaultFieldValue="now()"
                     app:showLabel="true"
                     app:iconResource="@drawable/ic_action_time_clock"
-                    app:parsePattern="MMM dd yyyy, hh:MM a"
+                    app:parsePattern="MMM dd yyyy, HH:mm:ss"
                     app:fieldTextSize="@dimen/text_size_medium"
                     app:fieldTextAppearance="?android:textAppearanceSmall"
                     android:layout_height="wrap_content" />
@@ -94,7 +94,7 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
+                android:visibility="gone"
                 app:fieldName="payment_term"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 app:fieldTextSize="@dimen/text_size_xmedium"
@@ -162,15 +162,13 @@
 
                 <TextView
                     android:id="@+id/untaxedTotal"
-                    android:paddingBottom="@dimen/default_8dp"
-                    android:paddingTop="@dimen/default_8dp"
                     android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:gravity="center_vertical|right"
                     android:minWidth="80dp"
-                    android:fontFamily="@string/font_normal"
-                    android:textColor="@color/body_text_1"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:layout_height="match_parent" />
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:textAppearance="@android:style/TextAppearance" />
 
                 <TextView
                     android:id="@+id/currency1"

@@ -40,18 +40,17 @@ public class CustomerSyncService extends OSyncService {
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("res.partner")) {
-            Log.i(TAG, "<< res.partner >> - sync: Start!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             ODomain domain = new ODomain();
             ResPartner resPartner = new ResPartner(getApplicationContext(), null);
             resPartner.quickSyncRecords(domain);
-/*            domain.add("|");
-            domain.add("|");
+            //domain.add("|");
+            //domain.add("|");
             //domain.add("opportunity_ids.user_id", "=", user.getUserId());
-            domain.add("sale_order_ids.user_id", "=", user.getUserId());
-            domain.add("id", "in", adapter.getModel().getServerIds());
-*/
+            //domain.add("sale_order_ids.user_id", "=", user.getUserId());
+            //domain.add("id", "in", adapter.getModel().getServerIds());
+
 //            adapter.setDomain(domain).syncDataLimit(200);
-            adapter.setDomain(domain);
+            adapter.setDomain(domain).syncDataLimit(120);
         }
     }
 }

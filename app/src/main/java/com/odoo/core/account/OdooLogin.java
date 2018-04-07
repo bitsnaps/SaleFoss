@@ -24,9 +24,11 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.ProductTemplate;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResCompany;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.config.FirstLaunchConfig;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
@@ -394,28 +396,57 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     company_details.put("id", mUser.getCompanyId());
                     ResCompany company = new ResCompany(OdooLogin.this, mUser);
                     company.quickCreateRecord(company_details);
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                try {
-                    Thread.sleep(1000);
-                    ODomain domainProdTemplate = new ODomain();
-
-                    // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
 
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
+                    ODomain domain = new ODomain();
+
                     AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
-                    ProductTemplate prodTemplate = new ProductTemplate(OdooLogin.this, mUser);
-                    //StockMove stock = new StockMove(OdooLogin.this, null);
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+                    ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
+                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
 
-                    salesOrderLine.quickSyncRecords(domainProdTemplate);
-                    prodProd.quickSyncRecords(domainProdTemplate);
-                    prodTemplate.quickSyncRecords(domainProdTemplate);
-                    paymentTerm.quickSyncRecords(domainProdTemplate);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_20));
+                        }
+                    });
+                    resPartner.quickSyncRecords(domain);
 
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_40));
+                        }
+                    });
+                    prodProd.quickSyncRecords(domain);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_60));
+                        }
+                    });
+                    salesOrderLine.quickSyncRecords(domain);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_80));
+                        }
+                    });
+                    paymentTerm.quickSyncRecords(domain);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
+                        }
+                    });
+                    sale.quickSyncRecords(domain);
+
+                    Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

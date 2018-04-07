@@ -223,13 +223,14 @@ public class AddProductLineWizard extends OdooCompatActivity implements
 
     @Override
     public void onClick(View v) {
+        Bundle data = new Bundle();
+        Intent intent = new Intent();
         switch (v.getId()) {
             case R.id.done:
-                Bundle data = new Bundle();
+
                 for (String key : lineValues.keySet()) {
                     data.putFloat(key, lineValues.get(key));
                 }
-                Intent intent = new Intent();
                 intent.putExtras(data);
                 setResult(RESULT_OK, intent);
                 finish();
@@ -246,6 +247,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             if (mLiveDataLoader != null)
                 mLiveDataLoader.cancel(true);
             if (edt_searchable_input.getText().length() >= 2) {
+
                 mLiveDataLoader = new LiveSearch();
                 mLiveDataLoader.execute(edt_searchable_input.getText()
                         .toString());

@@ -48,6 +48,7 @@ import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -98,18 +99,6 @@ public class Sales extends BaseFragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-            // saleOrder.syncDataFromOdoo();
-            //((SaleOrder) db()).syncDataFromOdoo();
-
-/*
-        Log.i(TAG, "Sync Starting: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        if (inNetwork()) {
-            ((SaleOrder) db()).syncDataFromOdoo();
-        } else {
-            Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
-        }
-
-*/
         initAdapter();
     }
 
@@ -249,8 +238,29 @@ public class Sales extends BaseFragment implements
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(SaleOrder.AUTHORITY);
-            setSwipeRefreshing(true);
+            SaleOrder sale = new SaleOrder(getContext(), null);
+            String sql = "SELECT name FROM sale_order WHERE id = 0";
+            List<ODataRow> have_id_zero_records = sale.query(sql);
+            int have_zero = have_id_zero_records.size();
+
+            try {
+                Thread.sleep(1000);
+                syncProduct(); // Try on time till one error
+
+                if (have_zero != 0) {
+                    syncLocalDatatoOdoo();
+                } else {
+                    setSwipeRefreshing(true);
+                    parent().sync().requestSync(SaleOrder.AUTHORITY);
+                    Toast.makeText(getActivity(), "Database synchronization!", Toast.LENGTH_SHORT)
+                            .show();
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Whooops!!!!! refresh crashed!", Toast.LENGTH_LONG)
+                        .show();
+            }
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
@@ -277,6 +287,8 @@ public class Sales extends BaseFragment implements
     @Override
     public void onSearchViewClose() {
         //Nothing to do
+
+
     }
 
     @Override
@@ -303,6 +315,8 @@ public class Sales extends BaseFragment implements
         else
             onDoubleClick(position);
     }
+
+
 
     private void showSheet(Cursor data) {
         OBottomSheet bottomSheet = new OBottomSheet(getActivity());
@@ -350,10 +364,17 @@ public class Sales extends BaseFragment implements
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
-        Bundle extras = row.getPrimaryBundleData();
-        extras.putString("type", mType.toString());
-        IntentUtils.startActivity(getActivity(), SalesDetail.class, extras);
+        if (data instanceof Cursor) {
+            try {
+                ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+                Bundle extras = row.getPrimaryBundleData();
+                extras.putString("type", mType.toString());
+                IntentUtils.startActivity(getActivity(), SalesDetail.class, extras);
+            } catch (Exception e) {
+                e.printStackTrace();
+                sheet.dismiss();
+            }
+        }
     }
 
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
@@ -398,5 +419,99 @@ public class Sales extends BaseFragment implements
         }
     }
 
+    private void syncLocalDatatoOdoo() {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(getContext());
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
+                dialog.setCancelable(false); // original false
+                setSwipeRefreshing(true);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(1000);
+                    ODomain domain = new ODomain();
+
+
+                    //ProductProduct product = new ProductProduct(getContext(), null);
+                    //int total = product.count("id != ?", new String[]{"0"});
+                    //product.quickSyncRecords(domain);
+
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
+                    SaleOrder saleOrder = new SaleOrder(getContext(), db().getUser());
+
+                    domain.add("id", "=", "0");
+
+                    salesOrderLine.quickSyncRecords(domain);
+                    saleOrder.quickSyncRecords(domain);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                hideRefreshingProgress();
+                dialog.dismiss();
+                Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
+                        .show();
+
+            }
+        }.execute();
+    }
+
+    private void syncProduct() {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+/*                dialog = new ProgressDialog(getContext());
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
+                dialog.setCancelable(false); // original false
+                setSwipeRefreshing(true);
+                dialog.show();
+*/
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(1000);
+                    ODomain domain = new ODomain();
+                    ProductProduct product = new ProductProduct(getContext(), null);
+                    product.quickSyncRecords(domain);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+/*
+                hideRefreshingProgress();
+                dialog.dismiss();
+                Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
+                        .show();
+*/
+            }
+        }.execute();
+    }
 
 }
