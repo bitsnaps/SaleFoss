@@ -43,11 +43,11 @@ public class CustomerSyncService extends OSyncService {
             ODomain domain = new ODomain();
             ResPartner resPartner = new ResPartner(getApplicationContext(), null);
             resPartner.quickSyncRecords(domain);
-            //domain.add("|");
-            //domain.add("|");
+            domain.add("|");
+            domain.add("|");
             //domain.add("opportunity_ids.user_id", "=", user.getUserId());
-            //domain.add("sale_order_ids.user_id", "=", user.getUserId());
-            //domain.add("id", "in", adapter.getModel().getServerIds());
+            domain.add("sale_order_ids.user_id", "=", user.getUserId());
+            domain.add("id", "in", adapter.getModel().getServerIds());
 
 //            adapter.setDomain(domain).syncDataLimit(200);
             adapter.setDomain(domain).syncDataLimit(120);

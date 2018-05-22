@@ -38,6 +38,7 @@
         <include
             android:id="@+id/loadingProgress"
             layout="@layout/listview_data_loading_progress" />
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -45,9 +46,23 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/default_16dp"
-        android:src="@drawable/ic_action_content_add"
         app:borderWidth="0dp"
-        app:layout_behavior="odoo.controls.fab.FABScrollBehaviour" />
+        app:layout_behavior="odoo.controls.fab.FABScrollBehaviour"
+        app:srcCompat="@drawable/ic_action_add" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/syncButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/default_16dp"
+        app:borderWidth="0dp"
+        app:srcCompat="@drawable/ic_action_move_to" />
+
 </RelativeLayout>

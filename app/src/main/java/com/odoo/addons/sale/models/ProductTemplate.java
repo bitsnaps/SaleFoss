@@ -33,6 +33,7 @@ public class ProductTemplate  extends OModel {
     @Override
     public ODomain defaultDomain(){
         ODomain domain = new ODomain();
+        domain.add("active", "=", "true");
         return domain;
     }
 

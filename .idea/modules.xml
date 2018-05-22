@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SaleFoss.iml" filepath="$PROJECT_DIR$/.idea/SaleFoss.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SaleFoss.iml" filepath="$PROJECT_DIR$/SaleFoss.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/calendar-lib/calendar-lib.iml" filepath="$PROJECT_DIR$/calendar-lib/calendar-lib.iml" />
       <module fileurl="file://$PROJECT_DIR$/intro-slider-lib/intro-slider-lib.iml" filepath="$PROJECT_DIR$/intro-slider-lib/intro-slider-lib.iml" />

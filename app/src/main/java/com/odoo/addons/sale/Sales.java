@@ -322,8 +322,6 @@ public class Sales extends BaseFragment implements
             onDoubleClick(position);
     }
 
-
-
     private void showSheet(Cursor data) {
         OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         bottomSheet.setData(data);
