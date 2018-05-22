@@ -151,13 +151,13 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
             if (mType == Type.Quotation) {
-                actionBar.setTitle(R.string.label_quotation_not_sync); //label_quotation - Original
+                actionBar.setTitle(R.string.label_quotation); //label_quotation - Original
                 txvType.setText(R.string.label_quotation);
-                mForm.setEditable(false); // eleminate if need to edit line
-                layoutAddItem.setVisibility(View.GONE); // eleminate if need to edit line
+                mForm.setEditable(true); // eleminate if need to edit line
+                layoutAddItem.setVisibility(View.VISIBLE); // eleminate if need to edit line
                 if (record.getString("state").equals("cancel"))
-                    actionBar.setTitle(R.string.label_quotation); //Original there was nothing
                     layoutAddItem.setVisibility(View.GONE);
+//                    actionBar.setTitle(R.string.label_quotation); //Original there was nothing
             } else {
                 layoutAddItem.setVisibility(View.GONE);
                 actionBar.setTitle(R.string.label_sale_orders);
@@ -214,14 +214,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         OField name = (OField) mForm.findViewById(R.id.fname);
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
-            menu.findItem(R.id.menu_sale_save).setVisible(false);
+            menu.findItem(R.id.menu_sale_save).setVisible(true);
             // Operation on Sale Ordermenu_sale_confirm_sale
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
         if (extra != null && record != null && record.getString("state").equals("cancel")) {
-            menu.findItem(R.id.menu_sale_save).setVisible(true).setTitle("Copy Quotation");
+            menu.findItem(R.id.menu_sale_save).setVisible(false).setTitle("Copy Quotation"); // original true
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             mForm.setEditable(true);
         } else {
@@ -245,7 +245,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
-
                     if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
                         // Original

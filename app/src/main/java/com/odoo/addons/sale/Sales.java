@@ -87,6 +87,9 @@ public class Sales extends BaseFragment implements
     private String mFilter = null;
     private Type mType = Type.Quotation;
     private Boolean mSyncRequested = false;
+    private int have_zero = 0;
+    private boolean haveNewQuotations= false;
+    private List<ODataRow> have_id_zero_records = null;
 
     public enum Type {
         Quotation,
@@ -114,12 +117,31 @@ public class Sales extends BaseFragment implements
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mList, this);
+
+        setHasFloatingButton(mView, R.id.syncButton, mList, this);
+        if (mType == Type.Quotation )
+            mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
         if (mType == Type.SaleOrder)
             mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
+
         setHasSyncStatusObserver(TAG, this, db());
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
         getLoaderManager().initLoader(0, null, this);
+
+/////
+        if (inNetwork() && checkNewQuotations()) {
+            if (mType == Type.Quotation)
+                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+
+        } else {
+            if (mType == Type.Quotation)
+                mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+
+        }
+        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+
     }
 
     @Override
@@ -243,24 +265,31 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onRefresh() {
+        boolean CheckNewRecords = false;
+
         if (inNetwork()) {
+           try {
 
-            SaleOrder sale = new SaleOrder(getContext(), null);
-            String sql = "SELECT name, _id, state FROM sale_order WHERE id = ?";
-            List<ODataRow> have_id_zero_records = sale.query(sql, new String[]{"0"});
-            int have_zero = have_id_zero_records.size();
+               if (inNetwork() && checkNewQuotations()) {
+                   if (mType == Type.Quotation)
+                       mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+                       CheckNewRecords = true;
+               } else {
+                   if (mType == Type.Quotation)
+                       mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
-            try {
-                Thread.sleep(1000);
-                if (have_zero != 0) {
-                    syncLocalDatatoOdoo(have_id_zero_records);
-                    syncProduct(); // Try on time till one error
-                } else {
-                    setSwipeRefreshing(true);
-                    parent().sync().requestSync(SaleOrder.AUTHORITY);
-                    Toast.makeText(getActivity(), "Database synchronization!", Toast.LENGTH_SHORT)
+               }
+
+               Thread.sleep(1000);
+                setSwipeRefreshing(true);
+                syncProduct(); // Try on time till one error
+                parent().sync().requestSync(SaleOrder.AUTHORITY);
+                if (CheckNewRecords){
+                    Toast.makeText(getActivity(), "Push the the button to sync new data", Toast.LENGTH_LONG)
                             .show();
-                }
+                } else
+                    Toast.makeText(getActivity(), "Database synchronization", Toast.LENGTH_LONG)
+                        .show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -269,6 +298,8 @@ public class Sales extends BaseFragment implements
             }
         } else {
             hideRefreshingProgress();
+            if (mType == Type.Quotation)
+                mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
                     .show();
         }
@@ -292,9 +323,8 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onSearchViewClose() {
+
         //Nothing to do
-
-
     }
 
     @Override
@@ -316,12 +346,12 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onItemClick(View view, int position) {
-//        if (mType == Type.Quotation)
-//            showSheet((Cursor) mAdapter.getItem(position));
- //       else
+        if (mType == Type.Quotation)
+            onDoubleClick(position);
+            //showSheet((Cursor) mAdapter.getItem(position));
+        else
             onDoubleClick(position);
     }
-
 
 
     private void showSheet(Cursor data) {
@@ -416,11 +446,25 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onClick(View v) {
+        Bundle bundle = new Bundle();
+
         switch (v.getId()) {
             case R.id.fabButton:
-                Bundle bundle = new Bundle();
                 bundle.putString("type", Type.Quotation.toString());
                 IntentUtils.startActivity(getActivity(), SalesDetail.class, bundle);
+                break;
+            case R.id.syncButton:
+                if (inNetwork() && checkNewQuotations()) {
+                    if (mType == Type.Quotation)
+                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+                    bundle.putString("type", Type.Quotation.toString());
+                    syncLocalDatatoOdoo(have_id_zero_records);
+                } else {
+                    if (mType == Type.Quotation)
+                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
+                            .show();
+                }
                 break;
         }
     }
@@ -444,36 +488,33 @@ public class Sales extends BaseFragment implements
             protected Void doInBackground(Void... params) {
                 try {
                     Thread.sleep(1000);
-
-                    Thread.sleep(1000);
                     ODomain domain = new ODomain();
-
                     SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
                     SaleOrder saleOrder = new SaleOrder(getContext(), db().getUser());
-
                     domain.add("id", "=", "0");
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-                    for(final ODataRow qUpdate:quotation) {
+                    for (final ODataRow qUpdate : quotation) {
 
                         OArguments args = new OArguments();
                         args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                         args.add(new JSONObject());
                         saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                        saleOrder.getServerDataHelper().callMethod("action_done", args);
+                        //saleOrder.getServerDataHelper().callMethod("action_done", args);
 
                         OValues values = new OValues();
-                        values.put("state", "done");
-                        values.put("state_title",saleOrder.getStateTitle(values));
+                        values.put("state", "sale");
+                        //values.put("state", "done");
+                        values.put("state_title", saleOrder.getStateTitle(values));
                         values.put("_is_dirty", "false");
-                        saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                            saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
                     }
 
                 } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
+                }
                 return null;
             }
 
@@ -482,6 +523,10 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
                 hideRefreshingProgress();
                 dialog.dismiss();
+                haveNewQuotations = false;
+                if (mType == Type.Quotation)
+                    mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+
                 Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
                         .show();
 
@@ -520,54 +565,23 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
-    private void syncConfirmNewOrdeders(final List<ODataRow> quotation, final SaleOrder sale ) {
-        new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
+    private boolean checkNewQuotations() {
+        boolean CheckOk = false;
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                dialog = new ProgressDialog(getContext());
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
-                dialog.setCancelable(false); // original false
-                setSwipeRefreshing(true);
-                dialog.show();
-
+        try {
+            SaleOrder sale = new SaleOrder(getContext(), null);
+            String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft"});
+            have_zero = have_id_zero_records.size();
+            if (have_zero != 0) {
+                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+                CheckOk = true;
             }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-
-                try {
-                    for(ODataRow quotationRec : quotation ) {
-                        OArguments args = new OArguments();
-                        args.add(new JSONArray().put(quotationRec.getInt("id")));
-                        args.add(new JSONObject());
-                        sale.getServerDataHelper().callMethod("action_confirm", args);
-                        OValues values = new OValues();
-                        values.put("state", "sale");
-                        values.put("state_title", sale.getStateTitle(values));
-                        values.put("_is_dirty", "false");
-                        sale.update(quotationRec.getInt(OColumn.ROW_ID), values);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                hideRefreshingProgress();
-                dialog.dismiss();
-                Toast.makeText(getActivity(), "All new records have been comfirmed!", Toast.LENGTH_LONG)
-                        .show();
-
-            }
-        }.execute();
+       } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return CheckOk;
     }
+
 
 }
