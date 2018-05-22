@@ -428,7 +428,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_60));
                         }
                     });
-                    salesOrderLine.quickSyncRecords(domain);
+                    //salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -444,7 +444,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
                         }
                     });
-                    sale.quickSyncRecords(domain);
+                    //sale.quickSyncRecords(domain);
 
                     Thread.sleep(500);
                 } catch (Exception e) {

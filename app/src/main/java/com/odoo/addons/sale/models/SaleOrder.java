@@ -428,6 +428,8 @@ public class SaleOrder extends OModel {
                 nameOrder = pream + "00" + nameOrder;
             } else if (nameOrder.length() == 2){
                 nameOrder = pream + "0" + nameOrder;
+            } else if (nameOrder.length() >= 3){
+                nameOrder = pream + nameOrder;
             }
         }
         else {
