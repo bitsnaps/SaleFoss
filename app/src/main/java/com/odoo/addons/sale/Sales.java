@@ -88,7 +88,7 @@ public class Sales extends BaseFragment implements
     private Type mType = Type.Quotation;
     private Boolean mSyncRequested = false;
     private int have_zero = 0;
-    private boolean haveNewQuotations= false;
+    private boolean haveNewQuotations = false;
     private List<ODataRow> have_id_zero_records = null;
 
     public enum Type {
@@ -119,7 +119,7 @@ public class Sales extends BaseFragment implements
         mAdapter.handleItemClickListener(mList, this);
 
         setHasFloatingButton(mView, R.id.syncButton, mList, this);
-        if (mType == Type.Quotation )
+        if (mType == Type.Quotation)
             mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
@@ -268,28 +268,28 @@ public class Sales extends BaseFragment implements
         boolean CheckNewRecords = false;
 
         if (inNetwork()) {
-           try {
+            try {
 
-               if (inNetwork() && checkNewQuotations()) {
-                   if (mType == Type.Quotation)
-                       mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-                       CheckNewRecords = true;
-               } else {
-                   if (mType == Type.Quotation)
-                       mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+                if (inNetwork() && checkNewQuotations()) {
+                    if (mType == Type.Quotation)
+                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+                    CheckNewRecords = true;
+                } else {
+                    if (mType == Type.Quotation)
+                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
-               }
+                }
 
-               Thread.sleep(1000);
+                Thread.sleep(1000);
                 setSwipeRefreshing(false); //true need
                 //syncProduct(); // Try on time till one error
                 parent().sync().requestSync(SaleOrder.AUTHORITY);
-                if (CheckNewRecords){
+                if (CheckNewRecords) {
                     Toast.makeText(getActivity(), "Push the the button to sync new data", Toast.LENGTH_LONG)
                             .show();
                 } else
                     Toast.makeText(getActivity(), "Database synchronization", Toast.LENGTH_LONG)
-                        .show();
+                            .show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -495,25 +495,25 @@ public class Sales extends BaseFragment implements
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
+
                     if (inNetwork() && checkNewQuotations()) {
-                    for (final ODataRow qUpdate : quotation) {
+                        for (final ODataRow qUpdate : quotation) {
 
-                        OArguments args = new OArguments();
-                        args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
-                        args.add(new JSONObject());
-                        saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                        saleOrder.getServerDataHelper().callMethod("action_done", args);
-
-                        OValues values = new OValues();
-                        //values.put("state", "sale");
-                        values.put("state", "done");
-                        values.put("state_title", saleOrder.getStateTitle(values));
-                        values.put("_is_dirty", "false");
-                        saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                            OArguments args = new OArguments();
+                            args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
+                            args.add(new JSONObject());
+                            Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
+                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
+                            if (confirm != null && done != null) {
+                                OValues values = new OValues();
+                                //values.put("state", "sale");
+                                values.put("state", "done");
+                                values.put("state_title", saleOrder.getStateTitle(values));
+                                values.put("_is_dirty", "false");
+                                saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                            }
+                        }
                     }
-                    }
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -579,7 +579,7 @@ public class Sales extends BaseFragment implements
                 mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                 CheckOk = true;
             }
-       } catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return CheckOk;
