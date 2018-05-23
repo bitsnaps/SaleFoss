@@ -281,8 +281,8 @@ public class Sales extends BaseFragment implements
                }
 
                Thread.sleep(1000);
-                setSwipeRefreshing(true);
-                syncProduct(); // Try on time till one error
+                setSwipeRefreshing(false); //true need
+                //syncProduct(); // Try on time till one error
                 parent().sync().requestSync(SaleOrder.AUTHORITY);
                 if (CheckNewRecords){
                     Toast.makeText(getActivity(), "Push the the button to sync new data", Toast.LENGTH_LONG)
@@ -495,22 +495,24 @@ public class Sales extends BaseFragment implements
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
-
+                    if (inNetwork() && checkNewQuotations()) {
                     for (final ODataRow qUpdate : quotation) {
 
                         OArguments args = new OArguments();
                         args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                         args.add(new JSONObject());
                         saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                        //saleOrder.getServerDataHelper().callMethod("action_done", args);
+                        saleOrder.getServerDataHelper().callMethod("action_done", args);
 
                         OValues values = new OValues();
-                        values.put("state", "sale");
-                        //values.put("state", "done");
+                        //values.put("state", "sale");
+                        values.put("state", "done");
                         values.put("state_title", saleOrder.getStateTitle(values));
                         values.put("_is_dirty", "false");
-                            saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                        saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
                     }
+                    }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();

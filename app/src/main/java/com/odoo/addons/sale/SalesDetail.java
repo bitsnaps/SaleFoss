@@ -248,6 +248,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
                         // Original
+
                         if(values.get("partner_name") != "false" && objects.size() > 0) {
                             SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
                             saleOrderOperation.execute(values);
