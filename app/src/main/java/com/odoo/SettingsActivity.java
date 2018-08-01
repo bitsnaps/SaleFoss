@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 9/1/15 11:32 AM
  */
 package com.odoo;
@@ -27,11 +27,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.odoo.addons.sale.Sales;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OAppBarUtils;
@@ -44,6 +47,8 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = SettingsActivity.class.getSimpleName();
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
+    public static final String ACTION_SYNCHRONIZATION = "com.odoo.ACTION_SYNCHRONIZATION";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +56,13 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.base_setting_activity);
         OAppBarUtils.setAppBar(this, true);
         ActionBar actionbar = getSupportActionBar();
-        if(actionbar!=null) {
+        if (actionbar != null) {
             actionbar.setHomeButtonEnabled(true);
             actionbar.setDisplayHomeAsUpEnabled(true);
             actionbar.setTitle(R.string.title_application_settings);
         }
     }
+
 
     @Override
     public void startActivity(Intent intent) {
@@ -64,6 +70,12 @@ public class SettingsActivity extends AppCompatActivity {
                 && intent.getAction().equals(ACTION_ABOUT)) {
             Intent about = new Intent(this, About.class);
             super.startActivity(about);
+            return;
+        }
+
+        if (intent.getAction() != null
+                && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
+
             return;
         }
         super.startActivity(intent);
@@ -96,8 +108,8 @@ public class SettingsActivity extends AppCompatActivity {
             OPreferenceManager mPref = new OPreferenceManager(this);
             int sync_interval = mPref.getInt("sync_interval", 1440);
             List<String> default_authorities = new ArrayList<>();
-            default_authorities.add("com.android.calendar");
-            default_authorities.add("com.android.contacts");
+//            default_authorities.add("com.android.calendar");
+//            default_authorities.add("com.android.contacts");
             SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
             for (SyncAdapterType lst : list) {
                 if (lst.authority.contains("com.odoo")
