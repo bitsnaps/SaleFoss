@@ -75,7 +75,9 @@ public class SettingsActivity extends AppCompatActivity {
 
         if (intent.getAction() != null
                 && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
-
+            Sales sales = new Sales();
+            List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
+            sales.syncLocalDatatoOdoo(this, have_id_zero_records);
             return;
         }
         super.startActivity(intent);
@@ -124,8 +126,9 @@ public class SettingsActivity extends AppCompatActivity {
                     SyncUtils.get(this).setSyncPeriodic(authority, sync_interval, 60, 1);
                 }
             }
-            Toast.makeText(this, OResource.string(this, R.string.toast_setting_saved),
-                    Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, OResource.string(this, R.string.toast_setting_saved),
+//                    Toast.LENGTH_LONG).show();
         }
     }
+
 }

@@ -5,6 +5,7 @@
         android:key="application_sync"
         android:title="@string/title_synchronization">
         <Preference
+            android:icon="@drawable/ic_action_database"
             android:title="@string/synchronization_database">
             <intent android:action="com.odoo.ACTION_SYNCHRONIZATION" />
         </Preference>

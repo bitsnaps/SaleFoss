@@ -131,7 +131,7 @@ public class Sales extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
 
 /////
-        if (inNetwork() && checkNewQuotations() != null) {
+        if (inNetwork() && checkNewQuotations(getContext()) != null) {
             if (mType == Type.Quotation)
                 mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
 
@@ -269,7 +269,7 @@ public class Sales extends BaseFragment implements
         if (inNetwork()) {
             try {
 
-                if (inNetwork() && checkNewQuotations() != null) {
+                if (inNetwork() && checkNewQuotations(getContext()) != null) {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                     CheckNewRecords = true;
@@ -453,11 +453,11 @@ public class Sales extends BaseFragment implements
                 IntentUtils.startActivity(getActivity(), SalesDetail.class, bundle);
                 break;
             case R.id.syncButton:
-                if (inNetwork() && checkNewQuotations() != null) {
+                if (inNetwork() && checkNewQuotations(getContext()) != null) {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                     bundle.putString("type", Type.Quotation.toString());
-                    syncLocalDatatoOdoo(have_id_zero_records);
+                    syncLocalDatatoOdoo(getContext(), have_id_zero_records);
                 } else {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
@@ -472,16 +472,16 @@ public class Sales extends BaseFragment implements
         return null;
     }
 
-    public void syncLocalDatatoOdoo(final List<ODataRow> quotation) {
+    public void syncLocalDatatoOdoo(final Context context, final List<ODataRow> quotation) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog = new ProgressDialog(getContext());
+                dialog = new ProgressDialog(context);
                 dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(getContext(), R.string.title_loading));
+                dialog.setMessage(OResource.string(context, R.string.title_loading));
                 dialog.setCancelable(false); // original false
                 setSwipeRefreshing(true);
                 dialog.show();
@@ -490,16 +490,19 @@ public class Sales extends BaseFragment implements
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(500);
                     ODomain domain = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(getContext(), db().getUser()); // getuser
-                    SaleOrder saleOrder = new SaleOrder(getContext(), db().getUser());
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(context, null);
+//                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, db().getUser()); // getuser
+//                    SaleOrder saleOrder = new SaleOrder(context, db().getUser());
                     domain.add("id", "=", "0");
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-                    if (inNetwork() && checkNewQuotations() != null) {
+//                    if (inNetwork() && checkNewQuotations(context) != null) {
+                    if (checkNewQuotations(context) != null) {
                         for (final ODataRow qUpdate : quotation) {
 
                             OArguments args = new OArguments();
@@ -530,9 +533,10 @@ public class Sales extends BaseFragment implements
                 dialog.dismiss();
                 haveNewQuotations = false;
                 if (mType == Type.Quotation)
-                    mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+                    if (mView != null)
+                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
-                Toast.makeText(getActivity(), "All records have been updated successfully!", Toast.LENGTH_LONG)
+                Toast.makeText(context, "All records have been updated!", Toast.LENGTH_LONG)
                         .show();
 
             }
@@ -570,16 +574,18 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
-    public List<ODataRow> checkNewQuotations() {
+    public List<ODataRow> checkNewQuotations(Context context) {
         boolean CheckOk = false;
         try {
-            SaleOrder sale = new SaleOrder(getContext(), null);
+            SaleOrder sale = new SaleOrder(context, null);
             String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
             have_id_zero_records = sale.query(sql, new String[]{"0", "draft"});
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
-                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                 CheckOk = true;
+            }
+            if (mView != null) {
+                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             e.printStackTrace();
