@@ -181,7 +181,6 @@ public class Sales extends BaseFragment implements
                 .setIcon(R.drawable.ic_action_sale_order)
                 .setInstance(new Sales())
                 .setExtra(data(Type.SaleOrder)));
-
         return menu;
     }
 
