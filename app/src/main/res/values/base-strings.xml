@@ -54,6 +54,7 @@
     <string name="title_application_settings">"Application Settings"</string>
     <string name="title_profile">Profile</string>
     <string name="title_about">About</string>
+    <string name="title_synchronization">Synchronization</string>
     <string name="title_confirm">Confirm</string>
     <string name="title_working">Working&#8230;</string>
     <string name="title_loading">Loading records to server&#8230;</string>
@@ -116,6 +117,7 @@
     </string-array>
     <string name="summary_about_odoo_mobile">Odoo Mobile</string>
     <string name="summary_about_foss_mobile">Foss-On-Line Mobile</string>
+    <string name="synchronization_database">Press here to sync database</string>
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Copyright © 2017-TODAY Dmitry Lavrentiev. All Rights Reserved.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>

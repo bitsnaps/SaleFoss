@@ -89,7 +89,7 @@ public class Sales extends BaseFragment implements
     private Boolean mSyncRequested = false;
     private int have_zero = 0;
     private boolean haveNewQuotations = false;
-    private List<ODataRow> have_id_zero_records = null;
+    public List<ODataRow> have_id_zero_records = null;
 
     public enum Type {
         Quotation,
@@ -131,7 +131,7 @@ public class Sales extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
 
 /////
-        if (inNetwork() && checkNewQuotations()) {
+        if (inNetwork() && checkNewQuotations() != null) {
             if (mType == Type.Quotation)
                 mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
 
@@ -269,7 +269,7 @@ public class Sales extends BaseFragment implements
         if (inNetwork()) {
             try {
 
-                if (inNetwork() && checkNewQuotations()) {
+                if (inNetwork() && checkNewQuotations() != null) {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                     CheckNewRecords = true;
@@ -281,7 +281,7 @@ public class Sales extends BaseFragment implements
 
                 Thread.sleep(1000);
                 setSwipeRefreshing(false); //true need
-                //syncProduct(); // Try on time till one error
+                syncProduct(); // Try on time till one error
                 parent().sync().requestSync(SaleOrder.AUTHORITY);
                 if (CheckNewRecords) {
                     Toast.makeText(getActivity(), "Push the the button to sync new data", Toast.LENGTH_LONG)
@@ -453,7 +453,7 @@ public class Sales extends BaseFragment implements
                 IntentUtils.startActivity(getActivity(), SalesDetail.class, bundle);
                 break;
             case R.id.syncButton:
-                if (inNetwork() && checkNewQuotations()) {
+                if (inNetwork() && checkNewQuotations() != null) {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                     bundle.putString("type", Type.Quotation.toString());
@@ -468,7 +468,11 @@ public class Sales extends BaseFragment implements
         }
     }
 
-    private void syncLocalDatatoOdoo(final List<ODataRow> quotation) {
+    public List<ODataRow> getIdZeroRecords() {
+        return null;
+    }
+
+    public void syncLocalDatatoOdoo(final List<ODataRow> quotation) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -495,7 +499,7 @@ public class Sales extends BaseFragment implements
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-                    if (inNetwork() && checkNewQuotations()) {
+                    if (inNetwork() && checkNewQuotations() != null) {
                         for (final ODataRow qUpdate : quotation) {
 
                             OArguments args = new OArguments();
@@ -548,7 +552,7 @@ public class Sales extends BaseFragment implements
             protected Void doInBackground(Void... params) {
 
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(300);
                     ODomain domain = new ODomain();
                     ProductProduct product = new ProductProduct(getContext(), null);
                     product.quickSyncRecords(domain);
@@ -566,9 +570,8 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
-    private boolean checkNewQuotations() {
+    public List<ODataRow> checkNewQuotations() {
         boolean CheckOk = false;
-
         try {
             SaleOrder sale = new SaleOrder(getContext(), null);
             String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
@@ -581,7 +584,9 @@ public class Sales extends BaseFragment implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return CheckOk;
+        if (CheckOk)
+            return have_id_zero_records;
+        return null;
     }
 
 
