@@ -72,12 +72,15 @@ public class SettingsActivity extends AppCompatActivity {
             super.startActivity(about);
             return;
         }
-
         if (intent.getAction() != null
                 && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
             Sales sales = new Sales();
             List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-            sales.syncLocalDatatoOdoo(this, have_id_zero_records);
+            if (have_id_zero_records != null)
+                sales.syncLocalDatatoOdoo(this, have_id_zero_records);
+            else
+                Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
+                        Toast.LENGTH_LONG).show();
             return;
         }
         super.startActivity(intent);
