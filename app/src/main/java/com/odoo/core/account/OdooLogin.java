@@ -413,9 +413,10 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_20));
                         }
                     });
-                    ODomain domainPartners = new ODomain();
-                    domainPartners.add("customer", "=", true);
-                    resPartner.quickSyncRecords(domainPartners);
+//                    ODomain domainPartners = new ODomain();
+//                    domainPartners.add("customer", "=", true);
+//                    resPartner.quickSyncRecords(domainPartners);
+                    resPartner.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
