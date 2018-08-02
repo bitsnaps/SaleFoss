@@ -75,12 +75,18 @@ public class SettingsActivity extends AppCompatActivity {
         if (intent.getAction() != null
                 && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
             Sales sales = new Sales();
-            List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-            if (have_id_zero_records != null)
-                sales.syncLocalDatatoOdoo(this, have_id_zero_records);
-            else
-                Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
-                        Toast.LENGTH_LONG).show();
+            App app = (App) this.getApplicationContext();
+            boolean isNetwork = app.inNetwork();
+            if (isNetwork) {
+                List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
+                if (have_id_zero_records != null)
+                    sales.syncLocalDatatoOdoo(this, have_id_zero_records);
+                else
+                    Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
+                            Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+            }
             return;
         }
         super.startActivity(intent);

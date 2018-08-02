@@ -131,15 +131,15 @@ public class Sales extends BaseFragment implements
         getLoaderManager().initLoader(0, null, this);
 
 /////
-        if (inNetwork() && checkNewQuotations(getContext()) != null) {
-            if (mType == Type.Quotation)
-                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-
-        } else {
-            if (mType == Type.Quotation)
-                mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-
-        }
+//        if (inNetwork() && checkNewQuotations(getContext()) != null) {
+//            if (mType == Type.Quotation)
+//                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+//
+//        } else {
+//            if (mType == Type.Quotation)
+//                mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+//
+//        }
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
     }
@@ -264,31 +264,36 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onRefresh() {
-        boolean CheckNewRecords = false;
+        List<ODataRow> CheckNewRecords = null;
 
         if (inNetwork()) {
             try {
+//                if (inNetwork() != false && CheckNewRecords != null) {
+//                    if (mType == Type.Quotation)
+//                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+////                    CheckNewRecords = true;
+//                } else {
+//                    if (mType == Type.Quotation)
+//                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+//
+//                }
 
-                if (inNetwork() && checkNewQuotations(getContext()) != null) {
-                    if (mType == Type.Quotation)
-                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-                    CheckNewRecords = true;
-                } else {
+                Thread.sleep(600);
+//                setSwipeRefreshing(false); //true need
+//                syncProduct(); // Try on time till one error
+                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                CheckNewRecords = checkNewQuotations(getContext());
+                if (CheckNewRecords != null) {
+//                    if (mType == Type.Quotation)
+//                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+                    Toast.makeText(getActivity(), R.string.toast_update_database, Toast.LENGTH_LONG)
+                            .show();
+                } else{
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-
+                    Toast.makeText(getActivity(), R.string.toast_no_new_records, Toast.LENGTH_LONG)
+                            .show();
                 }
-
-                Thread.sleep(1000);
-                setSwipeRefreshing(false); //true need
-                syncProduct(); // Try on time till one error
-                parent().sync().requestSync(SaleOrder.AUTHORITY);
-                if (CheckNewRecords) {
-                    Toast.makeText(getActivity(), "Push the the button to sync new data", Toast.LENGTH_LONG)
-                            .show();
-                } else
-                    Toast.makeText(getActivity(), "Database synchronization", Toast.LENGTH_LONG)
-                            .show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -489,6 +494,7 @@ public class Sales extends BaseFragment implements
 
             @Override
             protected Void doInBackground(Void... params) {
+
                 try {
                     Thread.sleep(500);
                     ODomain domain = new ODomain();
@@ -585,7 +591,7 @@ public class Sales extends BaseFragment implements
                 CheckOk = true;
             }
             if (mView != null) {
-                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+//                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             e.printStackTrace();
