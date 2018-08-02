@@ -80,8 +80,9 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private boolean syncRequested = false;
 
     public enum Type {
-        Leads, Opportunities
+        Leads, Opportunities, Customer, Supplier, Company
     }
+    private Type mType = Type.Customer;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -127,8 +128,19 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
-        String where = "customer = ?";
+        String where = "";
         List<String> args = new ArrayList<>();
+        switch (mType) {
+            case Customer:
+                where = "customer = ?";
+                break;
+            case Supplier:
+                where = "supplier = ?";
+                break;
+            case Company:
+                where = "is_company = ?";
+                break;
+        }
         args.add("true");
         if (mCurFilter != null) {
             where += " name like ? ";
