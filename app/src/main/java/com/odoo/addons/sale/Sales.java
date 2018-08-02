@@ -268,18 +268,8 @@ public class Sales extends BaseFragment implements
 
         if (inNetwork()) {
             try {
-//                if (inNetwork() != false && CheckNewRecords != null) {
-//                    if (mType == Type.Quotation)
-//                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-////                    CheckNewRecords = true;
-//                } else {
-//                    if (mType == Type.Quotation)
-//                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-//
-//                }
-
                 Thread.sleep(600);
-//                setSwipeRefreshing(false); //true need
+                setSwipeRefreshing(false); //true need
 //                syncProduct(); // Try on time till one error
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 CheckNewRecords = checkNewQuotations(getContext());
@@ -500,14 +490,11 @@ public class Sales extends BaseFragment implements
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
                     SaleOrder saleOrder = new SaleOrder(context, null);
-//                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, db().getUser()); // getuser
-//                    SaleOrder saleOrder = new SaleOrder(context, db().getUser());
                     domain.add("id", "=", "0");
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-//                    if (inNetwork() && checkNewQuotations(context) != null) {
                     if (checkNewQuotations(context) != null) {
                         for (final ODataRow qUpdate : quotation) {
 
@@ -542,7 +529,7 @@ public class Sales extends BaseFragment implements
                     if (mView != null)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
-                Toast.makeText(context, "All records have been updated!", Toast.LENGTH_LONG)
+                Toast.makeText(context, R.string.toast_recs_updated, Toast.LENGTH_LONG)
                         .show();
 
             }
@@ -600,6 +587,4 @@ public class Sales extends BaseFragment implements
             return have_id_zero_records;
         return null;
     }
-
-
 }

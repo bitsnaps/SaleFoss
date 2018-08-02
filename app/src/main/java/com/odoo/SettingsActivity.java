@@ -76,8 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
                 && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
             Sales sales = new Sales();
             App app = (App) this.getApplicationContext();
-            boolean isNetwork = app.inNetwork();
-            if (isNetwork) {
+            if (app.inNetwork()) {
                 List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
                 if (have_id_zero_records != null)
                     sales.syncLocalDatatoOdoo(this, have_id_zero_records);
@@ -99,7 +98,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onDetachedFromWindow() {
