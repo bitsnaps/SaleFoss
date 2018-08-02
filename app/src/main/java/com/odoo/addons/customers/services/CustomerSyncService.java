@@ -48,8 +48,6 @@ public class CustomerSyncService extends OSyncService {
             //domain.add("opportunity_ids.user_id", "=", user.getUserId());
             //domain.add("sale_order_ids.user_id", "=", user.getUserId());
             //domain.add("id", "in", adapter.getModel().getServerIds());
-
-//            adapter.setDomain(domain).syncDataLimit(200);
             adapter.setDomain(domain).syncDataLimit(120);
         }
     }

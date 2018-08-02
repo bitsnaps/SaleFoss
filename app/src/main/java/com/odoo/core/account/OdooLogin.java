@@ -400,6 +400,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 
+
                     AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
                     ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
@@ -412,7 +413,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_20));
                         }
                     });
-                    resPartner.quickSyncRecords(domain);
+                    ODomain domainPartners = new ODomain();
+                    domainPartners.add("customer", "=", true);
+                    resPartner.quickSyncRecords(domainPartners);
 
                     runOnUiThread(new Runnable() {
                         @Override

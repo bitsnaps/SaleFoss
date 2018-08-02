@@ -34,6 +34,7 @@ import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class ResPartner extends OModel {
     OColumn state_id = new OColumn("State", ResCountryState.class, OColumn.RelationType.ManyToOne);
     OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
     OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue("true");
+    OColumn supplier = new OColumn("Vendor", OBoolean.class).setDefaultValue("false");
     OColumn comment = new OColumn("Internal Note", OText.class);
     @Odoo.Functional(store = true, depends = {"parent_id"}, method = "storeCompanyName")
     OColumn company_name = new OColumn("Company Name", OVarchar.class).setSize(100)
@@ -77,6 +79,11 @@ public class ResPartner extends OModel {
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
         setHasMailChatter(true);
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer(){
+        return true;
     }
 
     @Override
