@@ -42,6 +42,7 @@ public class CustomerSyncService extends OSyncService {
         if (adapter.getModel().getModelName().equals("res.partner")) {
             ODomain domain = new ODomain();
             ResPartner resPartner = new ResPartner(getApplicationContext(), user);
+            domain.add("customer", "in", ("true"));
             resPartner.quickSyncRecords(domain);
 
 //            domain.add("|");
@@ -49,7 +50,7 @@ public class CustomerSyncService extends OSyncService {
 //            domain.add("opportunity_ids.user_id", "=", user.getUserId());
 //            domain.add("sale_order_ids.user_id", "=", user.getUserId());
 //            domain.add("id", "in", adapter.getModel().getServerIds());
-            adapter.setDomain(domain).syncDataLimit(200);
+//            adapter.setDomain(domain).syncDataLimit(200);
         }
     }
 }

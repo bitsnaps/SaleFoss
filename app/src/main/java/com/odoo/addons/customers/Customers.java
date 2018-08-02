@@ -127,10 +127,11 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
-        String where = "";
+        String where = "customer = ?";
         List<String> args = new ArrayList<>();
+        args.add("true");
         if (mCurFilter != null) {
-            where = " name like ? ";
+            where += " name like ? ";
             args.add(mCurFilter + "%");
         }
         String selection = (args.size() > 0) ? where : null;

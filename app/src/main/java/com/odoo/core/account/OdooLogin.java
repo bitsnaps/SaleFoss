@@ -414,9 +414,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
 //                    ODomain domainPartners = new ODomain();
-//                    domainPartners.add("customer", "=", true);
+//                    domainPartners.add("customer", "in", ("true"));
 //                    resPartner.quickSyncRecords(domainPartners);
-                    resPartner.quickSyncRecords(domain);
+//                    resPartner.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -432,7 +432,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_60));
                         }
                     });
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                     //salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
@@ -441,7 +441,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_80));
                         }
                     });
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                     //                    paymentTerm.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
