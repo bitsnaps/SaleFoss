@@ -42,7 +42,7 @@ public class CustomerSyncService extends OSyncService {
         if (adapter.getModel().getModelName().equals("res.partner")) {
             ODomain domain = new ODomain();
             ResPartner resPartner = new ResPartner(getApplicationContext(), user);
-            domain.add("customer", "in", ("true"));
+            domain.add("customer", "not in", ("false"));
             resPartner.quickSyncRecords(domain);
 
 //            domain.add("|");

@@ -46,6 +46,7 @@ import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -270,7 +271,6 @@ public class Sales extends BaseFragment implements
             try {
                 Thread.sleep(600);
                 setSwipeRefreshing(false); //true need
-//                syncProduct(); // Try on time till one error
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 CheckNewRecords = checkNewQuotations(getContext());
                 if (CheckNewRecords != null) {
@@ -490,6 +490,7 @@ public class Sales extends BaseFragment implements
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
                     SaleOrder saleOrder = new SaleOrder(context, null);
+
                     domain.add("id", "=", "0");
 
                     salesOrderLine.quickSyncRecords(domain);
@@ -536,13 +537,19 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
-    private void syncProduct() {
+    public void syncProduct(final Context context) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
             @Override
-            protected void onPreExecute() {
+            protected void onPreExecute(){
                 super.onPreExecute();
+                dialog = new ProgressDialog(context);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(context, R.string.title_loading_product));
+                dialog.setCancelable(false); // original false
+//                setSwipeRefreshing(true);
+                dialog.show();
             }
 
             @Override
@@ -551,7 +558,8 @@ public class Sales extends BaseFragment implements
                 try {
                     Thread.sleep(300);
                     ODomain domain = new ODomain();
-                    ProductProduct product = new ProductProduct(getContext(), null);
+                    ProductProduct product = new ProductProduct(context, null);
+//                    domain.add("id", "not in", product.getServerIds());
                     product.quickSyncRecords(domain);
 
                 } catch (Exception e) {
@@ -563,9 +571,12 @@ public class Sales extends BaseFragment implements
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
+//                hideRefreshingProgress();
+                dialog.dismiss();
             }
         }.execute();
     }
+
 
     public List<ODataRow> checkNewQuotations(Context context) {
         boolean CheckOk = false;

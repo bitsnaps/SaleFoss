@@ -7,9 +7,15 @@
         <Preference
             android:icon="@drawable/ic_action_database04"
             android:title="@string/synchronization_database">
-            <intent android:action="com.odoo.ACTION_SYNCHRONIZATION" />
+            <intent android:action="com.odoo.ACTION_ORDER_SYNCHRONIZATION" />
+        </Preference>
+        <Preference
+            android:icon="@drawable/ic_action_cart"
+            android:title="@string/synchronization_products">
+            <intent android:action="com.odoo.ACTION_PRODUCT_SYNCHRONIZATION" />
         </Preference>
     </PreferenceCategory>
+
 
     <!--<PreferenceCategory-->
         <!--android:key="account_sync_settings"-->

@@ -60,7 +60,7 @@ public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
     private Context mContext;
-    OColumn name = new OColumn("name", OVarchar.class).setDefaultValue("offline");
+    OColumn name = new OColumn("Name", OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn("Date", ODateTime.class);
     @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
     OColumn partner_id = new OColumn("Customer", ResPartner.class, OColumn.RelationType.ManyToOne);
@@ -106,7 +106,7 @@ public class SaleOrder extends OModel {
     }
 
     @Override
-    public ODomain defaultDomain(){
+    public ODomain defaultDomain() {
         ODomain domain = new ODomain();
         return domain;
     }
@@ -123,12 +123,12 @@ public class SaleOrder extends OModel {
             ResPartner partner = new ResPartner(mContext, getUser());
             AccountPaymentTerm term = new AccountPaymentTerm(mContext, getUser());
             ODataRow customer = partner.browse(row.getInt(OColumn.ROW_ID));
-                data.put("partner_invoice_id", customer.get("partner_invoice_id"));
-                data.put("partner_shipping_id", customer.get("partner_shipping_id"));
-                data.put("pricelist_id", customer.get("pricelist_id"));
-                data.put("payment_term", customer.get("payment_term"));
-                data.put("fiscal_position", customer.get("fiscal_position"));
-                partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
+            data.put("partner_invoice_id", customer.get("partner_invoice_id"));
+            data.put("partner_shipping_id", customer.get("partner_shipping_id"));
+            data.put("pricelist_id", customer.get("pricelist_id"));
+            data.put("payment_term", customer.get("payment_term"));
+            data.put("fiscal_position", customer.get("fiscal_position"));
+            partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -178,7 +178,7 @@ public class SaleOrder extends OModel {
 
     public String storePartnerName(OValues values) {
         try {
-            if (!values.getString("partner_id").equals("false")) {
+            if (!values.getString("partner_id").equals("false") ) {
                 return ((ArrayList) values.get("partner_id")).get(1).toString();
             }
         } catch (Exception e) {
@@ -385,7 +385,7 @@ public class SaleOrder extends OModel {
 
                     Log.i(TAG, "<< Update records in local DB where id=0 >>");
 
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser() );
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
                     SaleOrder saleOrder = new SaleOrder(mContext, getUser());
 
                     domain.add("id", "=", "0");
@@ -408,20 +408,21 @@ public class SaleOrder extends OModel {
 
     public static interface OnOperationSuccessListener {
         public void OnSuccess();
+
         public void OnCancelled();
     }
 
     // New name fo Sale order Table
-    public String newNameSaleOrder(String pream){
+    public String newNameSaleOrder(String pream) {
         String nameOrder = "";
         String prefix = pream;
 
         SaleOrder sale = new SaleOrder(mContext, null);
-        List<ODataRow> rows = sale.select( new String[]{"name"}, "name LIKE ?",
+        List<ODataRow> rows = sale.select(new String[]{"name"}, "name LIKE ?",
                 new String[]{prefix + "%"});
         int i = 0;
         int[] numbersNames = new int[rows.size()];
-        for(ODataRow row: rows){
+        for (ODataRow row : rows) {
             nameOrder = row.getString("name");
             numbersNames[i] = Integer.parseInt(nameOrder.substring(nameOrder.indexOf(prefix) + prefix.length()));
             i++;
@@ -431,13 +432,12 @@ public class SaleOrder extends OModel {
             nameOrder = Integer.toString(numbersNames[numbersNames.length - 1] + 1);
             if (nameOrder.length() == 1) {
                 nameOrder = pream + "00" + nameOrder;
-            } else if (nameOrder.length() == 2){
+            } else if (nameOrder.length() == 2) {
                 nameOrder = pream + "0" + nameOrder;
-            } else if (nameOrder.length() >= 3){
+            } else if (nameOrder.length() >= 3) {
                 nameOrder = pream + nameOrder;
             }
-        }
-        else {
+        } else {
             nameOrder = pream + "001";
         }
         return nameOrder;

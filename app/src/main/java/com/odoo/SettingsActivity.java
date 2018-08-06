@@ -21,6 +21,7 @@ package com.odoo;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
@@ -47,7 +48,8 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity {
     public static final String TAG = SettingsActivity.class.getSimpleName();
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
-    public static final String ACTION_SYNCHRONIZATION = "com.odoo.ACTION_SYNCHRONIZATION";
+    public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
+    public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
 
 
     @Override
@@ -72,23 +74,36 @@ public class SettingsActivity extends AppCompatActivity {
             super.startActivity(about);
             return;
         }
-        if (intent.getAction() != null
-                && intent.getAction().equals(ACTION_SYNCHRONIZATION)) {
+        if (intent.getAction() != null) {
             Sales sales = new Sales();
             App app = (App) this.getApplicationContext();
             if (app.inNetwork()) {
-                List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-                if (have_id_zero_records != null)
-                    sales.syncLocalDatatoOdoo(this, have_id_zero_records);
-                else
-                    Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
-                            Toast.LENGTH_LONG).show();
-            } else {
+                if (intent.getAction().equals(ACTION_ORDER_SYNCHRONIZATION)) {
+                    this.updateOrders(sales);
+                    return;
+                }
+                if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
+                    this.updateProducts(sales);
+                    return;
+                }
+            } else
                 Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-            }
-            return;
         }
         super.startActivity(intent);
+    }
+
+
+    private void updateOrders(Sales sales) {
+        List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
+        if (have_id_zero_records != null)
+            sales.syncLocalDatatoOdoo(this, have_id_zero_records);
+        else
+            Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
+                    Toast.LENGTH_LONG).show();
+    }
+
+    private void updateProducts(Sales sales) {
+        sales.syncProduct(this);
     }
 
     @Override

@@ -11,7 +11,7 @@ android {
         applicationId "com.odoo.crm"
         targetSdkVersion 25
         versionCode 7
-        versionName '1.4.23'
+        versionName '2.0.1'
         minSdkVersion 19
     }
     buildTypes {
@@ -27,6 +27,8 @@ android {
         }
     }
     productFlavors {
+    }
+    dexOptions {
     }
 }
 dependencies {

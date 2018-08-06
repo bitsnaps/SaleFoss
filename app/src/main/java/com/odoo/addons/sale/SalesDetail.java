@@ -116,7 +116,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             android.os.Process.killProcess(android.os.Process.myPid());
             //Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
         }
-        initAdapter();  // Original
+        initAdapter();   // Original
     }
 
     @Nullable
@@ -146,7 +146,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             if (record == null) {
                 finish();
             }
-            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
+            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation ) {
                 OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }

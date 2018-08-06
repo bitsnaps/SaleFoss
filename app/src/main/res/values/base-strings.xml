@@ -58,6 +58,7 @@
     <string name="title_confirm">Confirm</string>
     <string name="title_working">Working&#8230;</string>
     <string name="title_loading">Loading records to server&#8230;</string>
+    <string name="title_loading_product">Loading product from server&#8230;</string>
     <string name="title_please_wait">Please wait&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Search</string>
@@ -120,9 +121,10 @@
     </string-array>
     <string name="summary_about_odoo_mobile">Odoo Mobile</string>
     <string name="summary_about_foss_mobile">Foss-On-Line Mobile</string>
-    <string name="synchronization_database">Press here to sync database</string>
+    <string name="synchronization_database">Press To Sync The Orders</string>
+    <string name="synchronization_products">Press To Get Products</string>
     <!-- About Company Fragment Strings -->
-    <string name="about_Company_line1">Copyright © 2017-TODAY Dmitry Lavrentiev. All Rights Reserved.</string>
+    <string name="about_Company_line1">Copyright © 2018-TODAY FossOnline. All Rights Reserved.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
     <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
     <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
