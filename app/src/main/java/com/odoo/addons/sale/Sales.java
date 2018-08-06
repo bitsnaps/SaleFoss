@@ -50,8 +50,10 @@ import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
@@ -278,7 +280,7 @@ public class Sales extends BaseFragment implements
 //                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
                     Toast.makeText(getActivity(), R.string.toast_update_database, Toast.LENGTH_LONG)
                             .show();
-                } else{
+                } else {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
                     Toast.makeText(getActivity(), R.string.toast_no_new_records, Toast.LENGTH_LONG)
@@ -542,13 +544,13 @@ public class Sales extends BaseFragment implements
             private ProgressDialog dialog;
 
             @Override
-            protected void onPreExecute(){
+            protected void onPreExecute() {
                 super.onPreExecute();
                 dialog = new ProgressDialog(context);
                 dialog.setTitle(R.string.title_please_wait);
                 dialog.setMessage(OResource.string(context, R.string.title_loading_product));
-                dialog.setCancelable(false); // original false
-//                setSwipeRefreshing(true);
+                dialog.setCancelable(true); // original false
+                setSwipeRefreshing(true);
                 dialog.show();
             }
 
@@ -559,6 +561,26 @@ public class Sales extends BaseFragment implements
                     Thread.sleep(300);
                     ODomain domain = new ODomain();
                     ProductProduct product = new ProductProduct(context, null);
+//                    ProductTemplate product_temp = new ProductTemplate(context, null);
+//
+//                    List<ODataRow> dates = product_temp.select(new String[]{"id", "write_date", "name"});
+//                    List<String> datetime = new ArrayList();
+//
+//                    for (ODataRow row : dates) {
+//                        datetime.add(row.get("write_date").toString());
+//                    }
+//
+//                    List<ODataRow> items = new ArrayList<>();
+//                    try {
+//                        OdooFields fields = new OdooFields(new String[]{"id", "write_date", "name"});
+//                        ODomain domain_date = new ODomain();
+//                        domain_date.add("write_date", "=", "2018-08-06 09:10:58");
+//                        List<ODataRow> records = product_temp.getServerDataHelper().searchRecords(fields, domain_date, 1000);
+//                        items.addAll(records);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+
 //                    domain.add("id", "not in", product.getServerIds());
                     product.quickSyncRecords(domain);
 
@@ -571,7 +593,7 @@ public class Sales extends BaseFragment implements
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-//                hideRefreshingProgress();
+                hideRefreshingProgress();
                 dialog.dismiss();
             }
         }.execute();
