@@ -62,41 +62,41 @@ public class SaleOrder extends OModel {
     private Context mContext = getContext();
     private Context idContext = getContext();
 
-    OColumn name = new OColumn(_("Name"), OVarchar.class).setDefaultValue("offline");
-    OColumn date_order = new OColumn("Date", ODateTime.class);
+    OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
+    OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
     @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
-    OColumn partner_id = new OColumn(_("Customer"), ResPartner.class, OColumn.RelationType.ManyToOne);
-    OColumn user_id = new OColumn("Salesperson", ResUsers.class, OColumn.RelationType.ManyToOne);
-    OColumn amount_total = new OColumn("Total", OFloat.class);
-    OColumn payment_term = new OColumn("Payment Term", AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
-    OColumn amount_untaxed = new OColumn("Untaxed", OInteger.class);
-    OColumn amount_tax = new OColumn("Tax", OInteger.class);
-    OColumn client_order_ref = new OColumn("Client Order Reference",
+    OColumn partner_id = new OColumn(_s(R.string.field_label_partner_id), ResPartner.class, OColumn.RelationType.ManyToOne);
+    OColumn user_id = new OColumn(_s(R.string.field_label_user_id), ResUsers.class, OColumn.RelationType.ManyToOne);
+    OColumn amount_total = new OColumn(_s(R.string.field_label_amount_total), OFloat.class);
+    OColumn payment_term = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
+    OColumn amount_untaxed = new OColumn(_s(R.string.field_label_amount_untaxed), OInteger.class);
+    OColumn amount_tax = new OColumn(_s(R.string.field_label_amount_tax), OInteger.class);
+    OColumn client_order_ref = new OColumn(_s(R.string.field_label_client_order_ref),
             OVarchar.class).setSize(100);
-    OColumn state = new OColumn("status", OVarchar.class).setSize(10)
+    OColumn state = new OColumn(_s(R.string.field_label_state), OVarchar.class).setSize(10)
             .setDefaultValue("draft");
     @Odoo.Functional(method = "getStateTitle", store = true, depends = {"state"})
-    OColumn state_title = new OColumn("State Title", OVarchar.class)
+    OColumn state_title = new OColumn(_s(R.string.field_label_state_title), OVarchar.class)
             .setLocalColumn();
     @Odoo.Functional(method = "storePartnerName", store = true, depends = {"partner_id"})
-    OColumn partner_name = new OColumn("State Title", OVarchar.class)
+    OColumn partner_name = new OColumn(_s(R.string.field_label_partner_name), OVarchar.class)
             .setLocalColumn();
-    OColumn currency_id = new OColumn("currency", ResCurrency.class,
+    OColumn currency_id = new OColumn(_s(R.string.field_label_currency_id), ResCurrency.class,
             OColumn.RelationType.ManyToOne);
     @Odoo.Functional(method = "storeCurrencySymbol", store = true, depends = {"currency_id"})
-    OColumn currency_symbol = new OColumn("State Title", OVarchar.class)
+    OColumn currency_symbol = new OColumn(_s(R.string.field_label_currency_symbol), OVarchar.class)
             .setLocalColumn();
-    OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,
+    OColumn order_line = new OColumn(_s(R.string.field_label_order_line), SalesOrderLine.class,
             OColumn.RelationType.OneToMany).setRelatedColumn("order_id");
 
     @Odoo.Functional(store = true, depends = {"order_line"}, method = "countOrderLines")
-    OColumn order_line_count = new OColumn("Total Lines", OVarchar.class).setLocalColumn();
+    OColumn order_line_count = new OColumn(_s(R.string.field_label_order_line_count), OVarchar.class).setLocalColumn();
 
-    OColumn partner_invoice_id = new OColumn("partner_invoice_id", OVarchar.class).setLocalColumn(); // Original
-    OColumn partner_shipping_id = new OColumn("partner_shipping_id", OVarchar.class).setLocalColumn(); // Original
+    OColumn partner_invoice_id = new OColumn(_s(R.string.field_label_partner_invoice_id), OVarchar.class).setLocalColumn(); // Original
+    OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn(); // Original
 
-    OColumn pricelist_id = new OColumn("pricelist_id", OVarchar.class).setLocalColumn();
-    OColumn fiscal_position = new OColumn("fiscal_position", OVarchar.class).setLocalColumn();
+    OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
+    OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
 
     public SaleOrder(Context context, OUser user) {
         super(context, "sale.order", user);
@@ -107,8 +107,8 @@ public class SaleOrder extends OModel {
         }
     }
 
-    public String _(String nameField){
-        return idContext.getResources().getString(R.string.field_label_customer);
+    private String _s(int res_id) {
+        return OResource.string(idContext, res_id);
     }
 
     @Override

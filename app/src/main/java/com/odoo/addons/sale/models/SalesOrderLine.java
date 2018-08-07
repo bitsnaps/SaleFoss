@@ -21,6 +21,7 @@ package com.odoo.addons.sale.models;
 
 import android.content.Context;
 
+import com.odoo.R;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OFloat;
@@ -28,17 +29,24 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.OResource;
 
 public class SalesOrderLine extends OModel {
     public static final String TAG = SalesOrderLine.class.getSimpleName();
-    OColumn product_id = new OColumn("Product", ProductProduct.class,
+    private Context idContext = getContext();
+
+    OColumn product_id = new OColumn(_s(R.string.field_label_product_id), ProductProduct.class,
             OColumn.RelationType.ManyToOne);
-    OColumn name = new OColumn("Description ", OText.class);
-    OColumn product_uom_qty = new OColumn("Quantity", OInteger.class);
-    OColumn price_unit = new OColumn("Unit Price", OFloat.class);
-    OColumn price_subtotal = new OColumn("Sub Total", OFloat.class);
-    OColumn order_id = new OColumn("ID", SaleOrder.class,
+    OColumn name = new OColumn(_s(R.string.field_label_name), OText.class);
+    OColumn product_uom_qty = new OColumn(_s(R.string.field_label_product_uom_qty), OInteger.class);
+    OColumn price_unit = new OColumn(_s(R.string.field_label_price_unit), OFloat.class);
+    OColumn price_subtotal = new OColumn(_s(R.string.field_label_price_subtotal), OFloat.class);
+    OColumn order_id = new OColumn(_s(R.string.field_label_order_id), SaleOrder.class,
             OColumn.RelationType.ManyToOne);
+
+    private String _s(int res_id) {
+        return OResource.string(idContext, res_id);
+    }
 
     @Override
     public ODomain defaultDomain(){

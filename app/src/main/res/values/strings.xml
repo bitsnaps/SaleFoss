@@ -106,8 +106,8 @@
     <string name="toast_record_deleted">Record deleted</string>
     <string name="label_new">New</string>
 
-    <string name="field_label_customer">Customer</string>
     <string name="field_label_new">New</string>
+
     <string name="field_label_draft">Draft Quotation</string>
     <string name="field_label_sent">Quotation Sent</string>
     <string name="field_label_canceled">Cancelled</string>
@@ -117,7 +117,6 @@
     <string name="field_label_sipping_except">Shipping Exception</string>
     <string name="field_label_invoice_except">Invoice Exception</string>
     <string name="field_label_done">Done</string>
-
     <string name="label_total">Total:</string>
     <string name="label_untaxed_amount">Untaxed Amount:</string>
     <string name="label_taxes">Taxes :</string>
@@ -135,9 +134,40 @@
     <string name="label_quotation_confirmed">Quotation confirmed!</string>
     <string name="label_updated">updated</string>
     <string name="label_created">created</string>
-
     <string name="title_no_lines">(No lines)</string>
     <string name="lebel_lines">lines</string>
-
+    <string name="field_label_name">Name"</string>
+    <!--Model sale.order-->
+    <string name="field_label_date_order">"Дата"</string>
+    <string name="field_label_partner_id">Customer</string>
+    <string name="field_label_user_id">"Salesperson"</string>
+    <string name="field_label_amount_total">"Total"</string>
+    <string name="field_label_payment_term">"Payment Term"</string>
+    <string name="field_label_amount_untaxed">"Untaxed"</string>
+    <string name="field_label_amount_tax">"Tax"</string>
+    <string name="field_label_client_order_ref">"Client Order Reference"</string>
+    <string name="field_label_state">"Status"</string>
+    <string name="field_label_state_title">"State Title"</string>
+    <string name="field_label_partner_name">"Partner Name"</string>
+    <string name="field_label_currency_id">"Currency"</string>
+    <string name="field_label_currency_symbol">"Currency Symbol"</string>
+    <string name="field_label_order_line">"Order Lines"</string>
+    <string name="field_label_order_line_count">"Total Lines"</string>
+    <string name="field_label_partner_invoice_id">"Partner Invoice Id"</string>
+    <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
+    <string name="field_label_pricelist_id">"Price List Id"</string>
+    <string name="field_label_fiscal_position">"Fiscal Position"</string>
+    <!--Model order.line-->
+    <string name="field_label_product_id">Product</string>
+    <string name="field_label_product_uom_qty">Quantity</string>
+    <string name="field_label_price_unit">Unit Price</string>
+    <string name="field_label_price_subtotal">Sub Total</string>
+    <string name="field_label_order_id">Order Id</string>
+    <!--Model product.product-->
+    <string name="field_label_product_tmpl_id">Product Template</string>
+    <string name="field_label_name_template">Name</string>
+    <string name="field_label_default_code">Internal Reference</string>
+    <string name="field_label_lst_price">Public Price</string>
+    <string name="field_label_sale_ok">Can Bye</string>
 
 </resources>
