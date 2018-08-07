@@ -23,6 +23,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import com.odoo.R;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.BuildConfig;
 import com.odoo.core.orm.ODataRow;
@@ -36,6 +37,7 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.OResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,42 +45,47 @@ import java.util.List;
 public class ResPartner extends OModel {
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
             ".provider.content.sync.res_partner";
-
-    OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
-    OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
-    OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
-    OColumn street = new OColumn("Street", OVarchar.class).setSize(100);
-    OColumn street2 = new OColumn("Street2", OVarchar.class).setSize(100);
-    OColumn city = new OColumn("City", OVarchar.class);
-    OColumn zip = new OColumn("Zip", OVarchar.class);
-    OColumn website = new OColumn("Website", OVarchar.class).setSize(100);
-    OColumn phone = new OColumn("Phone", OVarchar.class).setSize(15);
-    OColumn mobile = new OColumn("Mobile", OVarchar.class).setSize(15);
-    OColumn email = new OColumn("Email", OVarchar.class);
-    OColumn company_id = new OColumn("Company", ResCompany.class, OColumn.RelationType.ManyToOne);
-    OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
+    private Context idContext = getContext();
+    OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setSize(100).setRequired();
+    OColumn is_company = new OColumn(_s(R.string.field_label_is_company), OBoolean.class).setDefaultValue(false);
+    OColumn image_small = new OColumn(_s(R.string.field_label_image_small), OBlob.class).setDefaultValue(false);
+    OColumn street = new OColumn(_s(R.string.field_label_street), OVarchar.class).setSize(100);
+    OColumn street2 = new OColumn(_s(R.string.field_label_street2), OVarchar.class).setSize(100);
+    OColumn city = new OColumn(_s(R.string.field_label_city), OVarchar.class);
+    OColumn zip = new OColumn(_s(R.string.field_label_zip), OVarchar.class);
+    OColumn website = new OColumn(_s(R.string.field_label_website), OVarchar.class).setSize(100);
+    OColumn phone = new OColumn(_s(R.string.field_label_phone), OVarchar.class).setSize(15);
+    OColumn mobile = new OColumn(_s(R.string.field_label_mobile), OVarchar.class).setSize(15);
+    OColumn email = new OColumn(_s(R.string.field_label_email), OVarchar.class);
+    OColumn company_id = new OColumn(_s(R.string.field_label_company_id), ResCompany.class, OColumn.RelationType.ManyToOne);
+    OColumn parent_id = new OColumn(_s(R.string.field_label_parent_id), ResPartner.class, OColumn.RelationType.ManyToOne)
             .addDomain("is_company", "=", true);
 
     @Odoo.Domain("[['country_id', '=', @country_id]]")
-    OColumn state_id = new OColumn("State", ResCountryState.class, OColumn.RelationType.ManyToOne);
-    OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
-    OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue("true");
-    OColumn comment = new OColumn("Internal Note", OText.class);
+    OColumn state_id = new OColumn(_s(R.string.field_label_state_id), ResCountryState.class, OColumn.RelationType.ManyToOne);
+    OColumn country_id = new OColumn(_s(R.string.field_label_country_id), ResCountry.class, OColumn.RelationType.ManyToOne);
+    OColumn customer = new OColumn(_s(R.string.field_label_customer), OBoolean.class).setDefaultValue("true");
+    OColumn comment = new OColumn(_s(R.string.field_label_comment), OText.class);
     @Odoo.Functional(store = true, depends = {"parent_id"}, method = "storeCompanyName")
-    OColumn company_name = new OColumn("Company Name", OVarchar.class).setSize(100)
+    OColumn company_name = new OColumn(_s(R.string.field_label_company_name), OVarchar.class).setSize(100)
             .setLocalColumn();
-    OColumn large_image = new OColumn("Image", OBlob.class).setDefaultValue("false").setLocalColumn();
+    OColumn large_image = new OColumn(_s(R.string.field_label_large_image), OBlob.class).setDefaultValue("false").setLocalColumn();
 
-    OColumn partner_invoice_id = new OColumn("partner_invoice_id", OVarchar.class).setLocalColumn();
-    OColumn partner_shipping_id = new OColumn("partner_shipping_id", OVarchar.class).setLocalColumn();
-    OColumn pricelist_id = new OColumn("pricelist_id", OVarchar.class).setLocalColumn();
-    OColumn fiscal_position = new OColumn("fiscal_position", OVarchar.class).setLocalColumn();
-    OColumn payment_term = new OColumn("Payment Term", AccountPaymentTerm.class, OColumn.RelationType.ManyToOne).setLocalColumn();
+    OColumn partner_invoice_id = new OColumn(_s(R.string.field_label_partner_invoice_id), OVarchar.class).setLocalColumn();
+    OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn();
+    OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
+    OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
+    OColumn payment_term = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne).setLocalColumn();
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
         setHasMailChatter(true);
     }
+
+    private String _s(int res_id) {
+        return OResource.string(idContext, res_id);
+    }
+
 
     @Override
     public Uri uri() {

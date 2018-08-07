@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Foss Sale</string>
+    <string name="label_today">Сегодня</string>
+    <!-- Sync Labels// -->
+    <string name="sync_label_customers">Покупатели</string>
+    <string name="sync_label_calendar">Календарь</string>
+    <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
+    <string name="sync_label_quotation_sales_orders">Предложение цен/Заказы продаж</string>
+    <string name="sync_label_phonecalls">Записанные вызовы</string>
+    <string name="no_notification">No Notification</string>
+    <string name="at_the_time_of_event">Во время события</string>
+    <string name="on_the_day_at">В день в %s</string>
+    <string name="on_your_working_day_start_time">Следующий рабочий день</string>
+    <string name="day_before_at">За день до %s</string>
+    <string name="minutes_before">%s минута до</string>
+    <string name="custom">Пользовательский...</string>
+    <string name="error_end_date_small_than_start_date">Конечная дата не может быть установлена до даты начала.</string>
+    <string name="label_all">Все</string>
+    <string name="label_leads">Leads</string>
+    <string name="label_lead">Lead</string>
+    <string name="label_opp">Opportunity</string>
+    <string name="label_opportunities">Opportunities</string>
+    <string name="label_quotation">Предложения цен</string>
+    <string name="label_quotation_not_sync">Закрытая Сессия</string>
+    <string name="label_opportunity">Возможность</string>
+    <string name="label_load_database_odo">Синхронизация</string>
+    <string name="label_sale_orders">Заказы продаж</string>
+    <string name="label_sync_data">Синхронизация</string>
+    <string name="label_phone_calls">Телефонные вызовы</string>
+    <string name="label_logged_calls">Записанные вызовы</string>
+    <string name="label_scheduled_calls">Запланированные вызовы</string>
+    <string name="label_logged_call">Записанный вызов</string>
+    <string name="label_scheduled_call">Запланированный вызов</string>
+    <string name="label_log_call">Журнал вызывов</string>
+    <string name="label_convert_to_opportunity">Преобразование в возможность</string>
+    <string name="label_create_opportunity">Создать возможность</string>
+    <string name="label_convert_to_quotation">Создать предложение</string>
+    <string name="label_create_quotation">@string/label_convert_to_quotation</string>
+    <string name="label_mark_as_lost">Mark Lost</string>
+    <string name="label_mark_as_won">Mark Won</string>
+    <string name="label_location">Местоположение</string>
+    <string name="label_call">Звонок</string>
+    <string name="label_call_held">Удерживать</string>
+    <string name="label_message">Сообщение</string>
+    <string name="label_schedule_call">Расписание</string>
+    <string name="label_meetings">Встреча</string>
+    <string name="label_sale_confirm_sale">Подтвердить продажу</string>
+    <string name="label_sale_create_invoice">Создать Счет-фактуру</string>
+    <string name="label_sale_cancel_order">Отменить заказ</string>
+    <string name="label_sale_new_copy_of_quotation">Новая копия Заказа</string>
+    <string name="label_mark_done">Пометка Сделано</string>
+    <string name="label_mark_undone">Пометка Несделано</string>
+    <string name="label_tag_new">Новый</string>
+    <string name="label_quotation_created">Заказ создан для</string>
+    <string name="label_re_schedule">Перерасчетe</string>
+    <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
+    <string name="label_no_customer_found">Клиенты не найдены</string>
+    <string name="label_no_location_found">Местоположение не найдено !</string>
+    <string name="label_no_contact_found">Контакт не найден!</string>
+    <string name="label_no_opportunity_found">No Opportunity Found !</string>
+    <string name="label_no_email_found">Не найдено email !</string>
+    <string name="label_no_logged_calls_found">Записанных вызывов не найдено</string>
+    <string name="label_no_scheduled_calls_found">Запланированных звонков не найдено</string>
+    <string name="label_event_marked">Событие с пометкой</string>
+    <string name="label_new_meeting">Новая Встреча</string>
+    <string name="label_edit_meeting">Изменить встречу</string>
+    <string name="label_missed_call_from_customer">Пропущенный звонок от клиента</string>
+    <string name="label_manage_order_lines">Позиции заказа</string>
+    <string name="label_define_lead">Define the lead</string>
+    <string name="label_expected_revenue">Expected Revenue</string>
+    <string name="label_at"> у </string>
+    <string name="label_conversion_action"> Conversion Action </string>
+    <string name="toast_information_saved">Информация сохранена</string>
+    <string name="toast_phone_call_marked_done">Звонок удерживается</string>
+    <string name="toast_event_marked_done">Событие обозначено законченным</string>
+    <string name="toast_image_size_too_large">Размер картинки слишком велик.</string>
+    <string name="toast_marked"> помечен</string>
+    <string name="message_to">Сообщение %s</string>
+    <string name="add_internal_note">Добавить в заметки</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Послать сообщение</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string-array name="array_conversation_actions">
+        <item>Convert to opportunity</item>
+        <item>Merge with existing opportunities</item>
+    </string-array>
+
+    <string name="label_send_by_email">Переслать email</string>
+    <string name="label_confirm_sale">Подтверждение продажи</string>
+    <string name="label_copy_quotation">Копирование заказа</string>
+    <string name="label_no_order_line">Вы не можете подтвердить продажу пока Позиция заказа не заполнена</string>
+    <string name="label_quotation_confirm">Заказ подтверждем !</string>
+    <string name="label_new_copy_quotation">Новая копия заказа</string>
+    <string name="label_opt_schedule_log_call">Расписание/Журнал вызывов</string>
+    <string name="label_opt_schedule_meeting">Встреча</string>
+
+    <!-- Working day start time -->
+    <string name="default_day_start_time">09:00:00</string>
+    <string name="label_version_build">Build</string>
+    <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
+    <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
+    <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
+    <string name="toast_record_deleted">Record deleted</string>
+    <string name="label_new">Новый</string>
+
+    <string name="field_label_new">Новый</string>
+
+    <string name="field_label_draft">Черновик заказа</string>
+    <string name="field_label_sent">Заказ отослан</string>
+    <string name="field_label_canceled">Отменен</string>
+    <string name="field_label_waiting_date">Ожидание расписания</string>
+    <string name="field_label_sale">Заказы продаж</string>
+    <string name="field_label_manual">Выставлене счета продаж</string>
+    <string name="field_label_sipping_except">Исключение доставки</string>
+    <string name="field_label_invoice_except">Исключения выставлнея счета</string>
+    <string name="field_label_done">Счет выставлен полностью</string>
+    <string name="label_total">Всего :</string>
+    <string name="label_untaxed_amount">Сумма без налогов :</string>
+    <string name="label_taxes">Налог :</string>
+    <string name="label_quantity">Количество</string>
+    <string name="label_unit_price">Стоймость единицы</string>
+    <string name="label_sub_total">Под Итог</string>
+    <string name="title_copy_quotation">Копия Заказа</string>
+    <string name="label_creating_lines">Создание позиции заказа</string>
+    <string name="label_creating">Создается</string>
+    <string name="label_canceled">отменена</string>
+    <string name="label_no">Ничего не </string>
+    <string name="label_found">найдено</string>
+    <string name="label_crash_refresh">Что то пошло не так!!!!! обновление остановлено!</string>
+    <string name="label_no_lines">Вы не можете подтвердить продажу пока Позиция заказа не заполнена</string>
+    <string name="label_quotation_confirmed">Предложение Заказа подтверждено!</string>
+    <string name="label_updated">обновлено</string>
+    <string name="label_created">создано</string>
+    <string name="title_no_lines">(Позиции заказа отсутствуют)</string>
+    <string name="lebel_lines">позиции заказа</string>
+    <string name="field_label_name">Имя"</string>
+    <!--Model sale.order-->
+    <string name="field_label_date_order">"Дата"</string>
+    <string name="field_label_partner_id">Покупатель</string>
+    <string name="field_label_user_id">"Продавец"</string>
+    <string name="field_label_amount_total">"Всего"</string>
+    <string name="field_label_payment_term">"Payment Term"</string>
+    <string name="field_label_amount_untaxed">"Untaxed"</string>
+    <string name="field_label_amount_tax">"Tax"</string>
+    <string name="field_label_client_order_ref">"Client Order Reference"</string>
+    <string name="field_label_state">"Status"</string>
+    <string name="field_label_state_title">"State Title"</string>
+    <string name="field_label_partner_name">"Partner Name"</string>
+    <string name="field_label_currency_id">"Currency"</string>
+    <string name="field_label_currency_symbol">"Currency Symbol"</string>
+    <string name="field_label_order_line">"Order Lines"</string>
+    <string name="field_label_order_line_count">"Total Lines"</string>
+    <string name="field_label_partner_invoice_id">"Partner Invoice Id"</string>
+    <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
+    <string name="field_label_pricelist_id">"Price List Id"</string>
+    <string name="field_label_fiscal_position">"Fiscal Position"</string>
+    <!--Model order.line-->
+    <string name="field_label_product_id">Product</string>
+    <string name="field_label_product_uom_qty">Quantity</string>
+    <string name="field_label_price_unit">Unit Price</string>
+    <string name="field_label_price_subtotal">Sub Total</string>
+    <string name="field_label_order_id">Order Id</string>
+    <!--Model product.product-->
+    <string name="field_label_product_tmpl_id">Product Template</string>
+    <string name="field_label_name_template">Name</string>
+    <string name="field_label_default_code">Internal Reference</string>
+    <string name="field_label_lst_price">Public Price</string>
+    <string name="field_label_sale_ok">Can Bye</string>
+    <!--Model res.partner-->
+    <string name="field_label_is_company">Является компанией</string>
+    <string name="field_label_image_small">Логотип</string>
+    <string name="field_label_street">Улица</string>
+    <string name="field_label_street2">Улица2</string>
+    <string name="field_label_city">Город</string>
+    <string name="field_label_zip">Индекс</string>
+    <string name="field_label_website">Вебсайт</string>
+    <string name="field_label_phone">Телефон</string>
+    <string name="field_label_mobile">Мобильный</string>
+    <string name="field_label_email">E-mail</string>
+    <string name="field_label_company_id">Компания</string>
+    <string name="field_label_parent_id">Родительские компании</string>
+    <string name="field_label_state_id">Область</string>
+    <string name="field_label_country_id">Страна</string>
+    <string name="field_label_customer">Клиент-Покупатель</string>
+    <string name="field_label_comment">Внутренняя записная книга</string>
+    <string name="field_label_company_name">Название Компании</string>
+    <string name="field_label_large_image">Логотип Большой</string>
+
+    <string name="control_label_username">ИМЯ ПОЛЬЗОВАТЕЛЯ</string>
+    <string name="control_label_user">ЛОГИН</string>
+    <string name="control_label_serv_url">URL СЕРВЕРА</string>
+    <string name="control_label_database">БАЗА ДАННЫХ</string>
+    <string name="control_label_odoo_server_version">ВЕРСИЯ ПО НА СЕРВЕРЕ</string>
+    <string name="control_label_timezone">ВРЕМЕННАЯ ЗОНА</string>
+
+</resources>

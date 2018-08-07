@@ -58,6 +58,7 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.OBottomSheet;
 
 import java.util.ArrayList;
@@ -315,7 +316,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> items = new ArrayList<ODrawerItem>();
-        items.add(new ODrawerItem(KEY).setTitle("Customers")
+        items.add(new ODrawerItem(KEY).setTitle(OResource.string(context, R.string.sync_label_customers))
                 .setIcon(R.drawable.ic_action_customers)
                 .setInstance(new Customers()));
         return items;

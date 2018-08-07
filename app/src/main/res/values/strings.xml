@@ -127,7 +127,7 @@
     <string name="label_creating_lines">Creating lines</string>
     <string name="label_creating">Creating</string>
     <string name="label_canceled">cancelled</string>
-    <string name="label_no">No</string>
+    <string name="label_no">Nothing </string>
     <string name="label_found">Found</string>
     <string name="label_crash_refresh">Whooops!!!!! refresh crashed!</string>
     <string name="label_no_lines">You cannot a sales order which has no line</string>
@@ -138,7 +138,7 @@
     <string name="lebel_lines">lines</string>
     <string name="field_label_name">Name"</string>
     <!--Model sale.order-->
-    <string name="field_label_date_order">"Дата"</string>
+    <string name="field_label_date_order">"Date"</string>
     <string name="field_label_partner_id">Customer</string>
     <string name="field_label_user_id">"Salesperson"</string>
     <string name="field_label_amount_total">"Total"</string>
@@ -169,5 +169,32 @@
     <string name="field_label_default_code">Internal Reference</string>
     <string name="field_label_lst_price">Public Price</string>
     <string name="field_label_sale_ok">Can Bye</string>
+    <!--Model res.partner-->
+    <string name="field_label_is_company">Is Company</string>
+    <string name="field_label_image_small">Avatar</string>
+    <string name="field_label_street">Street</string>
+    <string name="field_label_street2">Street2</string>
+    <string name="field_label_city">City</string>
+    <string name="field_label_zip">Zip</string>
+    <string name="field_label_website">Website</string>
+    <string name="field_label_phone">Phone</string>
+    <string name="field_label_mobile">Mobile</string>
+    <string name="field_label_email">Email</string>
+    <string name="field_label_company_id">Company</string>
+    <string name="field_label_parent_id">Related Company</string>
+    <string name="field_label_state_id">State</string>
+    <string name="field_label_country_id">Country</string>
+    <string name="field_label_customer">Customer</string>
+    <string name="field_label_comment">Internal Note</string>
+    <string name="field_label_company_name">Company Name</string>
+    <string name="field_label_large_image">Image</string>
+
+    <string name="control_label_user">USER LOGIN</string>
+    <string name="control_label_serv_url">SERVER URL</string>
+    <string name="control_label_database">DATABASE</string>
+    <string name="control_label_odoo_server_version">ODOO VERSION</string>
+    <string name="control_label_timezone">TIMEZONE</string>
+    <string name="control_label_username">Name</string>
+
 
 </resources>
