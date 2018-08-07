@@ -52,7 +52,7 @@
                         android:fontFamily="@string/font_condensed"
                         android:textColor="@color/body_text_3"
                         android:layout_height="wrap_content"
-                        android:text="Quantity" />
+                        android:text="@string/label_quantity" />
 
                     <TextView
                         android:id="@+id/edtProductQty"
@@ -76,7 +76,7 @@
                         android:fontFamily="@string/font_condensed"
                         android:textColor="@color/body_text_3"
                         android:layout_height="wrap_content"
-                        android:text="Unit Price" />
+                        android:text="@string/label_unit_price" />
 
                     <TextView
                         android:id="@+id/edtProductPrice"
@@ -100,7 +100,7 @@
                         android:fontFamily="@string/font_condensed"
                         android:textColor="@color/body_text_3"
                         android:layout_height="wrap_content"
-                        android:text="Sub Total" />
+                        android:text="@string/label_sub_total" />
 
 
                     <TextView

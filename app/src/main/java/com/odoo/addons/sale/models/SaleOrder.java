@@ -59,11 +59,13 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
-    private Context mContext;
-    OColumn name = new OColumn("Name", OVarchar.class).setDefaultValue("offline");
+    private Context mContext = getContext();
+    private Context idContext = getContext();
+
+    OColumn name = new OColumn(_("Name"), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn("Date", ODateTime.class);
     @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
-    OColumn partner_id = new OColumn("Customer", ResPartner.class, OColumn.RelationType.ManyToOne);
+    OColumn partner_id = new OColumn(_("Customer"), ResPartner.class, OColumn.RelationType.ManyToOne);
     OColumn user_id = new OColumn("Salesperson", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn amount_total = new OColumn("Total", OFloat.class);
     OColumn payment_term = new OColumn("Payment Term", AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
@@ -103,6 +105,10 @@ public class SaleOrder extends OModel {
         if (getUser().getOdooVersion().getVersionNumber() == 7) {
             date_order.setType(ODate.class);
         }
+    }
+
+    public String _(String nameField){
+        return idContext.getResources().getString(R.string.field_label_customer);
     }
 
     @Override
@@ -152,15 +158,15 @@ public class SaleOrder extends OModel {
 
     public String getStateTitle(OValues row) {
         HashMap<String, String> mStates = new HashMap<String, String>();
-        mStates.put("draft", "Draft Quotation");
-        mStates.put("sent", "Quotation Sent");
-        mStates.put("cancel", "Cancelled");
-        mStates.put("waiting_date", "Waiting Schedule");
-        mStates.put("sale", "Sales Order");
-        mStates.put("manual", "Sale to Invoice");
-        mStates.put("shipping_except", "Shipping Exception");
-        mStates.put("invoice_except", "Invoice Exception");
-        mStates.put("done", "Done");
+        mStates.put("draft", mContext.getString(R.string.field_label_draft));
+        mStates.put("sent", mContext.getString(R.string.field_label_sent));
+        mStates.put("cancel", mContext.getString(R.string.field_label_canceled));
+        mStates.put("waiting_date", mContext.getString(R.string.field_label_waiting_date));
+        mStates.put("sale", mContext.getString(R.string.field_label_sale));
+        mStates.put("manual", mContext.getString(R.string.field_label_manual));
+        mStates.put("shipping_except", mContext.getString(R.string.field_label_sipping_except));
+        mStates.put("invoice_except", mContext.getString(R.string.field_label_invoice_except));
+        mStates.put("done", mContext.getString(R.string.field_label_done));
         return mStates.get(row.getString("state"));
     }
 
@@ -192,12 +198,12 @@ public class SaleOrder extends OModel {
 
             JSONArray order_line = new JSONArray(values.getString("order_line"));
             if (order_line.length() > 0) {
-                return " (" + order_line.length() + " lines)";
+                return " (" + order_line.length() + " " + mContext.getString(R.string.lebel_lines) + ")";
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return " (No lines)";
+        return " " + mContext.getString(R.string.title_no_lines);
     }
 
 

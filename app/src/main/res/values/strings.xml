@@ -105,4 +105,39 @@
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
     <string name="label_new">New</string>
+
+    <string name="field_label_customer">Customer</string>
+    <string name="field_label_new">New</string>
+    <string name="field_label_draft">Draft Quotation</string>
+    <string name="field_label_sent">Quotation Sent</string>
+    <string name="field_label_canceled">Cancelled</string>
+    <string name="field_label_waiting_date">Waiting Schedule</string>
+    <string name="field_label_sale">Sales Order</string>
+    <string name="field_label_manual">Sale to Invoice</string>
+    <string name="field_label_sipping_except">Shipping Exception</string>
+    <string name="field_label_invoice_except">Invoice Exception</string>
+    <string name="field_label_done">Done</string>
+
+    <string name="label_total">Total:</string>
+    <string name="label_untaxed_amount">Untaxed Amount:</string>
+    <string name="label_taxes">Taxes :</string>
+    <string name="label_quantity">Quantity</string>
+    <string name="label_unit_price">Unit Price</string>
+    <string name="label_sub_total">Sub Total</string>
+    <string name="title_copy_quotation">Copy Quotation</string>
+    <string name="label_creating_lines">Creating lines</string>
+    <string name="label_creating">Creating</string>
+    <string name="label_canceled">cancelled</string>
+    <string name="label_no">No</string>
+    <string name="label_found">Found</string>
+    <string name="label_crash_refresh">Whooops!!!!! refresh crashed!</string>
+    <string name="label_no_lines">You cannot a sales order which has no line</string>
+    <string name="label_quotation_confirmed">Quotation confirmed!</string>
+    <string name="label_updated">updated</string>
+    <string name="label_created">created</string>
+
+    <string name="title_no_lines">(No lines)</string>
+    <string name="lebel_lines">lines</string>
+
+
 </resources>

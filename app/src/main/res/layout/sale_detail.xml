@@ -125,7 +125,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Manage order lines"
+                    android:text="@string/label_manage_order_lines"
                     android:textAllCaps="true"
                     android:textColor="@color/android_orange_dark"
                     android:textStyle="bold"
@@ -155,7 +155,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:padding="@dimen/default_8dp"
-                    android:text="Untaxed Amount:"
+                    android:text="@string/label_untaxed_amount"
                     android:gravity="center_vertical|right"
                     android:textAppearance="?android:textAppearanceSmall"
                     android:layout_height="match_parent" />
@@ -193,7 +193,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:padding="@dimen/default_8dp"
-                    android:text="Taxes :"
+                    android:text="@string/label_taxes"
                     android:gravity="center_vertical|right"
                     android:textAppearance="?android:textAppearanceSmall"
                     android:layout_height="match_parent" />
@@ -234,7 +234,7 @@
                     android:layout_weight="1"
                     android:padding="@dimen/default_8dp"
                     android:textStyle="bold"
-                    android:text="Total:"
+                    android:text="@string/label_total"
                     android:gravity="center_vertical|right"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:layout_height="match_parent" />

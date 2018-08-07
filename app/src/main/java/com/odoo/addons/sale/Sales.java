@@ -241,7 +241,7 @@ public class Sales extends BaseFragment implements
                     setHasSwipeRefreshView(mView, R.id.data_list_no_item, Sales.this);
                     OControls.setImage(mView, R.id.icon,
                             (mType == Type.Quotation) ? R.drawable.ic_action_quotation : R.drawable.ic_action_sale_order);
-                    OControls.setText(mView, R.id.title, "No " + mType + " Found");
+                    OControls.setText(mView, R.id.title, getString(R.string.label_no) + mType + getString(R.string.label_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
@@ -278,18 +278,18 @@ public class Sales extends BaseFragment implements
                 if (CheckNewRecords != null) {
 //                    if (mType == Type.Quotation)
 //                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-                    Toast.makeText(getActivity(), R.string.toast_update_database, Toast.LENGTH_LONG)
+                    Toast.makeText(getActivity(), _s(R.string.toast_update_database), Toast.LENGTH_LONG)
                             .show();
                 } else {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), R.string.toast_no_new_records, Toast.LENGTH_LONG)
+                    Toast.makeText(getActivity(), _s(R.string.toast_no_new_records), Toast.LENGTH_LONG)
                             .show();
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(getActivity(), "Whooops!!!!! refresh crashed!", Toast.LENGTH_LONG)
+                Toast.makeText(getActivity(), _s(R.string.label_crash_refresh), Toast.LENGTH_LONG)
                         .show();
             }
         } else {
@@ -384,10 +384,10 @@ public class Sales extends BaseFragment implements
                     if (inNetwork()) {
                         ((SaleOrder) db()).confirmSale(row, confirmSale);
                     } else {
-                        Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    OAlert.showWarning(getActivity(), "You cannot a sales order which has no line");
+                    OAlert.showWarning(getActivity(), getString(R.string.label_no_lines));
                 }
                 break;
         }
@@ -412,7 +412,7 @@ public class Sales extends BaseFragment implements
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), mType + " cancelled", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), mType + " "+ _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -422,7 +422,7 @@ public class Sales extends BaseFragment implements
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), "Quotation confirmed !", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -432,7 +432,7 @@ public class Sales extends BaseFragment implements
     SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), _s(R.string.label_copy_quotation), Toast.LENGTH_LONG).show();
         }
 
         @Override

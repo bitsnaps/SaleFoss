@@ -221,7 +221,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
         if (extra != null && record != null && record.getString("state").equals("cancel")) {
-            menu.findItem(R.id.menu_sale_save).setVisible(false).setTitle("Copy Quotation"); // original true
+            menu.findItem(R.id.menu_sale_save).setVisible(false).setTitle(R.string.title_copy_quotation); // original true
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             mForm.setEditable(true);
         } else {
@@ -288,7 +288,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             super.onPreExecute();
             mDialog = new ProgressDialog(SalesDetail.this);
             mDialog.setTitle(R.string.title_working);
-            mDialog.setMessage("Creating lines");
+            mDialog.setMessage(getString(R.string.label_creating_lines));
             mDialog.setCancelable(false);
             mDialog.show();
         }
@@ -312,7 +312,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mDialog.setMessage("Creating " + mSOType);
+                            mDialog.setMessage(getString(R.string.label_creating) + " " + mSOType);
                         }
                     });
                     Thread.sleep(500);
@@ -403,8 +403,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             super.onPostExecute(success);
             mDialog.dismiss();
             if (success) {
-                Toast.makeText(SalesDetail.this, (record != null) ? mSOType + " updated"
-                        : mSOType + " created", Toast.LENGTH_LONG).show();
+                Toast.makeText(SalesDetail.this, (record != null) ? mSOType + " " + getString(R.string.label_updated)
+                        : mSOType + " " + getString(R.string.label_created), Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -414,7 +414,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         @Override
         public void OnSuccess() {
             Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
-                    + " cancelled", Toast.LENGTH_LONG).show();
+                    + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
             finish();
         }
 
