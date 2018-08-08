@@ -4,7 +4,7 @@
     <string name="app_name">Foss Sale</string>
     <string name="label_today">Сегодня</string>
     <!-- Sync Labels// -->
-    <string name="sync_label_customers">Покупатели</string>
+    <string name="sync_label_customers">Клиенты</string>
     <string name="sync_label_calendar">Календарь</string>
     <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
     <string name="sync_label_quotation_sales_orders">Предложение цен/Заказы продаж</string>
@@ -112,17 +112,17 @@
     <string name="field_label_sent">Заказ отослан</string>
     <string name="field_label_canceled">Отменен</string>
     <string name="field_label_waiting_date">Ожидание расписания</string>
-    <string name="field_label_sale">Заказы продаж</string>
+    <string name="field_label_sale">Заказы продаж /</string>
     <string name="field_label_manual">Выставлене счета продаж</string>
     <string name="field_label_sipping_except">Исключение доставки</string>
     <string name="field_label_invoice_except">Исключения выставлнея счета</string>
     <string name="field_label_done">Счет выставлен полностью</string>
-    <string name="label_total">Всего :</string>
-    <string name="label_untaxed_amount">Сумма без налогов :</string>
-    <string name="label_taxes">Налог :</string>
-    <string name="label_quantity">Количество</string>
-    <string name="label_unit_price">Стоймость единицы</string>
-    <string name="label_sub_total">Под Итог</string>
+    <string name="label_total">Итого :</string>
+    <string name="label_untaxed_amount">Сумма без налога :</string>
+    <string name="label_taxes">Налоги :</string>
+    <string name="label_quantity">Заказанное кол-во</string>
+    <string name="label_unit_price">Цена за единицу</string>
+    <string name="label_sub_total">Подитог</string>
     <string name="title_copy_quotation">Копия Заказа</string>
     <string name="label_creating_lines">Создание позиции заказа</string>
     <string name="label_creating">Создается</string>
@@ -138,8 +138,8 @@
     <string name="lebel_lines">позиции заказа</string>
     <string name="field_label_name">Имя"</string>
     <!--Model sale.order-->
-    <string name="field_label_date_order">"Дата"</string>
-    <string name="field_label_partner_id">Покупатель</string>
+    <string name="field_label_date_order">"Дата подтверждения"</string>
+    <string name="field_label_partner_id">Заказчик</string>
     <string name="field_label_user_id">"Продавец"</string>
     <string name="field_label_amount_total">"Всего"</string>
     <string name="field_label_payment_term">"Payment Term"</string>
@@ -170,16 +170,16 @@
     <string name="field_label_lst_price">Public Price</string>
     <string name="field_label_sale_ok">Can Bye</string>
     <!--Model res.partner-->
-    <string name="field_label_is_company">Является компанией</string>
+    <string name="field_label_is_company">Компания</string>
     <string name="field_label_image_small">Логотип</string>
     <string name="field_label_street">Улица</string>
     <string name="field_label_street2">Улица2</string>
     <string name="field_label_city">Город</string>
     <string name="field_label_zip">Индекс</string>
-    <string name="field_label_website">Вебсайт</string>
+    <string name="field_label_website">Сайт</string>
     <string name="field_label_phone">Телефон</string>
     <string name="field_label_mobile">Мобильный</string>
-    <string name="field_label_email">E-mail</string>
+    <string name="field_label_email">Email</string>
     <string name="field_label_company_id">Компания</string>
     <string name="field_label_parent_id">Родительские компании</string>
     <string name="field_label_state_id">Область</string>
@@ -191,9 +191,9 @@
 
     <string name="control_label_username">ИМЯ ПОЛЬЗОВАТЕЛЯ</string>
     <string name="control_label_user">ЛОГИН</string>
-    <string name="control_label_serv_url">URL СЕРВЕРА</string>
-    <string name="control_label_database">БАЗА ДАННЫХ</string>
-    <string name="control_label_odoo_server_version">ВЕРСИЯ ПО НА СЕРВЕРЕ</string>
-    <string name="control_label_timezone">ВРЕМЕННАЯ ЗОНА</string>
+    <string name="control_label_serv_url">URL АДРЕС СЕРВЕРА</string>
+    <string name="control_label_database">НАЗВАНИЕ БАЗЫ ДАННЫХ</string>
+    <string name="control_label_odoo_server_version">ВЕРСИЯ СЕРВЕРА</string>
+    <string name="control_label_timezone">ЧАСОВОЙ ПОЯС</string>
 
 </resources>

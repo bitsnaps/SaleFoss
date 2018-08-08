@@ -31,7 +31,7 @@
     <string name="status_redirecting">Перенаправление&#8230;</string>
     <string name="label_select_user">Login to User</string>
     <string name="label_accounts">Учетные записи</string>
-    <string name="label_settings">Установки</string>
+    <string name="label_settings">Параметры</string>
     <string name="label_save">Сохранить</string>
     <string name="label_edit">Изменить</string>
     <string name="label_required">требуемый</string>
@@ -121,8 +121,8 @@
     </string-array>
     <string name="summary_about_odoo_mobile">Odoo Mobile</string>
     <string name="summary_about_foss_mobile">ФОСС-Он-Лайн</string>
-    <string name="synchronization_database">Нажмите чтобы синхронизировать данные Заказов</string>
-    <string name="synchronization_products">Нажмите чтобы обновить информацию о товарах</string>
+    <string name="synchronization_database">Синхронизировать данные Заказов</string>
+    <string name="synchronization_products">Обновить информацию о Продукции</string>
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Авторские права © 2018-СЕГОДНЯ ФОСС-Он-Лайн. Все права защищены.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
