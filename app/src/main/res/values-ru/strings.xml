@@ -113,7 +113,7 @@
     <string name="field_label_canceled">Отменен</string>
     <string name="field_label_waiting_date">Ожидание расписания</string>
     <string name="field_label_sale">Заказы продаж /</string>
-    <string name="field_label_manual">Выставлене счета продаж</string>
+    <string name="field_label_manual">Выставление счета продаж</string>
     <string name="field_label_sipping_except">Исключение доставки</string>
     <string name="field_label_invoice_except">Исключения выставлнея счета</string>
     <string name="field_label_done">Счет выставлен полностью</string>
@@ -136,7 +136,7 @@
     <string name="label_created">создано</string>
     <string name="title_no_lines">(Позиции заказа отсутствуют)</string>
     <string name="lebel_lines">позиции заказа</string>
-    <string name="field_label_name">Имя"</string>
+    <string name="field_label_name">Имя</string>
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата подтверждения"</string>
     <string name="field_label_partner_id">Заказчик</string>
@@ -185,7 +185,7 @@
     <string name="field_label_state_id">Область</string>
     <string name="field_label_country_id">Страна</string>
     <string name="field_label_customer">Клиент-Покупатель</string>
-    <string name="field_label_comment">Внутренняя записная книга</string>
+    <string name="field_label_comment">Внутренние заметки</string>
     <string name="field_label_company_name">Название Компании</string>
     <string name="field_label_large_image">Логотип Большой</string>
 

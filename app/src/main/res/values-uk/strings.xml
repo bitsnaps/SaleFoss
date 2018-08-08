@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Foss Sale</string>
+    <string name="label_today">Сегодня</string>
+    <!-- Sync Labels// -->
+    <string name="sync_label_customers">Клієнти</string>
+    <string name="sync_label_calendar">Календарь</string>
+    <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
+    <string name="sync_label_quotation_sales_orders">Комерційні пропозиції/Замовлення на продаж</string>
+    <string name="sync_label_phonecalls">Записані дзвінки</string>
+    <string name="no_notification">No Notification</string>
+    <string name="at_the_time_of_event">Під час події</string>
+    <string name="on_the_day_at">У день в %s</string>
+    <string name="on_your_working_day_start_time">Наступний робочий день</string>
+    <string name="day_before_at">За день до %s</string>
+    <string name="minutes_before">%s хвилина до</string>
+    <string name="custom">Призначений для Користувача&#8230;</string>
+    <string name="error_end_date_small_than_start_date">Конечная дата не может быть установлена до даты начала.</string>
+    <string name="label_all">Все</string>
+    <string name="label_leads">Leads</string>
+    <string name="label_lead">Lead</string>
+    <string name="label_opp">Opportunity</string>
+    <string name="label_opportunities">Opportunities</string>
+    <string name="label_quotation">Комерційна пропозиція</string>
+    <string name="label_quotation_not_sync">Закрита Сесія</string>
+    <string name="label_opportunity">Можливість</string>
+    <string name="label_load_database_odo">Синхронізація</string>
+    <string name="label_sale_orders">Замовлення на продаж</string>
+    <string name="label_sync_data">Синхронізація</string>
+    <string name="label_phone_calls">Телефоний виклик</string>
+    <string name="label_logged_calls">Записані виклики</string>
+    <string name="label_scheduled_calls">Заплановані виклики</string>
+    <string name="label_logged_call">Записаний виклик</string>
+    <string name="label_scheduled_call">Запланований виклик</string>
+    <string name="label_log_call">Журнал викликів</string>
+    <string name="label_convert_to_opportunity">Перетворення у можливість</string>
+    <string name="label_create_opportunity">Створити можливість</string>
+    <string name="label_convert_to_quotation">Створити пропозицію</string>
+    <string name="label_create_quotation">@string/label_convert_to_quotation</string>
+    <string name="label_mark_as_lost">Mark Lost</string>
+    <string name="label_mark_as_won">Mark Won</string>
+    <string name="label_location">Місцезнаходження</string>
+    <string name="label_call">Дзвінок</string>
+    <string name="label_call_held">Утримувати</string>
+    <string name="label_message">Повідомлення</string>
+    <string name="label_schedule_call">Розклад</string>
+    <string name="label_meetings">Зустріч</string>
+    <string name="label_sale_confirm_sale">Підтвердити продаж</string>
+    <string name="label_sale_create_invoice">Створити Рахунок-фактуру</string>
+    <string name="label_sale_cancel_order">Скасувати замовлення</string>
+    <string name="label_sale_new_copy_of_quotation">Нова копія Замовлення</string>
+    <string name="label_mark_done">Позначка Зроблено</string>
+    <string name="label_mark_undone">Позначка не Зроблено</string>
+    <string name="label_tag_new">Новый</string>
+    <string name="label_quotation_created">Заказ создан для</string>
+    <string name="label_re_schedule">Переглянуто</string>
+    <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
+    <string name="label_no_customer_found">Клієнти не знайдені</string>
+    <string name="label_no_location_found">Місцеположення не знайдено !</string>
+    <string name="label_no_contact_found">Контакт не знайден!</string>
+    <string name="label_no_opportunity_found">No Opportunity Found !</string>
+    <string name="label_no_email_found">Не знайдено email !</string>
+    <string name="label_no_logged_calls_found">Записаних викликів не знайдено</string>
+    <string name="label_no_scheduled_calls_found">Запланованих дзвінкив не знайдено</string>
+    <string name="label_event_marked">Подія з позначкою</string>
+    <string name="label_new_meeting">Нова Зустріч</string>
+    <string name="label_edit_meeting">Змінити зустріч</string>
+    <string name="label_missed_call_from_customer">Пропущений дзвінок від клієнта</string>
+    <string name="label_manage_order_lines">Рядки замовлення</string>
+    <string name="label_define_lead">Define the lead</string>
+    <string name="label_expected_revenue">Expected Revenue</string>
+    <string name="label_at"> у </string>
+    <string name="label_conversion_action"> Conversion Action </string>
+    <string name="toast_information_saved">Інформація збережена</string>
+    <string name="toast_phone_call_marked_done">Дзвінок утримується</string>
+    <string name="toast_event_marked_done">Подію позначено закінчинею</string>
+    <string name="toast_image_size_too_large">Розмір малюнка занадто великий.</string>
+    <string name="toast_marked"> позначений</string>
+    <string name="message_to">Повідомлення %s</string>
+    <string name="add_internal_note">Додати в замітки</string>
+    <string name="internal_note_hint">Add an internal note that will not be sent to the followers</string>
+    <string name="label_log_note">Log note</string>
+    <string name="label_send_message"><u>Послати повідомлення</u></string>
+    <string name="label_log_an_internal_note"><u>Log an internal note</u></string>
+    <string-array name="array_conversation_actions">
+        <item>Convert to opportunity</item>
+        <item>Merge with existing opportunities</item>
+    </string-array>
+
+    <string name="label_send_by_email">Переслати email</string>
+    <string name="label_confirm_sale">Підтвердження продажу</string>
+    <string name="label_copy_quotation">Копіювання пропозиції</string>
+    <string name="label_no_order_line">Ви не можете підтвердити продаж доки Рядок замовлення не заповнений</string>
+    <string name="label_quotation_confirm">Пропозиція підтверджена !</string>
+    <string name="label_new_copy_quotation">Нова копія пропозиції</string>
+    <string name="label_opt_schedule_log_call">Розклад/Журнал викликів</string>
+    <string name="label_opt_schedule_meeting">Зустріч</string>
+
+    <!-- Working day start time -->
+    <string name="default_day_start_time">09:00:00</string>
+    <string name="label_version_build">Build</string>
+    <string name="toast_permission_download_storage">Storage permission required to create downloaded file on your sdcard.</string>
+    <string name="toast_permission_download_storage_help">Storage permission required to store downloaded files on sdcard of your phone. Please grant permission for use this feature</string>
+    <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
+    <string name="toast_record_deleted">Record deleted</string>
+    <string name="label_new">Новий</string>
+
+    <string name="field_label_new">Новий</string>
+
+    <string name="field_label_draft">Чернетка пропозиції</string>
+    <string name="field_label_sent">Замовлення відіслано</string>
+    <string name="field_label_canceled">Скасовано</string>
+    <string name="field_label_waiting_date">Очикування розкладу</string>
+    <string name="field_label_sale">Замовлення на продаж \/</string>
+    <string name="field_label_manual">Виставлення рахунку продажів</string>
+    <string name="field_label_sipping_except">Виключення доставки</string>
+    <string name="field_label_invoice_except">Вийнятки выставлнея рахунку</string>
+    <string name="field_label_done">Рахунок виставлений повністью</string>
+    <string name="label_total">Разом :</string>
+    <string name="label_untaxed_amount">Сума без податків :</string>
+    <string name="label_taxes">Податки :</string>
+    <string name="label_quantity">Замовлена к-сть</string>
+    <string name="label_unit_price">Ціна одиниці</string>
+    <string name="label_sub_total">Підсумок</string>
+    <string name="title_copy_quotation">Копія Замовлення</string>
+    <string name="label_creating_lines">Стоворення рядка замовлення</string>
+    <string name="label_creating">Створюється</string>
+    <string name="label_canceled">скасована</string>
+    <string name="label_no">Нічого не </string>
+    <string name="label_found">знайдено</string>
+    <string name="label_crash_refresh">Щось трапилось!!!!! оновлення зупинено !</string>
+    <string name="label_no_lines">Ви не можете підтвердити продаж доки Рядок замовлення не заповнений</string>
+    <string name="label_quotation_confirmed">Пропозиція Замовлення підтверджено!</string>
+    <string name="label_updated">оновлено</string>
+    <string name="label_created">створена</string>
+    <string name="title_no_lines">(Рядки замовлення відсутні)</string>
+    <string name="lebel_lines">рядки замовлення</string>
+    <string name="field_label_name">ім\'я</string>
+    <!--Model sale.order-->
+    <string name="field_label_date_order">"Дата підтвердження"</string>
+    <string name="field_label_partner_id">Клієнт</string>
+    <string name="field_label_user_id">"Продавець"</string>
+    <string name="field_label_amount_total">"Разом"</string>
+    <string name="field_label_payment_term">"Payment Term"</string>
+    <string name="field_label_amount_untaxed">"Untaxed"</string>
+    <string name="field_label_amount_tax">"Tax"</string>
+    <string name="field_label_client_order_ref">"Client Order Reference"</string>
+    <string name="field_label_state">"Status"</string>
+    <string name="field_label_state_title">"State Title"</string>
+    <string name="field_label_partner_name">"Partner Name"</string>
+    <string name="field_label_currency_id">"Currency"</string>
+    <string name="field_label_currency_symbol">"Currency Symbol"</string>
+    <string name="field_label_order_line">"Order Lines"</string>
+    <string name="field_label_order_line_count">"Total Lines"</string>
+    <string name="field_label_partner_invoice_id">"Partner Invoice Id"</string>
+    <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
+    <string name="field_label_pricelist_id">"Price List Id"</string>
+    <string name="field_label_fiscal_position">"Fiscal Position"</string>
+    <!--Model order.line-->
+    <string name="field_label_product_id">Product</string>
+    <string name="field_label_product_uom_qty">Quantity</string>
+    <string name="field_label_price_unit">Unit Price</string>
+    <string name="field_label_price_subtotal">Sub Total</string>
+    <string name="field_label_order_id">Order Id</string>
+    <!--Model product.product-->
+    <string name="field_label_product_tmpl_id">Product Template</string>
+    <string name="field_label_name_template">Name</string>
+    <string name="field_label_default_code">Internal Reference</string>
+    <string name="field_label_lst_price">Public Price</string>
+    <string name="field_label_sale_ok">Can Bye</string>
+    <!--Model res.partner-->
+    <string name="field_label_is_company">Компанія</string>
+    <string name="field_label_image_small">Логотип</string>
+    <string name="field_label_street">Вулиця</string>
+    <string name="field_label_street2">Вулиця2</string>
+    <string name="field_label_city">Місто</string>
+    <string name="field_label_zip">Індекс</string>
+    <string name="field_label_website">Вебсайт</string>
+    <string name="field_label_phone">Телефон</string>
+    <string name="field_label_mobile">Мобільний</string>
+    <string name="field_label_email">Email</string>
+    <string name="field_label_company_id">Компанія</string>
+    <string name="field_label_parent_id">Дочірні компанії</string>
+    <string name="field_label_state_id">Область</string>
+    <string name="field_label_country_id">Країна</string>
+    <string name="field_label_customer">Кліент</string>
+    <string name="field_label_comment">Внутрішні нотатки</string>
+    <string name="field_label_company_name">Назва Компанії</string>
+    <string name="field_label_large_image">Великий Логотип</string>
+
+    <string name="control_label_username">ИМ\'Я КОРИСТУВАЧА</string>
+    <string name="control_label_user">ЛОГІН</string>
+    <string name="control_label_serv_url">URL АДРЕСА СЕРВЕРА</string>
+    <string name="control_label_database">НАЗВА БАЗИ ДАНИХ</string>
+    <string name="control_label_odoo_server_version">ВЕРСІЯ СЕРВЕРА</string>
+    <string name="control_label_timezone">ЧАСОВИЙ ПОЯС</string>
+
+</resources>

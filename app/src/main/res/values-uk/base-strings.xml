@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_accounts_settings">Odoo</string>
+    <string name="label_login">Логин</string>
+    <string name="label_accept_login">Прийняти та Увійти в обліковий запис</string>
+    <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_username_or_email">Им\'я користувача або email</string>
+    <string name="label_password">Пароль</string>
+    <string name="label_forgot_password">Забули пароль ?</string>
+    <string name="label_add_self_hosted_url">Add self-hosted URL</string>
+    <string name="label_login_with_odoo">Login with Odoo.com</string>
+    <string name="label_create_account">Створити обліковий запис</string>
+    <string name="label_select_database">Виберіть Базу Даних</string>
+    <string name="error_invalid_odoo_url">Invalid Odoo URL !</string>
+    <string name="error_invalid_username_or_password">Невірний Користувач або Пароль</string>
+    <string name="error_invalid_password">Невірний пароль</string>
+    <string name="error_provide_username">Им\'я користувача</string>
+    <string name="error_provide_password">Пароль</string>
+    <string name="error_provide_server_url">Provide server URL</string>
+    <string name="status_connecting_to_server">З\'єднання триває&#8230;</string>
+    <string name="status_connected_to_server">З\'єднаний</string>
+    <string name="status_logging_in">Вхід&#8230;</string>
+    <string name="status_login_success">Вхід виконаний успішно</string>
+    <string name="status_logout_success">Вихід виконаний успішно</string>
+    <string name="status_creating_account">Створюється обліковий запис</string>
+    <string name="status_db_load_20">Завантаження Бази Даних 20%&#8230;</string>
+    <string name="status_db_load_40">Завантаження Бази Даних 40%&#8230;</string>
+    <string name="status_db_load_60">Завантаження Бази Даних 60%&#8230;</string>
+    <string name="status_db_load_80">Завантаження Бази Даних 80%&#8230;</string>
+    <string name="status_db_load_95">Завантаження Бази Даних 95%&#8230;</string>
+    <string name="status_redirecting">Перенаправлення&#8230;</string>
+    <string name="label_select_user">Login to User</string>
+    <string name="label_accounts">Облікові записи</string>
+    <string name="label_settings">Налаштування</string>
+    <string name="label_save">Зберегти</string>
+    <string name="label_edit">Змінити</string>
+    <string name="label_required">необхідний</string>
+    <string name="label_more">Більше</string>
+    <string name="label_alert">Сигнал</string>
+    <string name="label_warning">Попередження</string>
+    <string name="label_error">Помилка</string>
+    <string name="label_share">Поділитися</string>
+    <string name="label_import_contact">Імпортувати</string>
+    <string name="label_address">Адреса</string>
+    <string name="label_reply">Відповісти</string>
+    <string name="label_close">Закрити</string>
+    <string name="label_send">Послати</string>
+    <!-- package warning -->
+    <!-- Drawer -->
+    <string name="label_drawer_account_add_account">Додаты обліковий Запис</string>
+    <string name="label_drawer_account_manage_accounts">Керувати Обліковими Записами</string>
+    <!-- Common Labels -->
+    <string name="title_application_settings">"Налаштування"</string>
+    <string name="title_profile">Профіль</string>
+    <string name="title_about">Про програму</string>
+    <string name="title_synchronization">Синхронізація</string>
+    <string name="title_confirm">Підтвердити</string>
+    <string name="title_working">Обрабляється&#8230;</string>
+    <string name="title_loading">Завантаження записіс на сервер&#8230;</string>
+    <string name="title_loading_product">Продукти завантажуються з серверу&#8230;</string>
+    <string name="title_please_wait">Почекайте будьласка&#8230;</string>
+    <string name="label_ok">OK</string>
+    <string name="label_search">Пошук</string>
+    <string name="label_delete">Видалити</string>
+    <string name="label_cancel">Скасувати</string>
+    <string name="label_logout">Вийти</string>
+    <string name="label_version">Версія</string>
+    <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
+    <string name="label_odoo_developer_mode">Режим розробника</string>
+    <string name="label_export_db">Експортувати базу данних</string>
+    <string name="label_our_apps">Наші програми</string>
+    <string name="label_attach_a_file"> + Приєднати файл</string>
+    <string name="label_be_patient_we_are_configuring_account_update">Будьте терплячі, ми оновлюємо ваш обліковий запис</string>
+    <!-- Toasts -->
+    <string name="developer_2_tap">Need 2 tap for developer mode</string>
+    <string name="developer_5_tap">Developer mode activated</string>
+    <string name="toast_setting_saved">Налаштування збережені.</string>
+    <string name="toast_no_new_records">Немає записів для синхронізації !</string>
+    <string name="toast_update_database">Увійдіть у Налаштування додатка для синхронізації бази даних</string>
+    <string name="toast_are_you_sure_logout">Ви впевнені що бажаєте вийти ?</string>
+    <string name="toast_are_you_sure_delete_account"> Ви впевнені, що бажаєте видалити обліковий запис ?</string>
+    <string name="toast_buy_a_new_smartphone"> Щось пішло не так</string>
+    <string name="toast_network_required">Необхідно підключення до мережі інтернет</string>
+    <string name="toast_recs_updated">Записи были обновлены!</string>
+    <string name="toast_has_partner_and_lines">Будь ласка виберіть Рядки замовлення або Клієнта !</string>
+    <string name="toast_account_removed">Обліковий Запис Вилучений Успішно</string>
+    <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
+    <string name="toast_updating_password">Оновлення паролю</string>
+    <string name="toast_something_gone_wrong">Щось пішло не так</string>
+    <!-- Setting pref strings -->
+    <string-array name="syncInterval">
+        <item name="5">Every 5 minutes</item>
+        <item name="10">Every 10 minutes</item>
+        <item name="20">Every 20 minutes</item>
+        <item name="40">Every 40 minutes</item>
+        <item name="60">Every 60 minutes</item>
+        <item name="1440">Once in a day</item>
+    </string-array>
+    <string-array name="syncIntervalValues">
+        <item name="5">5</item>
+        <item name="10">10</item>
+        <item name="20">20</item>
+        <item name="40">40</item>
+        <item name="60">60</item>
+        <item name="1440">1440</item>
+    </string-array>
+    <string-array name="syncDataLimit">
+        <item name="30">1 month old</item>
+        <item name="60">2 months old</item>
+        <item name="90">3 months old</item>
+        <item name="180">6 months old</item>
+        <item name="360">12 months old</item>
+    </string-array>
+    <string-array name="syncDataLimitValues">
+        <item name="30">30</item>
+        <item name="60">60</item>
+        <item name="90">90</item>
+        <item name="180">180</item>
+        <item name="360">360</item>
+    </string-array>
+    <string name="summary_about_odoo_mobile">Odoo Mobile</string>
+    <string name="summary_about_foss_mobile">ФОСС-Он-Лайн</string>
+    <string name="synchronization_database">Синхронізувати дані Замовлень</string>
+    <string name="synchronization_products">Оновити інформацію про Товари</string>
+    <!-- About Company Fragment Strings -->
+    <string name="about_Company_line1">Авторські права © 2018-СЬОГОДНІ ФОСС-Он-Лайн. Всі права захищені.</string>
+    <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
+    <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
+    <string name="app_version_name">Версія</string>
+    <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
+    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
+</resources>
+
+    
