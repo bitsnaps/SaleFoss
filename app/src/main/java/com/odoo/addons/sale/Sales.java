@@ -70,6 +70,7 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.OBottomSheet;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -149,13 +150,19 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
+        SaleOrder saleOrder = new SaleOrder(getContext(), null);
+        OValues state = new OValues();
+        state.put("state", row.getString("state"));
+        state.put("order_line", row.getString("order_line"));
+
         OControls.setText(view, R.id.name, row.getString("name"));
         String format = (db().getUser().getOdooVersion().getVersionNumber() <= 7)
                 ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
         String date = ODateUtils.convertToDefault(row.getString("date_order"),
                 format, "MMMM, dd");
         OControls.setText(view, R.id.date_order, date);
-        OControls.setText(view, R.id.state, row.getString("state_title"));
+//        OControls.setText(view, R.id.state, row.getString("state_title"));
+        OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
 
         if (row.getString("partner_name").equals("false")) {
             OControls.setGone(view, (R.id.partner_name));
@@ -241,7 +248,7 @@ public class Sales extends BaseFragment implements
                     setHasSwipeRefreshView(mView, R.id.data_list_no_item, Sales.this);
                     OControls.setImage(mView, R.id.icon,
                             (mType == Type.Quotation) ? R.drawable.ic_action_quotation : R.drawable.ic_action_sale_order);
-                    OControls.setText(mView, R.id.title, _s(R.string.label_no) + " " +  _s(R.string.label_found));
+                    OControls.setText(mView, R.id.title, _s(R.string.label_no) + " " + _s(R.string.label_found));
 //                    OControls.setText(mView, R.id.title, _s(R.string.label_no) + mType + getString(R.string.label_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
@@ -413,7 +420,7 @@ public class Sales extends BaseFragment implements
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), mType + " "+ _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), mType + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
         }
 
         @Override

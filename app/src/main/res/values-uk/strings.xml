@@ -112,7 +112,7 @@
     <string name="field_label_sent">Замовлення відіслано</string>
     <string name="field_label_canceled">Скасовано</string>
     <string name="field_label_waiting_date">Очикування розкладу</string>
-    <string name="field_label_sale">Замовлення на продаж \/</string>
+    <string name="field_label_sale">Замовлення на продаж</string>
     <string name="field_label_manual">Виставлення рахунку продажів</string>
     <string name="field_label_sipping_except">Виключення доставки</string>
     <string name="field_label_invoice_except">Вийнятки выставлнея рахунку</string>
@@ -134,8 +134,8 @@
     <string name="label_quotation_confirmed">Пропозиція Замовлення підтверджено!</string>
     <string name="label_updated">оновлено</string>
     <string name="label_created">створена</string>
-    <string name="title_no_lines">(Рядки замовлення відсутні)</string>
-    <string name="lebel_lines">рядки замовлення</string>
+    <string name="title_no_lines">(Рядки відсутні)</string>
+    <string name="label_lines">рядки замовлення</string>
     <string name="field_label_name">ім\'я</string>
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата підтвердження"</string>

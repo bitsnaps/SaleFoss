@@ -56,7 +56,7 @@
     <string name="title_synchronization">Синхронізація</string>
     <string name="title_confirm">Підтвердити</string>
     <string name="title_working">Обрабляється&#8230;</string>
-    <string name="title_loading">Завантаження записіс на сервер&#8230;</string>
+    <string name="title_loading">Завантаження комерційних пропозицій на сервер&#8230;</string>
     <string name="title_loading_product">Продукти завантажуються з серверу&#8230;</string>
     <string name="title_please_wait">Почекайте будьласка&#8230;</string>
     <string name="label_ok">OK</string>

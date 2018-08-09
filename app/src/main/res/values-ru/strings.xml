@@ -112,7 +112,7 @@
     <string name="field_label_sent">Заказ отослан</string>
     <string name="field_label_canceled">Отменен</string>
     <string name="field_label_waiting_date">Ожидание расписания</string>
-    <string name="field_label_sale">Заказы продаж /</string>
+    <string name="field_label_sale">Заказы продаж</string>
     <string name="field_label_manual">Выставление счета продаж</string>
     <string name="field_label_sipping_except">Исключение доставки</string>
     <string name="field_label_invoice_except">Исключения выставлнея счета</string>
@@ -134,12 +134,12 @@
     <string name="label_quotation_confirmed">Предложение Заказа подтверждено!</string>
     <string name="label_updated">обновлено</string>
     <string name="label_created">создано</string>
-    <string name="title_no_lines">(Позиции заказа отсутствуют)</string>
-    <string name="lebel_lines">позиции заказа</string>
+    <string name="title_no_lines">(Позиции отсутствуют)</string>
+    <string name="label_lines">позиции заказа</string>
     <string name="field_label_name">Имя</string>
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата подтверждения"</string>
-    <string name="field_label_partner_id">Заказчик</string>
+    <string name="field_label_partner_id">Клиент</string>
     <string name="field_label_user_id">"Продавец"</string>
     <string name="field_label_amount_total">"Всего"</string>
     <string name="field_label_payment_term">"Payment Term"</string>

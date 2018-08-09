@@ -322,7 +322,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("currency_symbol", currencyObj.getString("name"));
                     values.put("amount_tax","0");
                     values.put("currency_id", currencyObj.get("_id"));
-                    values.put("order_line_count", " (" + objects.size() + " lines)");
+//                    values.put("order_line_count", " (" + objects.size() + " lines)");
+                    values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
                     values.put("_is_dirty", "false");
@@ -355,7 +356,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     });
                     Thread.sleep(500);
                     values.put("amount_tax","0" );
-                    values.put("order_line_count", " (" + objects.size() + " lines)");
+//                    values.put("order_line_count", " (" + objects.size() + " lines)");
+                    values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
 

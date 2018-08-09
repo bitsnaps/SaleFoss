@@ -135,7 +135,7 @@
     <string name="label_updated">updated</string>
     <string name="label_created">created</string>
     <string name="title_no_lines">(No lines)</string>
-    <string name="lebel_lines">lines</string>
+    <string name="label_lines">lines</string>
     <string name="field_label_name">Name"</string>
     <!--Model sale.order-->
     <string name="field_label_date_order">"Confirmation Date"</string>

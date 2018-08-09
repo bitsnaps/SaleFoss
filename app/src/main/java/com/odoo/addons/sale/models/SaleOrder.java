@@ -198,12 +198,14 @@ public class SaleOrder extends OModel {
 
             JSONArray order_line = new JSONArray(values.getString("order_line"));
             if (order_line.length() > 0) {
-                return " (" + order_line.length() + " " + mContext.getString(R.string.lebel_lines) + ")";
+//                return " (" + order_line.length() + " " + mContext.getString(R.string.label_lines) + ")";
+                return " (" + order_line.length() + ")";
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return " " + mContext.getString(R.string.title_no_lines);
+//        return " " + mContext.getString(R.string.title_no_lines);
+        return " (0)";
     }
 
 
