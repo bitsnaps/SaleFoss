@@ -131,5 +131,6 @@
     <orderEntry type="library" name="Gradle: com.android.support:transition-25.1.0" level="project" />
     <orderEntry type="module" module-name="intro-slider-lib" />
     <orderEntry type="library" name="Gradle: org.apache.http.legacy-android-25" level="project" />
+    <orderEntry type="module" module-name="intro-slider-lib" />
   </component>
 </module>

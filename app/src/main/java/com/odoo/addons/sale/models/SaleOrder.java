@@ -102,9 +102,6 @@ public class SaleOrder extends OModel {
         super(context, "sale.order", user);
         mContext = context;
         setHasMailChatter(true);
-        if (getUser().getOdooVersion().getVersionNumber() == 7) {
-            date_order.setType(ODate.class);
-        }
     }
 
     private String _s(int res_id) {
@@ -365,51 +362,6 @@ public class SaleOrder extends OModel {
                 if (listener != null) {
                     listener.OnCancelled();
                 }
-            }
-        }.execute();
-    }
-
-    public void syncLocalDataBase() {
-        new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                dialog = new ProgressDialog(mContext);
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_loading));
-                dialog.setCancelable(false); // original false
-                dialog.show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    Thread.sleep(1000);
-                    ODomain domain = new ODomain();
-
-                    // Very impotant for Downloading data from ODOO Server!!!!!!!!!!
-
-                    Log.i(TAG, "<< Update records in local DB where id=0 >>");
-
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
-                    SaleOrder saleOrder = new SaleOrder(mContext, getUser());
-
-                    domain.add("id", "=", "0");
-                    salesOrderLine.quickSyncRecords(domain);
-                    saleOrder.quickSyncRecords(domain);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                dialog.dismiss();
             }
         }.execute();
     }

@@ -108,11 +108,11 @@
 
     <string name="field_label_new">Новый</string>
 
-    <string name="field_label_draft">Черновик заказа</string>
+    <string name="field_label_draft">Предложение цен</string>
     <string name="field_label_sent">Заказ отослан</string>
     <string name="field_label_canceled">Отменен</string>
     <string name="field_label_waiting_date">Ожидание расписания</string>
-    <string name="field_label_sale">Заказы продаж</string>
+    <string name="field_label_sale">Заказ продаж</string>
     <string name="field_label_manual">Выставление счета продаж</string>
     <string name="field_label_sipping_except">Исключение доставки</string>
     <string name="field_label_invoice_except">Исключения выставлнея счета</string>

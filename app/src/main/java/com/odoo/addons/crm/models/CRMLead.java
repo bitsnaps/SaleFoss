@@ -145,10 +145,6 @@ public class CRMLead extends OModel {
         super(context, "crm.lead", user);
         mContext = context;
         setHasMailChatter(true);
-        String serie = getOdooVersion().getServerSerie();
-        if (serie.equals("8.saas~6")) {
-            categ_ids.setName("tag_ids");
-        }
     }
 
     @Override

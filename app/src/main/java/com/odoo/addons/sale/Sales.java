@@ -183,14 +183,15 @@ public class Sales extends BaseFragment implements
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> menu = new ArrayList<>();
-        menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_quotation))
-                .setIcon(R.drawable.ic_action_quotation)
-                .setInstance(new Sales())
-                .setExtra(data(Type.Quotation)));
         menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_sale_orders))
                 .setIcon(R.drawable.ic_action_sale_order)
                 .setInstance(new Sales())
                 .setExtra(data(Type.SaleOrder)));
+        menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_quotation))
+                .setIcon(R.drawable.ic_action_quotation)
+                .setInstance(new Sales())
+                .setExtra(data(Type.Quotation)));
+
         return menu;
     }
 
@@ -237,7 +238,8 @@ public class Sales extends BaseFragment implements
         } else {
             if (db().isEmptyTable() && !mSyncRequested) {
                 mSyncRequested = true;
-                onRefresh();
+                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+//                onRefresh();
             }
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -276,23 +278,24 @@ public class Sales extends BaseFragment implements
     @Override
     public void onRefresh() {
         List<ODataRow> CheckNewRecords = null;
-
+        Context context = getContext();
         if (inNetwork()) {
             try {
                 Thread.sleep(600);
                 setSwipeRefreshing(false); //true need
+//                syncProductNew(context);
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
-                CheckNewRecords = checkNewQuotations(getContext());
+                CheckNewRecords = checkNewQuotations(context);
                 if (CheckNewRecords != null) {
 //                    if (mType == Type.Quotation)
 //                        mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-                    Toast.makeText(getActivity(), _s(R.string.toast_update_database), Toast.LENGTH_LONG)
-                            .show();
+//                    Toast.makeText(getActivity(), _s(R.string.toast_update_database), Toast.LENGTH_LONG)
+//                            .show();
                 } else {
                     if (mType == Type.Quotation)
                         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), _s(R.string.toast_no_new_records), Toast.LENGTH_LONG)
-                            .show();
+//                    Toast.makeText(getActivity(), _s(R.string.toast_no_new_records), Toast.LENGTH_LONG)
+//                            .show();
                 }
 
             } catch (Exception e) {
@@ -513,11 +516,13 @@ public class Sales extends BaseFragment implements
                             args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                             args.add(new JSONObject());
                             Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
-                            if (confirm != null && done != null) {
+                            Object delivery = saleOrder.getServerDataHelper().callMethod("action_view_delivery", args);
+//                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
+//                            if (confirm != null && done != null) {
+                            if (confirm != null) {
                                 OValues values = new OValues();
                                 //values.put("state", "sale");
-                                values.put("state", "done");
+                                values.put("state", "sale");
                                 values.put("state_title", saleOrder.getStateTitle(values));
                                 values.put("_is_dirty", "false");
                                 saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
@@ -557,7 +562,7 @@ public class Sales extends BaseFragment implements
                 dialog = new ProgressDialog(context);
                 dialog.setTitle(R.string.title_please_wait);
                 dialog.setMessage(OResource.string(context, R.string.title_loading_product));
-                dialog.setCancelable(true); // original false
+                dialog.setCancelable(false); // original false
                 setSwipeRefreshing(true);
                 dialog.show();
             }
@@ -607,7 +612,6 @@ public class Sales extends BaseFragment implements
         }.execute();
     }
 
-
     public List<ODataRow> checkNewQuotations(Context context) {
         boolean CheckOk = false;
         try {
@@ -628,4 +632,38 @@ public class Sales extends BaseFragment implements
             return have_id_zero_records;
         return null;
     }
+
+    public void syncProductNew(final Context context) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(300);
+                    ODomain domain = new ODomain();
+                    ProductProduct product = new ProductProduct(context, null);
+                    domain.add("id", "not in", product.getServerIds());
+                    product.quickSyncRecords(domain);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
 }
+
+
+

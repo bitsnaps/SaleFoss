@@ -108,7 +108,7 @@
 
     <string name="field_label_new">Новий</string>
 
-    <string name="field_label_draft">Чернетка пропозиції</string>
+    <string name="field_label_draft">Комерційна пропозиція</string>
     <string name="field_label_sent">Замовлення відіслано</string>
     <string name="field_label_canceled">Скасовано</string>
     <string name="field_label_waiting_date">Очикування розкладу</string>

@@ -49,7 +49,6 @@ public class ProductProduct extends OModel {
     OColumn sale_ok = new OColumn(_s(R.string.field_label_sale_ok), OBoolean.class).setDefaultValue(false);
 
 
-
     public ProductProduct(Context context, OUser user) {
         super(context, "product.product", user);
         setDefaultNameColumn("name_template");

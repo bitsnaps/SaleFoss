@@ -155,7 +155,7 @@ public class OForm extends LinearLayout {
                 c.setFormView(this);
                 c.setEditable(mEditable);
                 c.useTemplate(autoUIGenerate);
-                c.setModel(model); // acting error for sale.oder
+                c.setModel(model);
                 if (model.getColumn(c.getFieldName()) != null) {
                     OColumn column = model.getColumn(c.getFieldName());
                     if (column != null) {
@@ -164,7 +164,6 @@ public class OForm extends LinearLayout {
                         if (column.hasOnChange()) {
                             setOnChangeForControl(column, c);
                         }
-
                         // Setting domain Filter for column
                         if (column.hasDomainFilterColumn()) {
                             setOnDomainFilterCallBack(column, c);

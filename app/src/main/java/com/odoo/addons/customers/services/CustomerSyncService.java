@@ -24,10 +24,14 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.base.addons.res.ResPartner;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
+
+import java.util.List;
 
 public class CustomerSyncService extends OSyncService {
     public static final String TAG = CustomerSyncService.class.getSimpleName();
@@ -42,13 +46,11 @@ public class CustomerSyncService extends OSyncService {
         if (adapter.getModel().getModelName().equals("res.partner")) {
             ODomain domain = new ODomain();
             ResPartner resPartner = new ResPartner(getApplicationContext(), user);
-            domain.add("customer", "not in", ("false"));
+            domain.add("|");
+            domain.add("id", "in", adapter.getModel().getServerIds());
+            domain.add("sale_order_ids.user_id", "=", user.getUserId());
             resPartner.quickSyncRecords(domain);
-
 //            domain.add("|");
-//            domain.add("|");
-//            domain.add("opportunity_ids.user_id", "=", user.getUserId());
-//            domain.add("sale_order_ids.user_id", "=", user.getUserId());
 //            domain.add("id", "in", adapter.getModel().getServerIds());
 //            adapter.setDomain(domain).syncDataLimit(200);
         }

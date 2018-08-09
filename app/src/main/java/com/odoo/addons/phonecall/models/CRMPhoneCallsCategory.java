@@ -39,10 +39,6 @@ public class CRMPhoneCallsCategory extends OModel {
 
     public CRMPhoneCallsCategory(Context context, OUser user) {
         super(context, "crm.phonecall.category", user);
-        String serie = getOdooVersion().getServerSerie();
-        if (getOdooVersion().getVersionNumber() < 9 && !serie.equals("8.saas~6")) {
-            setModelName("crm.case.categ");
-        }
     }
 
 

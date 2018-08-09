@@ -108,7 +108,7 @@
 
     <string name="field_label_new">New</string>
 
-    <string name="field_label_draft">Draft Quotation</string>
+    <string name="field_label_draft">Quotation</string>
     <string name="field_label_sent">Quotation Sent</string>
     <string name="field_label_canceled">Cancelled</string>
     <string name="field_label_waiting_date">Waiting Schedule</string>

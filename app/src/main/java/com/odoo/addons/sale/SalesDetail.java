@@ -98,7 +98,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState); // check null second time
+        mForm = new OForm(this);
         setContentView(R.layout.sale_detail);
         OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
@@ -109,14 +111,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         partner = new ResPartner(this, null);
         products = new ProductProduct(this, null);
         lineOrder = new SalesOrderLine(this, null);
-        // Init() works too bad!
-        try {
-            init();
-        } catch (Exception e){
-            android.os.Process.killProcess(android.os.Process.myPid());
-            //Toast.makeText(this, "Whoops!!!", Toast.LENGTH_LONG).show();
-        }
-        initAdapter();   // Original
+        init();
+        initAdapter();
     }
 
     @Nullable
