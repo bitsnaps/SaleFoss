@@ -30,7 +30,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,20 +40,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
-import com.odoo.core.rpc.helper.OdooFields;
-import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -70,7 +63,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.OBottomSheet;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -85,20 +77,45 @@ public class Sales extends BaseFragment implements
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
     public Bundle dataGlob;
+    public List<ODataRow> have_id_zero_records = null;
+    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+    SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
     private View mView;
     private ListView mList;
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
     private Type mType = Type.Quotation;
+    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), mType + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
     private Boolean mSyncRequested = false;
     private int have_zero = 0;
     private boolean haveNewQuotations = false;
-    public List<ODataRow> have_id_zero_records = null;
-
-    public enum Type {
-        Quotation,
-        SaleOrder
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -134,7 +151,6 @@ public class Sales extends BaseFragment implements
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
         getLoaderManager().initLoader(0, null, this);
 
-/////
 //        if (inNetwork() && checkNewQuotations(getContext()) != null) {
 //            if (mType == Type.Quotation)
 //                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
@@ -144,6 +160,7 @@ public class Sales extends BaseFragment implements
 //                mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 //
 //        }
+
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
     }
@@ -159,7 +176,7 @@ public class Sales extends BaseFragment implements
         String format = (db().getUser().getOdooVersion().getVersionNumber() <= 7)
                 ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
         String date = ODateUtils.convertToDefault(row.getString("date_order"),
-                format, "MMMM, dd");
+                format, "MMMM, dd, HH:mm");
         OControls.setText(view, R.id.date_order, date);
 //        OControls.setText(view, R.id.state, row.getString("state_title"));
         OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
@@ -183,14 +200,14 @@ public class Sales extends BaseFragment implements
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> menu = new ArrayList<>();
-        menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_sale_orders))
-                .setIcon(R.drawable.ic_action_sale_order)
-                .setInstance(new Sales())
-                .setExtra(data(Type.SaleOrder)));
         menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_quotation))
                 .setIcon(R.drawable.ic_action_quotation)
                 .setInstance(new Sales())
                 .setExtra(data(Type.Quotation)));
+        menu.add(new ODrawerItem(TAG).setTitle(OResource.string(context, R.string.label_sale_orders))
+                .setIcon(R.drawable.ic_action_sale_order)
+                .setInstance(new Sales())
+                .setExtra(data(Type.SaleOrder)));
 
         return menu;
     }
@@ -273,7 +290,6 @@ public class Sales extends BaseFragment implements
     public Class<SaleOrder> database() {
         return SaleOrder.class;
     }
-
 
     @Override
     public void onRefresh() {
@@ -360,7 +376,6 @@ public class Sales extends BaseFragment implements
             onDoubleClick(position);
     }
 
-
     private void showSheet(Cursor data) {
         OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         bottomSheet.setData(data);
@@ -419,37 +434,6 @@ public class Sales extends BaseFragment implements
             }
         }
     }
-
-    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), mType + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-    SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
 
     @Override
     public void onClick(View v) {
@@ -661,6 +645,11 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    public enum Type {
+        Quotation,
+        SaleOrder
     }
 
 }

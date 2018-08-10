@@ -399,13 +399,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
-
-
-                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
-                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+//                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
+//                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
+//                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
-                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+//                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
