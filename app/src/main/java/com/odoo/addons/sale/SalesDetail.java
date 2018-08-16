@@ -102,7 +102,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private List<Object> objects = new ArrayList<>();
     private HashMap<String, Float> lineValues = new HashMap<>();
     private HashMap<String, Integer> lineIds = new HashMap<>();
-    private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt;
+    private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt, partnerId;
     private ODataRow currencyObj;
     private ResPartner partner = null;
     private ProductProduct products = null;
@@ -152,6 +152,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
             txvType.setText(R.string.label_quotation);
+            mForm.findViewById(R.id.partner_for_details).setVisibility(View.GONE);
         } else {
             record = sale.browse(extra.getInt(OColumn.ROW_ID));
             if (record == null) {
@@ -165,6 +166,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 actionBar.setTitle(R.string.label_quotation); //label_quotation - Original
                 txvType.setText(R.string.label_quotation);
                 mForm.setEditable(true); // eleminate if need to edit line
+                mForm.findViewById(R.id.partner_for_details).setVisibility(View.GONE);
+
                 layoutAddItem.setVisibility(View.VISIBLE); // eleminate if need to edit line
                 if (record.getString("state").equals("cancel"))
                     layoutAddItem.setVisibility(View.GONE);
@@ -263,19 +266,39 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
-//                    if (app.inNetwork() || !app.inNetwork()) {
-                        values.put("partner_name", partner.getName(values.getInt("partner_id")));
 
-                        if (values.get("partner_name") != "false" && objects.size() > 0) {
-                            SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
+                    if (!values.contains("partner_id")) {
+                        values.put("partner_name", "false");
+                        values.put("partner_id", "false");
+                    }
+
+                    values.put("partner_name", partner.getName(values.getInt("partner_id")));
+
+                    if (objects.size() > 0) {
+                        SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
+
+                        if (values.get("partner_name") != "false") {
                             saleOrderOperation.execute(values);
                         } else {
-                            Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
+                            List<ODataRow> rows = partner.select(
+                                    new String[]{"name", "parent_id"},
+                                    "name = ?",
+                                    new String[]{"Customer"}
+                            );
+                            for (ODataRow row : rows) {
+                                values.put("partner_name", partner.getName(row.getInt("_id")));
+                                values.put("partner_id", row.get("_id"));
+                                values.put("partner_invoice_id", "false");
+                                values.put("partner_shipping_id", "false");
+                                values.put("pricelist_id", "false");
+                                values.put("payment_term", "false");
+                                values.put("fiscal_position", "false");
+                                saleOrderOperation.execute(values);
+                            }
                         }
-
-//                    } else {
-//                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-//                    }
+                    } else {
+                        Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
+                    }
                 }
                 break;
             case R.id.menu_sale_confirm_sale:

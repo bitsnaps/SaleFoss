@@ -58,6 +58,7 @@
             <View style="@style/ViewSeparator" />
 
             <odoo.controls.OField
+                android:id="@+id/partner_for_details"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:fieldName="partner_id"

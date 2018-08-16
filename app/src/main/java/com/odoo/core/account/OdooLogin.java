@@ -106,7 +106,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
         if (BuildConfig.DEBUG) {
 //            edtSelfHosted.setText("https://odoo.foss.ua");
-            edtSelfHosted.setText("http://192.168.0.56:8069/");
+            edtSelfHosted.setText("http://192.168.1.2:8069/");
 
             edtUsername.setText("admin");
             edtPassword.setText("");
@@ -421,8 +421,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_40));
                         }
                     });
-//                    prodProd.quickSyncRecords(domain);
-
+                    //                    prodProd.quickSyncRecords(domain);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
