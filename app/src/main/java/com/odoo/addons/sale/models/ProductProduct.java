@@ -44,10 +44,7 @@ public class ProductProduct extends OModel {
             OColumn.RelationType.ManyToOne);
     @Odoo.Functional(method = "storeProductName", store = true, depends = {"product_tmpl_id"})
     OColumn name_template = new OColumn(_s(R.string.field_label_name), OVarchar.class).setSize(128).setLocalColumn();
-
-//    @Odoo.Functional(method = "storeDefaultCode", store = true, depends = {"product_tmpl_id"})
     OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class);
-//    OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class).setSize(64);
     OColumn lst_price = new OColumn(_s(R.string.field_label_lst_price), OFloat.class);
     OColumn sale_ok = new OColumn(_s(R.string.field_label_sale_ok), OBoolean.class).setDefaultValue(false);
 

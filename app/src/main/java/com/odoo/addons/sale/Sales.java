@@ -103,6 +103,7 @@ public class Sales extends BaseFragment implements
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
     private Type mType = Type.Quotation;
+    private SaleOrder sale = null;
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
@@ -177,6 +178,7 @@ public class Sales extends BaseFragment implements
                 ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
         String date = ODateUtils.convertToDefault(row.getString("date_order"),
                 format, "MMMM, dd, HH:mm");
+
         OControls.setText(view, R.id.date_order, date);
 //        OControls.setText(view, R.id.state, row.getString("state_title"));
         OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
@@ -255,8 +257,10 @@ public class Sales extends BaseFragment implements
         } else {
             if (db().isEmptyTable() && !mSyncRequested) {
                 mSyncRequested = true;
-                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
-//                onRefresh();
+                if (sale == null )
+                    sale = new SaleOrder(getContext(), null);
+//                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                onRefresh();
             }
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -300,6 +304,7 @@ public class Sales extends BaseFragment implements
                 Thread.sleep(600);
                 setSwipeRefreshing(false); //true need
 //                syncProductNew(context);
+//                sale.syncOrders(context);
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 CheckNewRecords = checkNewQuotations(context);
                 if (CheckNewRecords != null) {

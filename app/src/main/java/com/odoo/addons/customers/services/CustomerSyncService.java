@@ -19,10 +19,13 @@
  */
 package com.odoo.addons.customers.services;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.helper.ODomain;
@@ -45,14 +48,45 @@ public class CustomerSyncService extends OSyncService {
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("res.partner")) {
             ODomain domain = new ODomain();
-            ResPartner resPartner = new ResPartner(getApplicationContext(), user);
-            domain.add("|");
-            domain.add("id", "in", adapter.getModel().getServerIds());
-            domain.add("sale_order_ids.user_id", "=", user.getUserId());
-            resPartner.quickSyncRecords(domain);
+            this.syncCustomers(getApplicationContext(), user);
+
+//            ResPartner resPartner = new ResPartner(getApplicationContext(), user);
+//            domain.add("|");
+//            domain.add("id", "in", adapter.getModel().getServerIds());
+//            domain.add("sale_order_ids.user_id", "=", user.getUserId());
+//            resPartner.quickSyncRecords(domain);
 //            domain.add("|");
 //            domain.add("id", "in", adapter.getModel().getServerIds());
 //            adapter.setDomain(domain).syncDataLimit(200);
         }
     }
+    private void syncCustomers(final Context context, final OUser user) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(300);
+                    ODomain domain = new ODomain();
+                    ResPartner resPartner = new ResPartner(getApplicationContext(), user);
+                    resPartner.quickSyncRecords(domain);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
 }

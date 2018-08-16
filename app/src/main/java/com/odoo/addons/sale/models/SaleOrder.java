@@ -24,6 +24,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
@@ -404,4 +406,43 @@ public class SaleOrder extends OModel {
         }
         return nameOrder;
     }
+    public void syncOrders(final Context context) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                try {
+                    Thread.sleep(500);
+                    ODomain domain = new ODomain();
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(context, null);
+                    salesOrderLine.quickSyncRecords(domain);
+                    saleOrder.quickSyncRecords(domain);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+            }
+        }.execute();
+    }
+
 }
+

@@ -26,7 +26,6 @@ import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.config.FirstLaunchConfig;
