@@ -160,7 +160,7 @@ public class SaleOrder extends OModel {
         mStates.put("cancel", mContext.getString(R.string.field_label_canceled));
         mStates.put("waiting_date", mContext.getString(R.string.field_label_waiting_date));
         mStates.put("progress", mContext.getString(R.string.field_label_sale));
-//        mStates.put("sale", mContext.getString(R.string.field_label_sale));
+        mStates.put("sale", mContext.getString(R.string.field_label_sale));
         mStates.put("manual", mContext.getString(R.string.field_label_manual));
         mStates.put("shipping_except", mContext.getString(R.string.field_label_sipping_except));
         mStates.put("invoice_except", mContext.getString(R.string.field_label_invoice_except));
