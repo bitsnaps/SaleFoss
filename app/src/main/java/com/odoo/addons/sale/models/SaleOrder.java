@@ -131,6 +131,7 @@ public class SaleOrder extends OModel {
             data.put("pricelist_id", customer.get("pricelist_id"));
             data.put("payment_term", customer.get("payment_term"));
             data.put("fiscal_position", customer.get("fiscal_position"));
+
             partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
         } catch (Exception e) {
             e.printStackTrace();

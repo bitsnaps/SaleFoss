@@ -100,6 +100,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private ExpandableListControl mList;
     private ExpandableListControl.ExpandableListAdapter mAdapter;
     private List<Object> objects = new ArrayList<>();
+    private List<Object> objects_tmp = new ArrayList<>();
     private HashMap<String, Float> lineValues = new HashMap<>();
     private HashMap<String, Integer> lineIds = new HashMap<>();
     private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt, partnerId;
@@ -110,6 +111,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private LinearLayout layoutAddItem = null;
     private Type mType;
     private boolean saveWithProductLines = false;
+    private ProductProduct productProduct;
+    private List<Object> localItems = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -126,6 +129,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         partner = new ResPartner(this, null);
         products = new ProductProduct(this, null);
         lineOrder = new SalesOrderLine(this, null);
+        productProduct = new ProductProduct(this, null);
+
         init();
         initAdapter();
     }
@@ -200,26 +205,33 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
             for (ODataRow line : lines) {
                 int product_id = products.selectServerId(line.getInt("product_id"));
+                ODataRow row = products.browse(new String[]{"default_code"},
+                        line.getInt("product_id"));
+                line.put("default_code", row.getString("default_code"));
+                localItems.add(line);
+
                 if (product_id != 0) {
                     lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
                     lineIds.put(product_id + "", line.getInt("id"));
                 }
             }
-            objects.addAll(lines);
+            objects.addAll(localItems);
         }
+
         mAdapter = mList.getAdapter(R.layout.sale_order_line_item, objects,
                 new ExpandableListControl.ExpandableListAdapterGetViewListener() {
                     @Override
                     public View getView(int position, View mView, ViewGroup parent) {
                         ODataRow row = (ODataRow) mAdapter.getItem(position);
+
                         String defaulteCode = row.getString("default_code");
                         if (!defaulteCode.equals("false"))
                             OControls.setText(mView, R.id.edtName, "["
                                     + row.getString("default_code")
                                     + "] " + row.getString("name"));
-                        else
+                        else {
                             OControls.setText(mView, R.id.edtName, row.getString("name"));
-
+                        }
                         OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
                         OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
                         OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));

@@ -22,6 +22,7 @@ package com.odoo.addons.sale.models;
 import android.content.Context;
 
 import com.odoo.R;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
@@ -44,7 +45,9 @@ public class ProductProduct extends OModel {
     @Odoo.Functional(method = "storeProductName", store = true, depends = {"product_tmpl_id"})
     OColumn name_template = new OColumn(_s(R.string.field_label_name), OVarchar.class).setSize(128).setLocalColumn();
 
-    OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class).setSize(64);
+//    @Odoo.Functional(method = "storeDefaultCode", store = true, depends = {"product_tmpl_id"})
+    OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class);
+//    OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class).setSize(64);
     OColumn lst_price = new OColumn(_s(R.string.field_label_lst_price), OFloat.class);
     OColumn sale_ok = new OColumn(_s(R.string.field_label_sale_ok), OBoolean.class).setDefaultValue(false);
 
@@ -68,6 +71,7 @@ public class ProductProduct extends OModel {
         }
         return "false";
     }
+
 
     @Override
     public ODomain defaultDomain(){
