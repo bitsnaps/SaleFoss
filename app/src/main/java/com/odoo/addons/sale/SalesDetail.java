@@ -36,23 +36,14 @@ import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.R;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.addons.sale.models.StockMove;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
-import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.rpc.helper.OArguments;
-import com.odoo.core.rpc.helper.ODomain;
-import com.odoo.core.rpc.helper.ORecordValues;
-import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
-import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
@@ -61,7 +52,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +66,32 @@ import static com.odoo.addons.sale.Sales.Type;
 public class SalesDetail extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
     public static final int REQUEST_ADD_ITEMS = 323;
+    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
     private Bundle extra;
+    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
+                    + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
     private OForm mForm;
     private ODataRow record;
     private SaleOrder sale;
@@ -104,7 +119,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         setContentView(R.layout.sale_detail);
         OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
-        sale = new SaleOrder(this,  null);
+        sale = new SaleOrder(this, null);
         extra = getIntent().getExtras();
         mType = Type.valueOf(extra.getString("type"));
         currencyObj = sale.currency();
@@ -142,7 +157,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             if (record == null) {
                 finish();
             }
-            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation ) {
+            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
                 OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
@@ -194,7 +209,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     @Override
                     public View getView(int position, View mView, ViewGroup parent) {
                         ODataRow row = (ODataRow) mAdapter.getItem(position);
-                        OControls.setText(mView, R.id.edtName, row.getString("name"));
+                        String defaulteCode = row.getString("default_code");
+                        if (!defaulteCode.equals("false"))
+                            OControls.setText(mView, R.id.edtName, "["
+                                    + row.getString("default_code")
+                                    + "] " + row.getString("name"));
+                        else
+                            OControls.setText(mView, R.id.edtName, row.getString("name"));
+
                         OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
                         OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
                         OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));
@@ -245,10 +267,10 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
                         // Original
 
-                        if(values.get("partner_name") != "false" && objects.size() > 0) {
+                        if (values.get("partner_name") != "false" && objects.size() > 0) {
                             SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
                             saleOrderOperation.execute(values);
-                        } else{
+                        } else {
                             Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
                         }
 
@@ -265,7 +287,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                         }
+                        }
                     } else {
                         OAlert.showWarning(this, R.string.label_no_order_line + "");
                     }
@@ -273,6 +295,40 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.layoutAddItem:
+                if (mForm.getValues() != null) {
+                    Intent intent = new Intent(this, AddProductLineWizard.class);
+                    Bundle extra = new Bundle();
+                    for (String key : lineValues.keySet()) {
+                        extra.putFloat(key, lineValues.get(key));
+                    }
+                    intent.putExtras(extra);
+                    startActivityForResult(intent, REQUEST_ADD_ITEMS);
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+            saveWithProductLines = true;
+
+        if (requestCode == REQUEST_ADD_ITEMS && resultCode == Activity.RESULT_OK) {
+            lineValues.clear();
+            for (String key : data.getExtras().keySet()) {
+                if (data.getExtras().getFloat(key) > 0)
+                    lineValues.put(key, data.getExtras().getFloat(key));
+            }
+            OnProductChange onProductChange = new OnProductChange();
+            onProductChange.execute(lineValues);
+        }
     }
 
     private class SaleOrderOperation extends AsyncTask<OValues, Void, Boolean> {
@@ -291,8 +347,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected Boolean doInBackground(OValues... params) {
-            int new_id=0;
-            int product_ids=0;
+            int new_id = 0;
+            int product_ids = 0;
             String sql = "";
             try {
                 Thread.sleep(500);
@@ -316,7 +372,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("state_title", sale.getStateTitle(values));
                     values.put("user_id", sale.getUser().getUserId().toString());
                     values.put("currency_symbol", currencyObj.getString("name"));
-                    values.put("amount_tax","0");
+                    values.put("amount_tax", "0");
                     values.put("currency_id", currencyObj.get("_id"));
 //                    values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("order_line_count", " (" + objects.size() + ")");
@@ -337,7 +393,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                         sql = "SELECT _id FROM product_product WHERE id = ?";
                         List<ODataRow> records = products.query(sql, new String[]{row.getInt("product_id").toString()});
-                        for(ODataRow row_New: records){
+                        for (ODataRow row_New : records) {
                             product_ids = row_New.getInt("_id");
                         }
                         val_lines.put("product_id", product_ids);
@@ -351,7 +407,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         }
                     });
                     Thread.sleep(500);
-                    values.put("amount_tax","0" );
+                    values.put("amount_tax", "0");
 //                    values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
@@ -408,50 +464,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         }
     }
 
-    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
-                    + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
-            finish();
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
-
-    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
-            finish();
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.layoutAddItem:
-                if (mForm.getValues() != null) {
-                    Intent intent = new Intent(this, AddProductLineWizard.class);
-                    Bundle extra = new Bundle();
-                    for (String key : lineValues.keySet()) {
-                        extra.putFloat(key, lineValues.get(key));
-                    }
-                    intent.putExtras(extra);
-                    startActivityForResult(intent, REQUEST_ADD_ITEMS);
-                }
-                break;
-        }
-    }
-
     private class OnCustomerChangeUpdate extends AsyncTask<ODataRow, Void, Void> {
         private ProgressDialog progressDialog;
 
@@ -472,7 +484,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         }
 
         @Override
-        protected void onPostExecute(Void aVoid)  {
+        protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
         }
@@ -524,6 +536,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
                     values.put("price_subtotal", product.getFloat("lst_price") * qty);
+                    values.put("default_code", product.get("default_code"));
 
                     JSONArray tax_id = new JSONArray();
                     tax_id.put(6);
@@ -545,7 +558,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(List<ODataRow> row) {
-            try{
+            try {
                 super.onPostExecute(row);
                 if (row != null) {
                     objects.clear();
@@ -566,23 +579,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 e.printStackTrace();
                 progressDialog.dismiss();
             }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK)
-            saveWithProductLines = true;
-
-        if (requestCode == REQUEST_ADD_ITEMS && resultCode == Activity.RESULT_OK) {
-            lineValues.clear();
-            for (String key : data.getExtras().keySet()) {
-                if (data.getExtras().getFloat(key) > 0)
-                    lineValues.put(key, data.getExtras().getFloat(key));
-            }
-            OnProductChange onProductChange = new OnProductChange();
-            onProductChange.execute(lineValues);
         }
     }
 

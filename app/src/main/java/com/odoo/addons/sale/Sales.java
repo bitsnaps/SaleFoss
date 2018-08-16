@@ -223,8 +223,8 @@ public class Sales extends BaseFragment implements
                 args.addAll(Arrays.asList(new String[]{"draft", "sent", "cancel"}));
                 break;
             case SaleOrder:
-                where = "(state = ? or state = ? or state = ?)";
-                args.addAll(Arrays.asList(new String[]{"manual", "sale",
+                where = "(state = ? or state = ? or state = ? or state = ?)";
+                args.addAll(Arrays.asList(new String[]{"manual", "sale", "progress",
                         "done"}));
                 break;
         }
@@ -500,12 +500,16 @@ public class Sales extends BaseFragment implements
                             args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                             args.add(new JSONObject());
                             Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                            Object delivery = saleOrder.getServerDataHelper().callMethod("action_view_delivery", args);
+                            if (confirm.equals(false)){
+                                confirm = saleOrder.getServerDataHelper().callMethod("action_button_confirm", args);
+                            }
+
+                            //Object delivery = saleOrder.getServerDataHelper().callMethod("action_view_delivery", args);
 //                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
 //                            if (confirm != null && done != null) {
-                            if (confirm != null) {
+                            if (confirm != null && confirm.equals(true)) {
                                 OValues values = new OValues();
-                                //values.put("state", "sale");
+                                //values.put("state", "done");
                                 values.put("state", "sale");
                                 values.put("state_title", saleOrder.getStateTitle(values));
                                 values.put("_is_dirty", "false");

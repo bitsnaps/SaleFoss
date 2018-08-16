@@ -117,8 +117,14 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             OControls.setVisible(v, R.id.productQty);
             OControls.setText(v, R.id.productQty, qty + " ");
         }
-        OControls.setText(v, R.id.productName,
-                row.getString(productProduct.getDefaultNameColumn()));
+        String defaulteCode = row.getString("default_code");
+        if (defaulteCode.equals("false"))
+            OControls.setText(v, R.id.productName,
+                    row.getString(productProduct.getDefaultNameColumn()));
+        else
+            OControls.setText(v, R.id.productName,
+                    "[" + row.getString("default_code") + "] " + row.getString(productProduct.getDefaultNameColumn()));
+
         if (row.contains(OColumn.ROW_ID)
                 && selected_position == row.getInt(OColumn.ROW_ID)) {
             v.setBackgroundColor(getResources().getColor(
@@ -308,8 +314,8 @@ public class AddProductLineWizard extends OdooCompatActivity implements
 
     private class QuickCreateRecordProcess extends AsyncTask<ODataRow, Void, ODataRow> {
 
-        private ProgressDialog progressDialog;
         IOnQuickRecordCreateListener mOnQuickRecordCreateListener = null;
+        private ProgressDialog progressDialog;
 
         public QuickCreateRecordProcess(IOnQuickRecordCreateListener listener) {
             mOnQuickRecordCreateListener = listener;
