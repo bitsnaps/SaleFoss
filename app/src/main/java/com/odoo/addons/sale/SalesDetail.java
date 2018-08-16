@@ -263,9 +263,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
-                    if (app.inNetwork() || !app.inNetwork()) {
+//                    if (app.inNetwork() || !app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
-                        // Original
 
                         if (values.get("partner_name") != "false" && objects.size() > 0) {
                             SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
@@ -274,9 +273,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                             Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
                         }
 
-                    } else {
-                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                    }
+//                    } else {
+//                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+//                    }
                 }
                 break;
             case R.id.menu_sale_confirm_sale:
