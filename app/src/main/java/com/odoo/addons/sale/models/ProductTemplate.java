@@ -27,8 +27,6 @@ public class ProductTemplate  extends OModel {
     OColumn standard_price = new OColumn("Cost", OFloat.class);
     OColumn sale_ok = new OColumn("Can be Sold", OBoolean.class);
     OColumn active = new OColumn("Active", OBoolean.class);
-    OColumn default_code = new OColumn("Internal Reference", OVarchar.class);
-//    OColumn image_medium = new OColumn("Avatar", OBlob.class);
 
     @Override
     public ODomain defaultDomain(){

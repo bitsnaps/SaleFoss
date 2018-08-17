@@ -469,6 +469,33 @@ public class Sales extends BaseFragment implements
         return null;
     }
 
+
+    public List<ODataRow> checkNewQuotations(Context context) {
+        boolean CheckOk = false;
+        try {
+            SaleOrder sale = new SaleOrder(context, null);
+            String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft"});
+            have_zero = have_id_zero_records.size();
+            if (have_zero != 0) {
+                CheckOk = true;
+            }
+            if (mView != null) {
+//                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (CheckOk)
+            return have_id_zero_records;
+        return null;
+    }
+
+    public enum Type {
+        Quotation,
+        SaleOrder
+    }
+
     public void syncLocalDatatoOdoo(final Context context, final List<ODataRow> quotation) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
@@ -567,27 +594,6 @@ public class Sales extends BaseFragment implements
                     Thread.sleep(300);
                     ODomain domain = new ODomain();
                     ProductProduct product = new ProductProduct(context, null);
-//                    ProductTemplate product_temp = new ProductTemplate(context, null);
-//
-//                    List<ODataRow> dates = product_temp.select(new String[]{"id", "write_date", "name"});
-//                    List<String> datetime = new ArrayList();
-//
-//                    for (ODataRow row : dates) {
-//                        datetime.add(row.get("write_date").toString());
-//                    }
-//
-//                    List<ODataRow> items = new ArrayList<>();
-//                    try {
-//                        OdooFields fields = new OdooFields(new String[]{"id", "write_date", "name"});
-//                        ODomain domain_date = new ODomain();
-//                        domain_date.add("write_date", "=", "2018-08-06 09:10:58");
-//                        List<ODataRow> records = product_temp.getServerDataHelper().searchRecords(fields, domain_date, 1000);
-//                        items.addAll(records);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-
-//                    domain.add("id", "not in", product.getServerIds());
                     product.quickSyncRecords(domain);
 
                 } catch (Exception e) {
@@ -603,27 +609,6 @@ public class Sales extends BaseFragment implements
                 dialog.dismiss();
             }
         }.execute();
-    }
-
-    public List<ODataRow> checkNewQuotations(Context context) {
-        boolean CheckOk = false;
-        try {
-            SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
-            have_id_zero_records = sale.query(sql, new String[]{"0", "draft"});
-            have_zero = have_id_zero_records.size();
-            if (have_zero != 0) {
-                CheckOk = true;
-            }
-            if (mView != null) {
-//                mView.findViewById(R.id.syncButton).setVisibility(View.VISIBLE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (CheckOk)
-            return have_id_zero_records;
-        return null;
     }
 
     public void syncProductNew(final Context context) {
@@ -654,11 +639,6 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
             }
         }.execute();
-    }
-
-    public enum Type {
-        Quotation,
-        SaleOrder
     }
 
 }

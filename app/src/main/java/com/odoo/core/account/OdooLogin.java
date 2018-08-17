@@ -23,7 +23,6 @@ import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.base.addons.res.ResCompany;
@@ -402,9 +401,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     ODomain domain = new ODomain();
 //                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
-//                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
-//                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -428,7 +427,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
                     Thread.sleep(1000);
-                    //salesOrderLine.quickSyncRecords(domain);
+                    salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -447,7 +446,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     });
                     domain.add("user_id", "=", mUser.getUserId());
                     Thread.sleep(1000);
-                    //sale.quickSyncRecords(domain);
+                    sale.quickSyncRecords(domain);
 
                 } catch (Exception e) {
                     e.printStackTrace();

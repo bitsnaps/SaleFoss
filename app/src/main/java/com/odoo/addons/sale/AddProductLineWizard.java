@@ -17,7 +17,7 @@ import android.widget.ListView;
 
 import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
-import com.odoo.addons.sale.models.ProductTemplate;
+//import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
@@ -40,7 +40,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
         OListAdapter.OnSearchChange, IOnQuickRecordCreateListener, AdapterView.OnItemLongClickListener {
 
     private ProductProduct productProduct;
-    private ProductTemplate productTemplate;
+//    private ProductTemplate productTemplate;
     private EditText edt_searchable_input;
     private ListView mList = null;
     private OListAdapter mAdapter;
@@ -58,7 +58,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
         setContentView(R.layout.sale_add_item);
         setResult(RESULT_CANCELED);
         productProduct = new ProductProduct(this, null);
-        productTemplate = new ProductTemplate(this, null);
+//        productTemplate = new ProductTemplate(this, null);
         edt_searchable_input = (EditText) findViewById(R.id.edt_searchable_input);
         edt_searchable_input.addTextChangedListener(this);
         findViewById(R.id.done).setOnClickListener(this);
@@ -117,13 +117,13 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             OControls.setVisible(v, R.id.productQty);
             OControls.setText(v, R.id.productQty, qty + " ");
         }
-        String defaulteCode = row.getString("default_code");
-        if (defaulteCode.equals("false"))
+        String defaultCode = row.getString("default_code");
+        if (defaultCode.equals("false"))
             OControls.setText(v, R.id.productName,
                     row.getString(productProduct.getDefaultNameColumn()));
         else
             OControls.setText(v, R.id.productName,
-                    "[" + row.getString("default_code") + "] " + row.getString(productProduct.getDefaultNameColumn()));
+                    "[" + defaultCode + "] " + row.getString(productProduct.getDefaultNameColumn()));
 
         if (row.contains(OColumn.ROW_ID)
                 && selected_position == row.getInt(OColumn.ROW_ID)) {

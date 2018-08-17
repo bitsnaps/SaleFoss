@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 13/1/15 11:11 AM
  */
 package com.odoo.addons.sale.models;
@@ -22,7 +22,6 @@ package com.odoo.addons.sale.models;
 import android.content.Context;
 
 import com.odoo.R;
-import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
@@ -40,7 +39,7 @@ public class ProductProduct extends OModel {
     public static final String TAG = ProductProduct.class.getSimpleName();
     private Context idContext = getContext();
 
-    OColumn product_tmpl_id = new OColumn(_s(R.string.field_label_product_tmpl_id),  ProductTemplate.class,
+    OColumn product_tmpl_id = new OColumn(_s(R.string.field_label_product_tmpl_id), ProductTemplate.class,
             OColumn.RelationType.ManyToOne);
     @Odoo.Functional(method = "storeProductName", store = true, depends = {"product_tmpl_id"})
     OColumn name_template = new OColumn(_s(R.string.field_label_name), OVarchar.class).setSize(128).setLocalColumn();
@@ -69,9 +68,8 @@ public class ProductProduct extends OModel {
         return "false";
     }
 
-
     @Override
-    public ODomain defaultDomain(){
+    public ODomain defaultDomain() {
         ODomain domain = new ODomain();
         return domain;
     }

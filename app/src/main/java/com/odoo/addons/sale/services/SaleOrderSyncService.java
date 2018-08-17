@@ -67,7 +67,6 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
                 adapter.onSyncFinish(this);
             domain.add("user_id", "=", user.getUserId());
             adapter.setDomain(domain).syncDataLimit(50);
-            adapter.setDomain(domain);
         }
 
         if (adapter.getModel().getModelName().equals("account.payment.term")) {
