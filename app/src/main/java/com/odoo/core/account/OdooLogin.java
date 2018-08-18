@@ -21,7 +21,6 @@ import com.odoo.App;
 import com.odoo.BuildConfig;
 import com.odoo.OdooActivity;
 import com.odoo.R;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
@@ -104,7 +103,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
         if (BuildConfig.DEBUG) {
 //            edtSelfHosted.setText("https://odoo.foss.ua");
-            edtSelfHosted.setText("http://192.168.1.2:8069/");
+            edtSelfHosted.setText("http://192.168.43.253:8069/");
 
             edtUsername.setText("admin");
             edtPassword.setText("");
@@ -400,7 +399,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 //                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
-//                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, mUser);
+                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
@@ -419,7 +418,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_40));
                         }
                     });
-                    //                    prodProd.quickSyncRecords(domain);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

@@ -215,8 +215,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     lineIds.put(product_id + "", line.getInt("id"));
                 }
             }
-            objects.addAll(localItems);
-//            objects.addAll(lines);
+//            objects.addAll(localItems);
+            objects.addAll(lines);
         }
 
         mAdapter = mList.getAdapter(R.layout.sale_order_line_item, objects,
@@ -226,11 +226,11 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         ODataRow row = (ODataRow) mAdapter.getItem(position);
 
                         String defaultCode = row.getString("default_code");
-                        if (!defaultCode.equals("false"))
-                            OControls.setText(mView, R.id.edtName, "["
-                                    + defaultCode
-                                    + "] " + row.getString("name"));
-                        else {
+                        if (!defaultCode.equals("false")) {
+                            OControls.setText(mView, R.id.edtNumber, "[" + defaultCode + "] ");
+                            OControls.setText(mView, R.id.edtName, row.getString("name"));
+                        } else {
+                            OControls.setText(mView, R.id.edtNumber, "");
                             OControls.setText(mView, R.id.edtName, row.getString("name"));
                         }
                         OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));

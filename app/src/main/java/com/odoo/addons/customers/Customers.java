@@ -107,6 +107,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mPartnersList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mPartnersList, this);
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
+        mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
         getLoaderManager().initLoader(0, null, this);
     }

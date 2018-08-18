@@ -17,7 +17,6 @@ import android.widget.ListView;
 
 import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
-//import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
@@ -35,12 +34,14 @@ import java.util.List;
 
 import odoo.controls.IOnQuickRecordCreateListener;
 
+//import com.odoo.addons.sale.models.ProductTemplate;
+
 public class AddProductLineWizard extends OdooCompatActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
         OListAdapter.OnSearchChange, IOnQuickRecordCreateListener, AdapterView.OnItemLongClickListener {
 
     private ProductProduct productProduct;
-//    private ProductTemplate productTemplate;
+    //    private ProductTemplate productTemplate;
     private EditText edt_searchable_input;
     private ListView mList = null;
     private OListAdapter mAdapter;
