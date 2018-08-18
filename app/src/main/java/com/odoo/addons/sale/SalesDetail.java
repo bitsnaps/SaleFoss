@@ -113,6 +113,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private boolean saveWithProductLines = false;
     private ProductProduct productProduct;
     private List<Object> localItems = new ArrayList<>();
+    private Sales sales = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -130,9 +131,17 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         products = new ProductProduct(this, null);
         lineOrder = new SalesOrderLine(this, null);
         productProduct = new ProductProduct(this, null);
+        sales = new Sales();
 
+        boolean temp = sale.getFirsLoadProduct();
+        if (!temp) {
+            sales.syncProduct(this);
+//            sales.syncProductNew(this);
+            temp = sale.setFirsLoadProduct(true);
+        }
         init();
         initAdapter();
+
     }
 
     @Nullable

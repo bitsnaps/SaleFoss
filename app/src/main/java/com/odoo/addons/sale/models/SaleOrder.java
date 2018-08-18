@@ -61,6 +61,7 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
+    private static boolean isFirstUpdateProduct = false;
     private Context mContext = getContext();
     private Context idContext = getContext();
 
@@ -104,6 +105,13 @@ public class SaleOrder extends OModel {
         super(context, "sale.order", user);
         mContext = context;
         setHasMailChatter(true);
+    }
+    public boolean setFirsLoadProduct(boolean isThere) {
+        return this.isFirstUpdateProduct = isThere;
+    }
+
+    public boolean getFirsLoadProduct() {
+        return this.isFirstUpdateProduct;
     }
 
     private String _s(int res_id) {

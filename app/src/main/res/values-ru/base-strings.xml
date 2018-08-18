@@ -59,6 +59,7 @@
     <string name="title_working">Идет обработка&#8230;</string>
     <string name="title_loading">Загрузка записей на сервер&#8230;</string>
     <string name="title_loading_product">Продукты загружаются с сервера&#8230;</string>
+    <string name="title_first_product">Нужно загрузить продукты!&#8230;</string>
     <string name="title_please_wait">Подождите пожалуйста&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Поиск</string>
