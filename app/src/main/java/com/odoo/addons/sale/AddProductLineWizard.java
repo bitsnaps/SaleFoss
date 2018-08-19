@@ -73,6 +73,8 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             }
             for (Object local : productProduct.select()) {
                 ODataRow product = (ODataRow) local;
+                if (product.get("sale_ok").equals("false"))
+                    continue;
                 if (lineValues.containsKey(product.getString("id") + "")) {
                     localItems.add(0, product);
                 } else {
@@ -254,9 +256,9 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 mLiveDataLoader.cancel(true);
             if (edt_searchable_input.getText().length() >= 2) {
 
-                mLiveDataLoader = new LiveSearch();
-                mLiveDataLoader.execute(edt_searchable_input.getText()
-                        .toString());
+//                mLiveDataLoader = new LiveSearch();
+//                mLiveDataLoader.execute(edt_searchable_input.getText()
+//                        .toString());
             }
         }
     }
@@ -280,7 +282,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 domain.add("id", "not in", productProduct.getServerIds());
                 if (mCol != null) {
                     for (String key : mCol.getDomains().keySet()) {
-                        // domain.add("sale_ok", "=", true);
+                        domain.add("sale_ok", "=", true);
                     }
                 }
                 OdooFields fields = new OdooFields(productProduct.getColumns());

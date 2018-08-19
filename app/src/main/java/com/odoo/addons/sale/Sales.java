@@ -594,7 +594,7 @@ public class Sales extends BaseFragment implements
                     Thread.sleep(300);
                     ODomain domain = new ODomain();
                     ProductProduct product = new ProductProduct(context, null);
-                    domain.add("sale_ok", "=", true);
+//                    domain.add("sale_ok", "=", true);
                     product.quickSyncRecords(domain);
                 } catch (Exception e) {
                     e.printStackTrace();
