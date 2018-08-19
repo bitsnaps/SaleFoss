@@ -63,7 +63,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private TextView mLoginProcessStatus = null;
     private App mApp;
     private Odoo mOdoo;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -403,6 +402,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+                    sale.setFirsLoadProduct(false);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
