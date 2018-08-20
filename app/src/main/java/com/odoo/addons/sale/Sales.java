@@ -558,13 +558,18 @@ public class Sales extends BaseFragment implements
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                hideRefreshingProgress();
-                dialog.dismiss();
-                haveNewQuotations = false;
-                if (mType == Type.Quotation)
-                    if (mView != null)
-                        mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-
+                try {
+                    hideRefreshingProgress();
+                    haveNewQuotations = false;
+                    if (mType == Type.Quotation)
+                        if (mView != null)
+                            mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+                    dialog.dismiss();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Не переворачиваем!!!!!!!", Toast.LENGTH_LONG)
+                            .show();
+                }
                 Toast.makeText(context, R.string.toast_recs_updated, Toast.LENGTH_LONG)
                         .show();
 
