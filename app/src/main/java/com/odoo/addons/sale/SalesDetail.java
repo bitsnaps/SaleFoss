@@ -313,7 +313,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                                 values.put("partner_invoice_id", "false");
                                 values.put("partner_shipping_id", "false");
                                 values.put("pricelist_id", "false");
-                                values.put("payment_term", "false");
+//                                values.put("payment_term", "false");
                                 values.put("fiscal_position", "false");
                                 saleOrderOperation.execute(values);
                             }

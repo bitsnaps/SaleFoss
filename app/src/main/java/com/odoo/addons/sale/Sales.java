@@ -43,8 +43,10 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
+import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
@@ -103,7 +105,6 @@ public class Sales extends BaseFragment implements
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
     private Type mType = Type.Quotation;
-    private SaleOrder sale = null;
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
@@ -114,6 +115,7 @@ public class Sales extends BaseFragment implements
         public void OnCancelled() {
         }
     };
+    private SaleOrder sale = null;
     private Boolean mSyncRequested = false;
     private int have_zero = 0;
     private boolean haveNewQuotations = false;
@@ -257,7 +259,7 @@ public class Sales extends BaseFragment implements
         } else {
             if (db().isEmptyTable() && !mSyncRequested) {
                 mSyncRequested = true;
-                if (sale == null )
+                if (sale == null)
                     sale = new SaleOrder(getContext(), null);
 //                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 onRefresh();
@@ -491,11 +493,6 @@ public class Sales extends BaseFragment implements
         return null;
     }
 
-    public enum Type {
-        Quotation,
-        SaleOrder
-    }
-
     public void syncLocalDatatoOdoo(final Context context, final List<ODataRow> quotation) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
@@ -531,12 +528,14 @@ public class Sales extends BaseFragment implements
                             OArguments args = new OArguments();
                             args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                             args.add(new JSONObject());
-                            Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-                            if (confirm.equals(false)){
-                                confirm = saleOrder.getServerDataHelper().callMethod("action_button_confirm", args);
-                            }
-
-                            //Object delivery = saleOrder.getServerDataHelper().callMethod("action_view_delivery", args);
+//                            Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
+//                            if (confirm.equals(false)) {
+//                                confirm = saleOrder.getServerDataHelper().callMethod("action_button_confirm", args);
+//                            }
+//                            ResUsers users = new ResUsers(context, null);
+//                            ServerDataHelper serverDataHelper = users.getServerDataHelper();
+//                            Object confirm =  serverDataHelper.callMethod("sale.order","create_with_full_confirm", args, null, null);
+                            Object confirm = saleOrder.getServerDataHelper().callMethod("create_with_full_confirm", args);
 //                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
 //                            if (confirm != null && done != null) {
                             if (confirm != null && confirm.equals(true)) {
@@ -643,6 +642,11 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    public enum Type {
+        Quotation,
+        SaleOrder
     }
 
 }
