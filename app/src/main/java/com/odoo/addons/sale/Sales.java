@@ -37,16 +37,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
-import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
@@ -510,44 +509,24 @@ public class Sales extends BaseFragment implements
 
             @Override
             protected Void doInBackground(Void... params) {
+                final TextView mLoginProcessStatus = null;
 
                 try {
                     Thread.sleep(500);
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
                     SaleOrder saleOrder = new SaleOrder(context, null);
-
+                    Object confirm = null;
+//done recently
+                    domain.add("|");
                     domain.add("id", "=", "0");
+                    domain.add("state", "=", "draft");
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-                    if (checkNewQuotations(context) != null) {
-                        for (final ODataRow qUpdate : quotation) {
-
-                            OArguments args = new OArguments();
-                            args.add(new JSONArray().put(saleOrder.selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
-                            args.add(new JSONObject());
-//                            Object confirm = saleOrder.getServerDataHelper().callMethod("action_confirm", args);
-//                            if (confirm.equals(false)) {
-//                                confirm = saleOrder.getServerDataHelper().callMethod("action_button_confirm", args);
-//                            }
-//                            ResUsers users = new ResUsers(context, null);
-//                            ServerDataHelper serverDataHelper = users.getServerDataHelper();
-//                            Object confirm =  serverDataHelper.callMethod("sale.order","create_with_full_confirm", args, null, null);
-                            Object confirm = saleOrder.getServerDataHelper().callMethod("create_with_full_confirm", args);
-//                            Object done = saleOrder.getServerDataHelper().callMethod("action_done", args);
-//                            if (confirm != null && done != null) {
-                            if (confirm != null && confirm.equals(true)) {
-                                OValues values = new OValues();
-                                //values.put("state", "done");
-                                values.put("state", "sale");
-                                values.put("state_title", saleOrder.getStateTitle(values));
-                                values.put("_is_dirty", "false");
-                                saleOrder.update(qUpdate.getInt(OColumn.ROW_ID), values);
-                            }
-                        }
-                    }
+                    doWorkflowFullConfirmEachOrder(saleOrder, context, quotation);
+//                    doWorkflowFullConfirm(saleOrder, context, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -642,6 +621,53 @@ public class Sales extends BaseFragment implements
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    private void doWorkflowFullConfirmEachOrder(SaleOrder model, Context context, final List<ODataRow> quotation) {
+
+        if (checkNewQuotations(context) != null) {
+            for (final ODataRow qUpdate : quotation) {
+                JSONArray idList = new JSONArray();
+                OArguments args = new OArguments();
+                idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+                args.add(idList);
+                args.add(new JSONObject());
+                Object confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+                if (confirm != null && confirm.equals(true)) {
+                    OValues values = new OValues();
+                    values.put("state", "sale");
+                    values.put("state_title", model.getStateTitle(values));
+                    values.put("_is_dirty", "false");
+                    model.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                }
+            }
+        }
+    }
+
+    private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
+        Object confirm = null;
+
+        if (checkNewQuotations(context) != null) {
+            JSONArray idList = new JSONArray();
+            OArguments args = new OArguments();
+            for (final ODataRow qUpdate : quotation) {
+                idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+            }
+            args.add(idList);
+            args.add(new JSONObject());
+            confirm = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+            if (confirm != null && confirm.equals(true)) {
+                for (final ODataRow qUpdate : quotation) {
+                    OValues values = new OValues();
+                    values.put("state", "sale");
+                    values.put("state_title", model.getStateTitle(values));
+                    values.put("_is_dirty", "false");
+                    model.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                }
+            }
+        }
     }
 
     public enum Type {
