@@ -75,7 +75,8 @@ public class ResPartner extends OModel {
     OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn();
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
-    OColumn payment_term = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne).setLocalColumn();
+
+//    OColumn payment_term = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne).setLocalColumn();
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);

@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                app:fieldName="payment_term"
+                app:fieldName="payment_term_id"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 app:fieldTextSize="@dimen/text_size_xmedium"
                 app:showIcon="false"

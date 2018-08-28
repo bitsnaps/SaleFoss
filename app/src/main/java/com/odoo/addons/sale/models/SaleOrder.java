@@ -23,9 +23,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
@@ -38,7 +35,6 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.orm.fields.types.ODate;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
@@ -56,8 +52,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import com.odoo.core.support.addons.fragment.BaseFragment;
-
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
@@ -71,7 +65,7 @@ public class SaleOrder extends OModel {
     OColumn partner_id = new OColumn(_s(R.string.field_label_partner_id), ResPartner.class, OColumn.RelationType.ManyToOne);
     OColumn user_id = new OColumn(_s(R.string.field_label_user_id), ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn amount_total = new OColumn(_s(R.string.field_label_amount_total), OFloat.class);
-    OColumn payment_term = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
+    OColumn payment_term_id = new OColumn(_s(R.string.field_label_payment_term), AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
     OColumn amount_untaxed = new OColumn(_s(R.string.field_label_amount_untaxed), OInteger.class);
     OColumn amount_tax = new OColumn(_s(R.string.field_label_amount_tax), OInteger.class);
     OColumn client_order_ref = new OColumn(_s(R.string.field_label_client_order_ref),
@@ -101,11 +95,17 @@ public class SaleOrder extends OModel {
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
 
+    OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
+    @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
+    OColumn invoice_status_title = new OColumn("Invoice Title", OVarchar.class)
+            .setLocalColumn();
+
     public SaleOrder(Context context, OUser user) {
         super(context, "sale.order", user);
         mContext = context;
         setHasMailChatter(true);
     }
+
     public boolean setFirsLoadProduct(boolean isThere) {
         return this.isFirstUpdateProduct = isThere;
     }
@@ -139,7 +139,7 @@ public class SaleOrder extends OModel {
             data.put("partner_invoice_id", customer.get("partner_invoice_id"));
             data.put("partner_shipping_id", customer.get("partner_shipping_id"));
             data.put("pricelist_id", customer.get("pricelist_id"));
-            data.put("payment_term", customer.get("payment_term"));
+            data.put("payment_term_id", customer.get("payment_term_id"));
             data.put("fiscal_position", customer.get("fiscal_position"));
 
             partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
@@ -176,7 +176,17 @@ public class SaleOrder extends OModel {
         mStates.put("shipping_except", mContext.getString(R.string.field_label_sipping_except));
         mStates.put("invoice_except", mContext.getString(R.string.field_label_invoice_except));
         mStates.put("done", mContext.getString(R.string.field_label_done));
+
         return mStates.get(row.getString("state"));
+    }
+
+    public String getInvoiceStatusTitle(OValues row) {
+        HashMap<String, String> mStates = new HashMap<String, String>();
+        mStates.put("upselling", "Upselling Opportunity");
+        mStates.put("invoiced", "Fully Invoiced");
+        mStates.put("to invoice", "To Invoice");
+        mStates.put("no", "Nothing to Invoice");
+        return mStates.get(row.getString("invoice_status"));
     }
 
     public String storeCurrencySymbol(OValues values) {
@@ -193,7 +203,7 @@ public class SaleOrder extends OModel {
 
     public String storePartnerName(OValues values) {
         try {
-            if (!values.getString("partner_id").equals("false") ) {
+            if (!values.getString("partner_id").equals("false")) {
                 return ((ArrayList) values.get("partner_id")).get(1).toString();
             }
         } catch (Exception e) {
@@ -378,12 +388,6 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
-    public static interface OnOperationSuccessListener {
-        public void OnSuccess();
-
-        public void OnCancelled();
-    }
-
     // New name fo Sale order Table
     public String newNameSaleOrder(String pream) {
         String nameOrder = "";
@@ -414,6 +418,7 @@ public class SaleOrder extends OModel {
         }
         return nameOrder;
     }
+
     public void syncOrders(final Context context) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
@@ -450,6 +455,12 @@ public class SaleOrder extends OModel {
                 dialog.dismiss();
             }
         }.execute();
+    }
+
+    public static interface OnOperationSuccessListener {
+        public void OnSuccess();
+
+        public void OnCancelled();
     }
 
 }

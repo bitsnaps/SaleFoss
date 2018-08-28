@@ -44,6 +44,7 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -518,15 +519,13 @@ public class Sales extends BaseFragment implements
                     SaleOrder saleOrder = new SaleOrder(context, null);
                     Object confirm = null;
 //done recently
-                    domain.add("|");
                     domain.add("id", "=", "0");
-                    domain.add("state", "=", "draft");
 
                     salesOrderLine.quickSyncRecords(domain);
                     saleOrder.quickSyncRecords(domain);
 
-                    doWorkflowFullConfirmEachOrder(saleOrder, context, quotation);
-//                    doWorkflowFullConfirm(saleOrder, context, quotation);
+//                    doWorkflowFullConfirmEachOrder(saleOrder, context, quotation);
+                    doWorkflowFullConfirm(saleOrder, context, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -626,6 +625,9 @@ public class Sales extends BaseFragment implements
     private void doWorkflowFullConfirmEachOrder(SaleOrder model, Context context, final List<ODataRow> quotation) {
 
         if (checkNewQuotations(context) != null) {
+            Object createInvoice;
+            Object createDelivery;
+
             for (final ODataRow qUpdate : quotation) {
                 JSONArray idList = new JSONArray();
                 OArguments args = new OArguments();
@@ -633,7 +635,12 @@ public class Sales extends BaseFragment implements
                 args.add(idList);
                 args.add(new JSONObject());
                 Object confirm = model.getServerDataHelper().callMethod("action_confirm", args);
-                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+                createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+                createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+
+//                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
                 if (confirm != null && confirm.equals(true)) {
                     OValues values = new OValues();
                     values.put("state", "sale");
@@ -647,6 +654,9 @@ public class Sales extends BaseFragment implements
 
     private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
         Object confirm = null;
+        Object createInvoice;
+        Object createDelivery;
+        Object comfirm_full;
 
         if (checkNewQuotations(context) != null) {
             JSONArray idList = new JSONArray();
@@ -656,17 +666,28 @@ public class Sales extends BaseFragment implements
             }
             args.add(idList);
             args.add(new JSONObject());
-            confirm = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+            confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+
+            comfirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
 
             if (confirm != null && confirm.equals(true)) {
                 for (final ODataRow qUpdate : quotation) {
                     OValues values = new OValues();
                     values.put("state", "sale");
                     values.put("state_title", model.getStateTitle(values));
+                    if (comfirm_full.equals(true)){
+                        values.put("invoice_status", "invoiced");
+                        values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                    }
                     values.put("_is_dirty", "false");
                     model.update(qUpdate.getInt(OColumn.ROW_ID), values);
                 }
             }
+
         }
     }
 
