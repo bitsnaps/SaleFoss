@@ -135,7 +135,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
         boolean temp = sale.getFirsLoadProduct();
         if (!temp) {
-            sales.syncProduct(this);
+//            sales.syncProduct(this);
 //            sales.syncProductNew(this);
             temp = sale.setFirsLoadProduct(true);
         }
