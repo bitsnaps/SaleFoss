@@ -44,7 +44,6 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
-import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -173,6 +172,7 @@ public class Sales extends BaseFragment implements
         SaleOrder saleOrder = new SaleOrder(getContext(), null);
         OValues state = new OValues();
         state.put("state", row.getString("state"));
+        state.put("invoice_status", row.getString("invoice_status"));
         state.put("order_line", row.getString("order_line"));
 
         OControls.setText(view, R.id.name, row.getString("name"));
@@ -182,8 +182,13 @@ public class Sales extends BaseFragment implements
                 format, "MMMM, dd, HH:mm");
 
         OControls.setText(view, R.id.date_order, date);
-//        OControls.setText(view, R.id.state, row.getString("state_title"));
-        OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
+
+        if (row.getString("state").equals("sale")) {
+            OControls.setText(view, R.id.state, saleOrder.getInvoiceStatusTitle(state));
+        } else {
+            OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
+        }
+//        OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
 
         if (row.getString("partner_name").equals("false")) {
             OControls.setGone(view, (R.id.partner_name));
@@ -679,7 +684,7 @@ public class Sales extends BaseFragment implements
                     OValues values = new OValues();
                     values.put("state", "sale");
                     values.put("state_title", model.getStateTitle(values));
-                    if (comfirm_full.equals(true)){
+                    if (comfirm_full.equals(true)) {
                         values.put("invoice_status", "invoiced");
                         values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
                     }
@@ -687,7 +692,6 @@ public class Sales extends BaseFragment implements
                     model.update(qUpdate.getInt(OColumn.ROW_ID), values);
                 }
             }
-
         }
     }
 
