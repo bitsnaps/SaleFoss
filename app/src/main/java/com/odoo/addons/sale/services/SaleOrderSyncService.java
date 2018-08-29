@@ -69,14 +69,15 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             adapter.setDomain(domain).syncDataLimit(50);
         }
 
-        if (adapter.getModel().getModelName().equals("account.payment.term")) {
+        if (adapter.getModel().getModelName().equals("product.product")) {
             adapter.onSyncFinish(syncFinishListener);
         }
     }
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-        return new OSyncAdapter(getApplicationContext(), AccountPaymentTerm.class, SaleOrderSyncService.this, true);
+//        return new OSyncAdapter(getApplicationContext(), AccountPaymentTerm.class, SaleOrderSyncService.this, true);
+        return new OSyncAdapter(getApplicationContext(), ProductProduct.class, SaleOrderSyncService.this, true);
     }
 
     ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
