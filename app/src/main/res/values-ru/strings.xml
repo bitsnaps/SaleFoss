@@ -8,6 +8,7 @@
     <string name="sync_label_calendar">Календарь</string>
     <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
     <string name="sync_label_quotation_sales_orders">Предложение цен/Заказы продаж</string>
+    <string name="sync_label_products">Продукты</string>
     <string name="sync_label_phonecalls">Записанные вызовы</string>
     <string name="no_notification">No Notification</string>
     <string name="at_the_time_of_event">Во время события</string>

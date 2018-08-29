@@ -312,6 +312,8 @@ public class Sales extends BaseFragment implements
                 setSwipeRefreshing(false); //true need
 //                syncProductNew(context);
 //                sale.syncOrders(context);
+
+                parent().sync().requestSync(ProductProduct.AUTHORITY); // Check for need
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 CheckNewRecords = checkNewQuotations(context);
                 if (CheckNewRecords != null) {
@@ -694,6 +696,7 @@ public class Sales extends BaseFragment implements
             }
         }
     }
+
 
     public enum Type {
         Quotation,

@@ -8,6 +8,7 @@
     <string name="sync_label_calendar">Calendar</string>
     <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
     <string name="sync_label_quotation_sales_orders">Quotations/Sales Orders</string>
+    <string name="sync_label_products">Products</string>
     <string name="sync_label_phonecalls">Logged Calls</string>
     <string name="no_notification">No Notification</string>
     <string name="at_the_time_of_event">At the time of event</string>

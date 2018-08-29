@@ -21,18 +21,15 @@ package com.odoo;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.odoo.addons.sale.Sales;
-import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;

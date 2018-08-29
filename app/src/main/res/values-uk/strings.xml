@@ -9,6 +9,7 @@
     <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
     <string name="sync_label_quotation_sales_orders">Комерційні пропозиції/Замовлення на продаж</string>
     <string name="sync_label_phonecalls">Записані дзвінки</string>
+    <string name="sync_label_products">Продукти</string>
     <string name="no_notification">No Notification</string>
     <string name="at_the_time_of_event">Під час події</string>
     <string name="on_the_day_at">У день в %s</string>
