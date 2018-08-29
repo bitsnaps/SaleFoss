@@ -398,11 +398,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 //                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
-                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+//                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
+//                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
-                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
-                    sale.setFirsLoadProduct(false);
+//                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+//                    sale.setFirsLoadProduct(false);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -425,7 +425,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
                     Thread.sleep(1000);
-                    salesOrderLine.quickSyncRecords(domain);
+//                    salesOrderLine.quickSyncRecords(domain);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -442,9 +442,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
                         }
                     });
-                    domain.add("user_id", "=", mUser.getUserId());
-                    Thread.sleep(1000);
-                    sale.quickSyncRecords(domain);
+//                    domain.add("user_id", "=", mUser.getUserId());
+//                    Thread.sleep(1000);
+//                    sale.quickSyncRecords(domain);
 
                 } catch (Exception e) {
                     e.printStackTrace();
