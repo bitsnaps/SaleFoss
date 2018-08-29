@@ -524,11 +524,9 @@ public class Sales extends BaseFragment implements
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
                     SaleOrder saleOrder = new SaleOrder(context, null);
-                    Object confirm = null;
-//done recently
                     domain.add("id", "=", "0");
-
                     salesOrderLine.quickSyncRecords(domain);
+                    Thread.sleep(500);
                     saleOrder.quickSyncRecords(domain);
 
 //                    doWorkflowFullConfirmEachOrder(saleOrder, context, quotation);
