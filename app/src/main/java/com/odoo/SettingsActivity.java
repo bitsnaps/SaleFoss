@@ -128,6 +128,7 @@ public class SettingsActivity extends AppCompatActivity {
             Account mAccount = user.getAccount();
             OPreferenceManager mPref = new OPreferenceManager(this);
             int sync_interval = mPref.getInt("sync_interval", 1440);
+
             List<String> default_authorities = new ArrayList<>();
 //            default_authorities.add("com.android.calendar");
 //            default_authorities.add("com.android.contacts");
