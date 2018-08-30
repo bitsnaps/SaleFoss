@@ -118,6 +118,12 @@
     <string name="field_label_sipping_except">Shipping Exception</string>
     <string name="field_label_invoice_except">Invoice Exception</string>
     <string name="field_label_done">Done</string>
+
+    <string name="field_label_upselling">Upselling Opportunity</string>
+    <string name="field_label_invoiced">Fully Invoiced</string>
+    <string name="field_label_to_invoice">To Invoice</string>
+    <string name="field_label_no">Nothing to Invoice</string>
+
     <string name="label_total">Total :</string>
     <string name="label_untaxed_amount">Untaxed Amount :</string>
     <string name="label_taxes">Taxes :</string>

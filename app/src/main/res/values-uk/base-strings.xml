@@ -58,7 +58,7 @@
     <string name="title_working">Обрабляється&#8230;</string>
     <string name="title_loading">Завантаження комерційних пропозицій на сервер&#8230;</string>
     <string name="title_loading_product">Продукти завантажуються з серверу&#8230;</string>
-    <string name="title_please_wait">Почекайте будьласка&#8230;</string>
+    <string name="title_please_wait">Будь ласка почекайте&#8230;</string>
     <string name="title_first_product">Спочатку треба завантажити продукти !&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Пошук</string>

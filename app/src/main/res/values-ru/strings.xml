@@ -118,6 +118,12 @@
     <string name="field_label_sipping_except">Исключение доставки</string>
     <string name="field_label_invoice_except">Исключения выставлнея счета</string>
     <string name="field_label_done">Счет выставлен полностью</string>
+
+    <string name="field_label_upselling">Оптимизация возможностей</string>
+    <string name="field_label_invoiced">Счет выставлен полностью</string>
+    <string name="field_label_to_invoice">В Счет</string>
+    <string name="field_label_no">В Счет ничего не выставлено</string>
+
     <string name="label_total">Итого :</string>
     <string name="label_untaxed_amount">Сумма без налога :</string>
     <string name="label_taxes">Налоги :</string>

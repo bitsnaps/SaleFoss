@@ -118,6 +118,12 @@
     <string name="field_label_sipping_except">Виключення доставки</string>
     <string name="field_label_invoice_except">Вийнятки выставлнея рахунку</string>
     <string name="field_label_done">Рахунок виставлений повністью</string>
+
+    <string name="field_label_upselling">Оптимизація можливостей</string>
+    <string name="field_label_invoiced">Повністю включено в рахунок</string>
+    <string name="field_label_to_invoice">До включення у рахунок</string>
+    <string name="field_label_no">До рахунку нічого не включено</string>
+
     <string name="label_total">Разом :</string>
     <string name="label_untaxed_amount">Сума без податків :</string>
     <string name="label_taxes">Податки :</string>

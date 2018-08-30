@@ -512,6 +512,7 @@ public class Sales extends BaseFragment implements
                 dialog.setMessage(OResource.string(context, R.string.title_loading));
                 dialog.setCancelable(false); // original false
                 setSwipeRefreshing(true);
+
                 dialog.show();
             }
 
