@@ -176,16 +176,15 @@ public class SaleOrder extends OModel {
         mStates.put("shipping_except", mContext.getString(R.string.field_label_sipping_except));
         mStates.put("invoice_except", mContext.getString(R.string.field_label_invoice_except));
         mStates.put("done", mContext.getString(R.string.field_label_done));
-
         return mStates.get(row.getString("state"));
     }
 
     public String getInvoiceStatusTitle(OValues row) {
         HashMap<String, String> mStates = new HashMap<String, String>();
-        mStates.put("upselling", "Upselling Opportunity");
-        mStates.put("invoiced", "Fully Invoiced");
-        mStates.put("to invoice", "To Invoice");
-        mStates.put("no", "Nothing to Invoice");
+        mStates.put("upselling", mContext.getString(R.string.field_label_upselling));
+        mStates.put("invoiced", mContext.getString(R.string.field_label_invoiced));
+        mStates.put("to invoice", mContext.getString(R.string.field_label_to_invoice));
+        mStates.put("no", mContext.getString(R.string.field_label_no));
         return mStates.get(row.getString("invoice_status"));
     }
 
