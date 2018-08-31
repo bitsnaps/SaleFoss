@@ -75,6 +75,7 @@ public class Sales extends BaseFragment implements
         SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
         ISyncStatusObserverListener, IOnItemClickListener, View.OnClickListener,
         OBottomSheet.OSheetActionClickListener, OBottomSheet.OSheetItemClickListener {
+
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
     public Bundle dataGlob;
@@ -381,8 +382,8 @@ public class Sales extends BaseFragment implements
     @Override
     public void onItemClick(View view, int position) {
         if (mType == Type.Quotation)
-            onDoubleClick(position);
-            //showSheet((Cursor) mAdapter.getItem(position));
+//            onDoubleClick(position);
+            showSheet((Cursor) mAdapter.getItem(position));
         else
             onDoubleClick(position);
     }
@@ -710,7 +711,11 @@ public class Sales extends BaseFragment implements
                     values.put("_is_dirty", "false");
                     model.update(qUpdate.getInt(OColumn.ROW_ID), values);
                 }
+            } else {
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
             }
+
         }
     }
 

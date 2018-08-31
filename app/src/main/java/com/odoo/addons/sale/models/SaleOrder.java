@@ -243,14 +243,16 @@ public class SaleOrder extends OModel {
 
             @Override
             protected Void doInBackground(Void... params) {
+                Object mCancel;
                 try {
                     OArguments args = new OArguments();
                     if (type == Sales.Type.SaleOrder) {
                         args.add(new JSONArray().put(quotation.getInt("id")));
                         args.add(new JSONObject());
-                        getServerDataHelper().callMethod("action_cancel", args);
+                        mCancel =  getServerDataHelper().callMethod("action_cancel", args);
                     } else {
-                        getServerDataHelper().callMethod("action_cancel", args);
+
+                        mCancel = getServerDataHelper().callMethod("action_cancel", args);
                         //getServerDataHelper().executeWorkFlow(quotation.getInt("id"), "cancel");
                     }
 
@@ -307,7 +309,6 @@ public class SaleOrder extends OModel {
                     args.add(new JSONArray().put(quotation.getInt("id")));
                     args.add(new JSONObject());
                     getServerDataHelper().callMethod("action_confirm", args);
-                    getServerDataHelper().callMethod("action_done", args);
 
                     OValues values = new OValues();
                     values.put("state", "done");
