@@ -310,10 +310,7 @@ public class Sales extends BaseFragment implements
             try {
                 Thread.sleep(600);
                 setSwipeRefreshing(false); //true need
-//                syncProductNew(context);
-//                sale.syncOrders(context);
-
-                parent().sync().requestSync(ProductProduct.AUTHORITY); // Check for need
+//                parent().sync().requestSync(ProductProduct.AUTHORITY); // Check for need
                 parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 CheckNewRecords = checkNewQuotations(context);
                 if (CheckNewRecords != null) {
@@ -536,6 +533,9 @@ public class Sales extends BaseFragment implements
                     doWorkflowFullConfirm(saleOrder, context, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+
                 }
                 return null;
             }
@@ -633,8 +633,9 @@ public class Sales extends BaseFragment implements
     private void doWorkflowFullConfirmEachOrder(SaleOrder model, Context context, final List<ODataRow> quotation) {
 
         if (checkNewQuotations(context) != null) {
-            Object createInvoice;
-            Object createDelivery;
+            Object createInvoice = null;
+            Object createDelivery = null;
+            Object confirm = null;
 
             for (final ODataRow qUpdate : quotation) {
                 JSONArray idList = new JSONArray();
@@ -642,17 +643,27 @@ public class Sales extends BaseFragment implements
                 idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
                 args.add(idList);
                 args.add(new JSONObject());
-                Object confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                try {
+                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
 
                 createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
                 createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
 
 //                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+                }
 
                 if (confirm != null && confirm.equals(true)) {
                     OValues values = new OValues();
                     values.put("state", "sale");
                     values.put("state_title", model.getStateTitle(values));
+                    if (createDelivery.equals(true) && createInvoice.equals(true)) {
+                        values.put("invoice_status", "invoiced");
+                        values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                    }
                     values.put("_is_dirty", "false");
                     model.update(qUpdate.getInt(OColumn.ROW_ID), values);
                 }
@@ -664,7 +675,7 @@ public class Sales extends BaseFragment implements
         Object confirm = null;
         Object createInvoice;
         Object createDelivery;
-        Object comfirm_full;
+        Object confirm_full = null;
 
         if (checkNewQuotations(context) != null) {
             JSONArray idList = new JSONArray();
@@ -675,19 +686,24 @@ public class Sales extends BaseFragment implements
             args.add(idList);
             args.add(new JSONObject());
 
-            confirm = model.getServerDataHelper().callMethod("action_confirm", args);
-
-            comfirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+            try {
+                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                confirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
 
 //            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
 //            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
+            }
 
             if (confirm != null && confirm.equals(true)) {
                 for (final ODataRow qUpdate : quotation) {
                     OValues values = new OValues();
                     values.put("state", "sale");
                     values.put("state_title", model.getStateTitle(values));
-                    if (comfirm_full.equals(true)) {
+                    if (confirm_full.equals(true)) {
                         values.put("invoice_status", "invoiced");
                         values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
                     }

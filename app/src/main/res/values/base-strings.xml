@@ -84,6 +84,7 @@
     <string name="toast_buy_a_new_smartphone">Buy a new smartphone for you!!!</string>
     <string name="toast_network_required">Network required</string>
     <string name="toast_recs_updated">The records have been updated!</string>
+    <string name="toast_problem_on_server_odoo">Problem with Odoo server request !</string>
     <string name="toast_has_partner_and_lines">Please select a Order lines!</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>

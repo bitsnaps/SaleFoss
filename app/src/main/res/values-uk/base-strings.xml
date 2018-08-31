@@ -85,6 +85,7 @@
     <string name="toast_recs_updated">Записи были обновлены!</string>
     <string name="toast_has_partner_and_lines">Будь ласка виберіть Рядки замовлення !</string>
     <string name="toast_account_removed">Обліковий Запис Вилучений Успішно</string>
+    <string name="toast_problem_on_server_odoo">Проблема на сервері Odoo Рахунок сформован частково !</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Оновлення паролю</string>
     <string name="toast_something_gone_wrong">Щось пішло не так</string>

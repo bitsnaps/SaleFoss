@@ -37,17 +37,25 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".addons.customers.CustomerDetails" />
-        <activity android:name=".core.account.ManageAccounts" />
+        <activity
+            android:name=".addons.customers.CustomerDetails"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".core.account.ManageAccounts"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".OdooActivity"
-            android:label="${applicationName}" />
-        <activity android:name="odoo.controls.SearchableItemActivity" />
-        <activity android:name=".SettingsActivity" />
+            android:label="${applicationName}"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="odoo.controls.SearchableItemActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SettingsActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".core.account.AppIntro"
@@ -55,16 +63,23 @@
 
         <activity
             android:name=".base.addons.mail.widget.MailDetailDialog"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".base.addons.mail.widget.MailChatterCompose"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".core.account.OdooAccountQuickManage"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".core.account.About" />
-        <activity android:name=".core.account.Profile" />
+            android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".core.account.About"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".core.account.Profile"
+            android:screenOrientation="portrait" />
 
         <!-- Reminder Receivers// -->
         <receiver android:name=".core.utils.reminder.ReminderReceiver" />
