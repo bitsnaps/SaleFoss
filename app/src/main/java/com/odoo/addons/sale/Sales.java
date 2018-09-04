@@ -30,6 +30,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -381,10 +382,10 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onItemClick(View view, int position) {
-        if (mType == Type.Quotation)
+        if (mType == Type.Quotation) {
 //            onDoubleClick(position);
             showSheet((Cursor) mAdapter.getItem(position));
-        else
+        } else
             onDoubleClick(position);
     }
 
@@ -408,7 +409,7 @@ public class Sales extends BaseFragment implements
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         switch (item.getItemId()) {
             case R.id.menu_quotation_cancel:
-                ((SaleOrder) db()).cancelOrder(mType, row, cancelOrder);
+                ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);
                 break;
             case R.id.menu_quotation_new:
                 if (inNetwork()) {
@@ -481,8 +482,8 @@ public class Sales extends BaseFragment implements
         boolean CheckOk = false;
         try {
             SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, _id, state FROM sale_order WHERE id = ? or state = ?";
-            have_id_zero_records = sale.query(sql, new String[]{"0", "draft"});
+            String sql = "SELECT name, _id, state FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
                 CheckOk = true;
@@ -499,6 +500,7 @@ public class Sales extends BaseFragment implements
     }
 
     public void syncLocalDatatoOdoo(final Context context, final List<ODataRow> quotation) {
+
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -510,7 +512,6 @@ public class Sales extends BaseFragment implements
                 dialog.setMessage(OResource.string(context, R.string.title_loading));
                 dialog.setCancelable(false); // original false
                 setSwipeRefreshing(true);
-
                 dialog.show();
             }
 
@@ -519,15 +520,16 @@ public class Sales extends BaseFragment implements
                 final TextView mLoginProcessStatus = null;
 
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(1000);
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
                     SaleOrder saleOrder = new SaleOrder(context, null);
-                    Object confirm = null;
 //done recently
                     domain.add("id", "=", "0");
 
+                    Log.e(TAG, "<< sale.order.line - syncing now >>");
                     salesOrderLine.quickSyncRecords(domain);
+                    Log.e(TAG, "<< sale.order - syncing now >>");
                     saleOrder.quickSyncRecords(domain);
 
 //                    doWorkflowFullConfirmEachOrder(saleOrder, context, quotation);
@@ -645,10 +647,10 @@ public class Sales extends BaseFragment implements
                 args.add(idList);
                 args.add(new JSONObject());
                 try {
-                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                    confirm = model.getServerDataHelper().callMethod("action_confirm", args);
 
-                createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
-                createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+                    createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+                    createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
 
 //                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
                 } catch (Exception e) {
