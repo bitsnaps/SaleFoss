@@ -304,9 +304,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         } else {
                             List<ODataRow> rows = partner.select(
                                     new String[]{"name", "parent_id"},
-                                    "name = ?",
-                                    new String[]{"Customer"}
+                                    "default_customer = ?",
+                                    new String[]{"true"}
                             );
+//                            List<ODataRow> rows = partner.select(
+//                                    new String[]{"name", "parent_id"},
+//                                    "name = ?",
+//                                    new String[]{"Customer"}
+//                            );
                             for (ODataRow row : rows) {
                                 values.put("partner_name", partner.getName(row.getInt("_id")));
                                 values.put("partner_id", row.get("_id"));

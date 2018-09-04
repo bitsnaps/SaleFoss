@@ -134,7 +134,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         List<String> args = new ArrayList<>();
         switch (mType) {
             case Customer:
-                where = "customer = ? and name = ?";
+//                where = "customer = ? and name = ?";
+                where = "customer = ?";
                 break;
             case Supplier:
                 where = "supplier = ?";
@@ -144,7 +145,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 break;
         }
         args.add("true");
-        args.add("Customer");
+//        args.add("Customer");
         if (mCurFilter != null) {
             where += " name like ? ";
             args.add(mCurFilter + "%");

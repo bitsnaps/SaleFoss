@@ -47,6 +47,8 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OStringColorUtil;
 
+import java.util.List;
+
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
@@ -118,6 +120,8 @@ public class CustomerDetails extends OdooCompatActivity
             findViewById(R.id.customer_view_layout).setVisibility(View.GONE);
             findViewById(R.id.customer_edit_layout).setVisibility(View.VISIBLE);
             OField is_company = (OField) findViewById(R.id.is_company_edit);
+            OField default_customer = (OField) findViewById(R.id.is_default);
+
             is_company.setOnValueChangeListener(this);
         } else {
             mForm = (OForm) findViewById(R.id.customerForm);
@@ -222,7 +226,16 @@ public class CustomerDetails extends OdooCompatActivity
                         values.put("large_image", newImage);
                     }
                     if (record != null) {
+                        String sql = "SELECT _id FROM res_partner WHERE default_customer = ?";
+                        OValues makeFalse = new OValues();
+                        makeFalse.put("default_customer", false);
+                        List<ODataRow> rec = resPartner.query(sql, new String[]{"true"});
+                        for (ODataRow row : rec) {
+                            resPartner.update(row.getInt(OColumn.ROW_ID), makeFalse);
+                        }
+
                         resPartner.update(record.getInt(OColumn.ROW_ID), values);
+
                         Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupToolbar();

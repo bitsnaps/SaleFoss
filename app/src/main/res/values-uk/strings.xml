@@ -164,6 +164,7 @@
     <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
     <string name="field_label_pricelist_id">"Price List Id"</string>
     <string name="field_label_fiscal_position">"Fiscal Position"</string>
+    <string name="field_label_default_customer">"Покупець по замовчуванню"</string>
     <!--Model order.line-->
     <string name="field_label_product_id">Product</string>
     <string name="field_label_product_uom_qty">Quantity</string>
