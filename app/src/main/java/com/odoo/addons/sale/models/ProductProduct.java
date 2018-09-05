@@ -22,6 +22,7 @@ package com.odoo.addons.sale.models;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.BuildConfig;
 import com.odoo.R;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -38,7 +39,10 @@ import java.util.ArrayList;
 
 public class ProductProduct extends OModel {
     public static final String TAG = ProductProduct.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.product_product";
+//    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.product_product";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
+            ".provider.content.sync.product_product";
+
     private Context idContext = getContext();
 
     OColumn product_tmpl_id = new OColumn(_s(R.string.field_label_product_tmpl_id), ProductTemplate.class,

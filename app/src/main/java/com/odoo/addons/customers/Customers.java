@@ -339,8 +339,15 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(ResPartner.AUTHORITY);
-            setSwipeRefreshing(true);
+            try {
+                parent().sync().requestSync(ResPartner.AUTHORITY);
+                setSwipeRefreshing(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getActivity(), _s(R.string.label_crash_refresh), Toast.LENGTH_LONG)
+                        .show();
+            }
+
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)

@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.BuildConfig;
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
@@ -58,7 +59,10 @@ import java.util.List;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
+    //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
+            ".provider.content.sync.sale_order";
+
     private static boolean isFirstUpdateProduct = false;
     private Context mContext = getContext();
     private Context idContext = getContext();
@@ -338,9 +342,11 @@ public class SaleOrder extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (!faultOrder)
-                    if (listener != null) { listener.OnSuccess();}
-                else
-                    if (listener != null) { listener.OnCancelled();}
+                    if (listener != null) {
+                        listener.OnSuccess();
+                    } else if (listener != null) {
+                        listener.OnCancelled();
+                    }
             }
 
             @Override
@@ -397,9 +403,9 @@ public class SaleOrder extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (listener != null) {
-                    if (!faultOrder){
+                    if (!faultOrder) {
                         listener.OnSuccess();
-                    } else{
+                    } else {
                         listener.OnFault();
                     }
                 }
@@ -461,9 +467,9 @@ public class SaleOrder extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (listener != null) {
-                    if (!faultOrder){
+                    if (!faultOrder) {
                         listener.OnSuccess();
-                    } else{
+                    } else {
                         listener.OnFault();
                     }
                 }
@@ -551,31 +557,25 @@ public class SaleOrder extends OModel {
         return nameOrder;
     }
 
-    public void syncOrders(final Context context) {
+    public void syncOrders(final Context context, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
+            private Boolean faultOrder = false;
+            private Object connect;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog = new ProgressDialog(mContext);
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_working));
-                dialog.setCancelable(false);
-                dialog.show();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-
+                OArguments args = new OArguments();
+                args.add(new JSONObject());
                 try {
-                    Thread.sleep(500);
-                    ODomain domain = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
-                    SaleOrder saleOrder = new SaleOrder(context, null);
-                    salesOrderLine.quickSyncRecords(domain);
-                    saleOrder.quickSyncRecords(domain);
+                    connect = getServerDataHelper().callMethod("exist_db", args);
+
                 } catch (Exception e) {
+                    faultOrder = true;
                     e.printStackTrace();
                 }
                 return null;
@@ -584,7 +584,14 @@ public class SaleOrder extends OModel {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                dialog.dismiss();
+                if (listener != null) {
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
+                }
+
             }
         }.execute();
     }
@@ -620,6 +627,7 @@ public class SaleOrder extends OModel {
             update(quotation.getInt(OColumn.ROW_ID), values);
         }
     }
+
     private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
         Object confirm = null;
         Object createInvoice;
@@ -688,7 +696,9 @@ public class SaleOrder extends OModel {
     public static interface OnOperationSuccessListener {
 
         public void OnSuccess();
+
         public void OnFault();
+
         public void OnCancelled();
     }
 
