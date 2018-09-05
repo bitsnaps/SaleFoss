@@ -330,8 +330,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 if (record != null) {
                     if (extra != null && record.getFloat("amount_total") > 0) {
                         if (app.inNetwork()) {
-// Close session and
-//                            sale.confirmSale(record, confirmSale);
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();

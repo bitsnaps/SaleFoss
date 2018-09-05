@@ -61,6 +61,7 @@
     <string name="title_first_product">Need load product!&#8230;</string>
     <string name="title_loading_product">Loading product from server&#8230;</string>
     <string name="title_please_wait">Please wait&#8230;</string>
+    <string name="title_please_wait_order">Please wait, Order is confirming&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Search</string>
     <string name="label_delete">Delete</string>

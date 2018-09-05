@@ -355,28 +355,27 @@ public class SaleOrder extends OModel {
                 super.onPreExecute();
                 dialog = new ProgressDialog(mContext);
                 dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setMessage(OResource.string(mContext, R.string.title_please_wait_order));
                 dialog.setCancelable(false);
                 dialog.show();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-
                 try {
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
-                    SaleOrder saleOrder = new SaleOrder(mContext, null);
-//done recently
-                    domain.add("id", "=", "0");
 
+                    domain.add("id", "=", "0");
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
                     salesOrderLine.quickSyncRecords(domain);
+
                     Log.e(TAG, "<< sale.order - syncing now >>");
-                    saleOrder.quickSyncRecords(domain);
+                    quickSyncRecords(domain);
+
                     int temp = selectServerId(quotation.getInt(OColumn.ROW_ID));
                     quotation.put("id", temp);
-                    doOrderFullConfirm(saleOrder, mContext, quotation);
+                    doOrderFullConfirm(quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
@@ -537,7 +536,7 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
-    private void doOrderFullConfirm(SaleOrder model, Context context, final ODataRow quotation) {
+    private void doOrderFullConfirm(final ODataRow quotation) {
         Object createInvoice = null;
         Object createDelivery = null;
         Object confirm = null;
@@ -546,29 +545,28 @@ public class SaleOrder extends OModel {
         args.add(new JSONArray().put(quotation.getInt("id")));
         args.add(new JSONObject());
         try {
-            confirm = model.getServerDataHelper().callMethod("action_confirm", args);
-            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
-            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+            confirm = getServerDataHelper().callMethod("action_confirm", args);
+            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
 
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+            Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
                     .show();
         }
 
         if (confirm != null && confirm.equals(true)) {
             OValues values = new OValues();
             values.put("state", "sale");
-            values.put("state_title", model.getStateTitle(values));
+            values.put("state_title", getStateTitle(values));
             if (createDelivery.equals(true) && createInvoice.equals(true)) {
                 values.put("invoice_status", "invoiced");
-                values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                values.put("invoice_status_title", getInvoiceStatusTitle(values));
             }
             values.put("_is_dirty", "false");
             update(quotation.getInt(OColumn.ROW_ID), values);
         }
     }
-
 
     public static interface OnOperationSuccessListener {
         public void OnSuccess();
