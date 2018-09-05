@@ -139,6 +139,8 @@
     <string name="label_crash_refresh">Whooops!!!!! refresh crashed!</string>
     <string name="label_no_lines">You cannot a sales order which has no line</string>
     <string name="label_quotation_confirmed">Quotation confirmed!</string>
+    <string name="label_quotation_fault">Quotation not confirmed, check connection on the server!</string>
+
     <string name="label_updated">updated</string>
     <string name="label_created">created</string>
     <string name="title_no_lines">(No lines)</string>

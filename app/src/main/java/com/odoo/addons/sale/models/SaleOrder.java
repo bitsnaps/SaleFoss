@@ -24,6 +24,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
@@ -60,6 +62,8 @@ public class SaleOrder extends OModel {
     private static boolean isFirstUpdateProduct = false;
     private Context mContext = getContext();
     private Context idContext = getContext();
+    public List<ODataRow> have_id_zero_records = null;
+    private int have_zero = 0;
 
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
@@ -289,6 +293,7 @@ public class SaleOrder extends OModel {
     public void cancelOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
+            private Boolean faultOrder = false;
 
             @Override
             protected void onPreExecute() {
@@ -322,7 +327,9 @@ public class SaleOrder extends OModel {
                     update(quotation.getInt(OColumn.ROW_ID), values);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    faultOrder = true;
                 }
+                faultOrder = false;
                 return null;
             }
 
@@ -330,9 +337,10 @@ public class SaleOrder extends OModel {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
-                if (listener != null) {
-                    listener.OnSuccess();
-                }
+                if (!faultOrder)
+                    if (listener != null) { listener.OnSuccess();}
+                else
+                    if (listener != null) { listener.OnCancelled();}
             }
 
             @Override
@@ -349,6 +357,7 @@ public class SaleOrder extends OModel {
     public void confirmSale(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
+            private Boolean faultOrder = false;
 
             @Override
             protected void onPreExecute() {
@@ -378,25 +387,8 @@ public class SaleOrder extends OModel {
                     doOrderFullConfirm(quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                            .show();
-
+                    faultOrder = true;
                 }
-//                try {
-//
-//                    OArguments args = new OArguments();
-//                    args.add(new JSONArray().put(quotation.getInt("id")));
-//                    args.add(new JSONObject());
-//                    getServerDataHelper().callMethod("action_confirm", args);
-//
-//                    OValues values = new OValues();
-//                    values.put("state", "done");
-//                    values.put("state_title", getStateTitle(values));
-//                    values.put("_is_dirty", "false");
-//                    update(quotation.getInt(OColumn.ROW_ID), values);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
                 return null;
             }
 
@@ -405,7 +397,11 @@ public class SaleOrder extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (listener != null) {
-                    listener.OnSuccess();
+                    if (!faultOrder){
+                        listener.OnSuccess();
+                    } else{
+                        listener.OnFault();
+                    }
                 }
             }
 
@@ -419,6 +415,63 @@ public class SaleOrder extends OModel {
             }
         }.execute();
     }
+
+    public void confirmAllSaleOrders(final Context context, final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
+
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+            private Boolean faultOrder = false;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(context);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(context, R.string.title_loading));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                final TextView mLoginProcessStatus = null;
+
+                try {
+                    ODomain domain = new ODomain();
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(context, null);
+
+                    domain.add("id", "=", "0");
+
+                    Log.e(TAG, "<< sale.order.line - syncing now >>");
+                    salesOrderLine.quickSyncRecords(domain);
+                    Log.e(TAG, "<< sale.order - syncing now >>");
+                    saleOrder.quickSyncRecords(domain);
+
+                    doWorkflowFullConfirm(saleOrder, context, quotation);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    faultOrder = true;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    if (!faultOrder){
+                        listener.OnSuccess();
+                    } else{
+                        listener.OnFault();
+                    }
+                }
+
+            }
+        }.execute();
+    }
+
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
@@ -567,10 +620,75 @@ public class SaleOrder extends OModel {
             update(quotation.getInt(OColumn.ROW_ID), values);
         }
     }
+    private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
+        Object confirm = null;
+        Object createInvoice;
+        Object createDelivery;
+        Object confirm_full = null;
+
+        if (checkNewQuotations(context) != null) {
+            JSONArray idList = new JSONArray();
+            OArguments args = new OArguments();
+            for (final ODataRow qUpdate : quotation) {
+                idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+            }
+            args.add(idList);
+            args.add(new JSONObject());
+
+            try {
+                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                confirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
+            }
+
+            if (confirm != null && confirm.equals(true)) {
+                for (final ODataRow qUpdate : quotation) {
+                    OValues values = new OValues();
+                    values.put("state", "sale");
+                    values.put("state_title", model.getStateTitle(values));
+                    if (confirm_full.equals(true)) {
+                        values.put("invoice_status", "invoiced");
+                        values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                    }
+                    values.put("_is_dirty", "false");
+                    model.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                }
+            } else {
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
+            }
+
+        }
+    }
+
+    public List<ODataRow> checkNewQuotations(Context context) {
+        boolean CheckOk = false;
+        try {
+            SaleOrder sale = new SaleOrder(context, null);
+            String sql = "SELECT name, _id, state FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
+            have_zero = have_id_zero_records.size();
+            if (have_zero != 0) {
+                CheckOk = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (CheckOk)
+            return have_id_zero_records;
+        return null;
+    }
 
     public static interface OnOperationSuccessListener {
-        public void OnSuccess();
 
+        public void OnSuccess();
+        public void OnFault();
         public void OnCancelled();
     }
 

@@ -66,11 +66,17 @@ import static com.odoo.addons.sale.Sales.Type;
 public class SalesDetail extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
     public static final int REQUEST_ADD_ITEMS = 323;
+
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
             finish();
+        }
+
+        @Override
+        public void OnFault() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -85,6 +91,10 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
                     + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
             finish();
+        }
+        @Override
+        public void OnFault() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
         }
 
         @Override

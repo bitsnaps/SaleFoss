@@ -81,10 +81,16 @@ public class Sales extends BaseFragment implements
     public static final String KEY_MENU = "key_sales_menu";
     public Bundle dataGlob;
     public List<ODataRow> have_id_zero_records = null;
+
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnFault() {
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -95,6 +101,10 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
+        }
+        @Override
+        public void OnFault() {
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -110,6 +120,11 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), mType + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnFault() {
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -648,11 +663,8 @@ public class Sales extends BaseFragment implements
                 args.add(new JSONObject());
                 try {
                     confirm = model.getServerDataHelper().callMethod("action_confirm", args);
-
                     createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
                     createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
-
-//                Object confirmWorkFlow = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)

@@ -139,6 +139,7 @@
     <string name="label_crash_refresh">Щось трапилось!!!!! оновлення зупинено !</string>
     <string name="label_no_lines">Ви не можете підтвердити продаж доки Рядок замовлення не заповнений</string>
     <string name="label_quotation_confirmed">Пропозиція Замовлення підтверджено!</string>
+    <string name="label_quotation_fault">Пропозиція Замовлення не підтверджено, перевірте з\'єднання з сервером!</string>
     <string name="label_updated">оновлено</string>
     <string name="label_created">створена</string>
     <string name="title_no_lines">(Рядки відсутні)</string>
