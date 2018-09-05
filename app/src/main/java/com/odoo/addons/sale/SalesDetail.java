@@ -307,24 +307,22 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                                     "default_customer = ?",
                                     new String[]{"true"}
                             );
-//                            List<ODataRow> rows = partner.select(
-//                                    new String[]{"name", "parent_id"},
-//                                    "name = ?",
-//                                    new String[]{"Customer"}
-//                            );
-                            for (ODataRow row : rows) {
-                                values.put("partner_name", partner.getName(row.getInt("_id")));
-                                values.put("partner_id", row.get("_id"));
-                                values.put("partner_invoice_id", "false");
-                                values.put("partner_shipping_id", "false");
-                                values.put("pricelist_id", "false");
-//                                values.put("payment_term_id", "false");
-                                values.put("fiscal_position", "false");
-                                saleOrderOperation.execute(values);
-                            }
+                            if (rows.size() <= 0){
+                                Toast.makeText(this, R.string.toast_has_partner, Toast.LENGTH_LONG).show();
+                            } else
+                                for (ODataRow row : rows) {
+                                    values.put("partner_name", partner.getName(row.getInt("_id")));
+                                    values.put("partner_id", row.get("_id"));
+                                    values.put("partner_invoice_id", "false");
+                                    values.put("partner_shipping_id", "false");
+                                    values.put("pricelist_id", "false");
+//                                    values.put("payment_term_id", "false");
+                                    values.put("fiscal_position", "false");
+                                    saleOrderOperation.execute(values);
+                                }
                         }
                     } else {
-                        Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.toast_has_lines, Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
@@ -333,6 +331,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     if (extra != null && record.getFloat("amount_total") > 0) {
                         if (app.inNetwork()) {
 // Close session and
+//                            sale.confirmSale(record, confirmSale);
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();

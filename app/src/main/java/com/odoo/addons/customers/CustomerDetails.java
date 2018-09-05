@@ -226,20 +226,13 @@ public class CustomerDetails extends OdooCompatActivity
                         values.put("large_image", newImage);
                     }
                     if (record != null) {
-                        String sql = "SELECT _id FROM res_partner WHERE default_customer = ?";
-                        OValues makeFalse = new OValues();
-                        makeFalse.put("default_customer", false);
-                        List<ODataRow> rec = resPartner.query(sql, new String[]{"true"});
-                        for (ODataRow row : rec) {
-                            resPartner.update(row.getInt(OColumn.ROW_ID), makeFalse);
-                        }
-
+                        defaultCustomer(resPartner);
                         resPartner.update(record.getInt(OColumn.ROW_ID), values);
-
                         Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupToolbar();
                     } else {
+                        defaultCustomer(resPartner);
                         final int row_id = resPartner.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
                             finish();
@@ -268,6 +261,20 @@ public class CustomerDetails extends OdooCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void defaultCustomer(OModel model){
+
+        List<ODataRow> recs = model.select(new String[]{"_id"},
+                "default_customer = ?", new String[]{"true"}
+        );
+
+        OValues makeFalse = new OValues();
+        makeFalse.put("default_customer", false);
+        for (ODataRow row : recs) {
+            model.update(row.getInt(OColumn.ROW_ID), makeFalse);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -83,7 +83,8 @@
     <string name="toast_buy_a_new_smartphone"> Щось пішло не так</string>
     <string name="toast_network_required">Необхідно підключення до мережі інтернет</string>
     <string name="toast_recs_updated">Записи были обновлены!</string>
-    <string name="toast_has_partner_and_lines">Будь ласка виберіть Рядки замовлення !</string>
+    <string name="toast_has_lines">Будь ласка виберіть Рядки замовлення !</string>
+    <string name="toast_has_partner">Будь ласка виберіть Покупця за замовчуванням !</string>
     <string name="toast_account_removed">Обліковий Запис Вилучений Успішно</string>
     <string name="toast_problem_on_server_odoo">Проблема на сервері Odoo Рахунок сформован частково. Зверніться до Администратора !</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>

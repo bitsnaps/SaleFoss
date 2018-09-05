@@ -23,6 +23,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
@@ -306,7 +308,7 @@ public class SaleOrder extends OModel {
                     if (type == Sales.Type.SaleOrder) {
                         args.add(new JSONArray().put(quotation.getInt("id")));
                         args.add(new JSONObject());
-                        mCancel =  getServerDataHelper().callMethod("action_cancel", args);
+                        mCancel = getServerDataHelper().callMethod("action_cancel", args);
                     } else {
 
                         mCancel = getServerDataHelper().callMethod("action_cancel", args);
@@ -360,21 +362,42 @@ public class SaleOrder extends OModel {
 
             @Override
             protected Void doInBackground(Void... params) {
+
                 try {
+                    ODomain domain = new ODomain();
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(mContext, null);
+//done recently
+                    domain.add("id", "=", "0");
 
-                    OArguments args = new OArguments();
-                    args.add(new JSONArray().put(quotation.getInt("id")));
-                    args.add(new JSONObject());
-                    getServerDataHelper().callMethod("action_confirm", args);
-
-                    OValues values = new OValues();
-                    values.put("state", "done");
-                    values.put("state_title", getStateTitle(values));
-                    values.put("_is_dirty", "false");
-                    update(quotation.getInt(OColumn.ROW_ID), values);
+                    Log.e(TAG, "<< sale.order.line - syncing now >>");
+                    salesOrderLine.quickSyncRecords(domain);
+                    Log.e(TAG, "<< sale.order - syncing now >>");
+                    saleOrder.quickSyncRecords(domain);
+                    int temp = selectServerId(quotation.getInt(OColumn.ROW_ID));
+                    quotation.put("id", temp);
+                    doOrderFullConfirm(saleOrder, mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+
                 }
+//                try {
+//
+//                    OArguments args = new OArguments();
+//                    args.add(new JSONArray().put(quotation.getInt("id")));
+//                    args.add(new JSONObject());
+//                    getServerDataHelper().callMethod("action_confirm", args);
+//
+//                    OValues values = new OValues();
+//                    values.put("state", "done");
+//                    values.put("state_title", getStateTitle(values));
+//                    values.put("_is_dirty", "false");
+//                    update(quotation.getInt(OColumn.ROW_ID), values);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
                 return null;
             }
 
@@ -513,6 +536,39 @@ public class SaleOrder extends OModel {
             }
         }.execute();
     }
+
+    private void doOrderFullConfirm(SaleOrder model, Context context, final ODataRow quotation) {
+        Object createInvoice = null;
+        Object createDelivery = null;
+        Object confirm = null;
+        OArguments args = new OArguments();
+
+        args.add(new JSONArray().put(quotation.getInt("id")));
+        args.add(new JSONObject());
+        try {
+            confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                    .show();
+        }
+
+        if (confirm != null && confirm.equals(true)) {
+            OValues values = new OValues();
+            values.put("state", "sale");
+            values.put("state_title", model.getStateTitle(values));
+            if (createDelivery.equals(true) && createInvoice.equals(true)) {
+                values.put("invoice_status", "invoiced");
+                values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+            }
+            values.put("_is_dirty", "false");
+            update(quotation.getInt(OColumn.ROW_ID), values);
+        }
+    }
+
 
     public static interface OnOperationSuccessListener {
         public void OnSuccess();

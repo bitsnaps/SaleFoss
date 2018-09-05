@@ -79,10 +79,13 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
+    private ResPartner resPartner;
+    private String userName = null;
 
     public enum Type {
         Leads, Opportunities, Customer, Supplier, Company
     }
+
     private Type mType = Type.Customer;
 
     @Override
@@ -109,6 +112,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+        resPartner = new ResPartner(getContext(), null);
+        userName = resPartner.getUser().getUsername();
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -134,8 +139,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         List<String> args = new ArrayList<>();
         switch (mType) {
             case Customer:
-//                where = "customer = ? and name = ?";
-                where = "customer = ?";
+                where = "customer = ? and name not like ?";
                 break;
             case Supplier:
                 where = "supplier = ?";
@@ -145,7 +149,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 break;
         }
         args.add("true");
-//        args.add("Customer");
+        args.add(userName);
+
         if (mCurFilter != null) {
             where += " name like ? ";
             args.add(mCurFilter + "%");
@@ -262,10 +267,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        if (data instanceof Cursor){
+        if (data instanceof Cursor) {
             ODataRow row = OCursorUtils.toDatarow((Cursor) data);
 
-        try {
+            try {
                 if (row.getInt(OColumn.ROW_ID) == 0) {
                     CustomerQuickCreator customerQuickCreater =
                             new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
