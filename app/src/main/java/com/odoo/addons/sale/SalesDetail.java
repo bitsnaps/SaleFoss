@@ -298,10 +298,15 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
-
-                    if (!values.contains("partner_id")) {
-                        values.put("partner_name", "false");
-                        values.put("partner_id", "false");
+                    record = sale.browse(extra.getInt(OColumn.ROW_ID));
+                    if (record == null){
+                        if (!values.contains("partner_id")) {
+                            values.put("partner_name", "false");
+                            values.put("partner_id", "false");
+                        }
+                    } else{
+                        values.put("partner_name", record.get("partner_name").toString());
+                        values.put("partner_id", record.getInt("partner_id").toString());
                     }
 
                     values.put("partner_name", partner.getName(values.getInt("partner_id")));
