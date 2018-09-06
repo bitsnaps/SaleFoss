@@ -19,8 +19,10 @@
  */
 package com.odoo.addons.sale.models;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 
 import com.odoo.BuildConfig;
 import com.odoo.R;
@@ -31,9 +33,12 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -84,4 +89,96 @@ public class ProductProduct extends OModel {
     public Uri uri() {
         return buildURI(AUTHORITY);
     }
+
+    public void syncProduct(final Context context, final ProductProduct.OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+            private Boolean faultOrder = false;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(context);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(context, R.string.title_loading_product));
+                dialog.setCancelable(false); // original false
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                ODomain domain = new ODomain();
+                OArguments args = new OArguments();
+                args.add(new JSONObject());
+
+                try {
+                    Thread.sleep(300);
+                    Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
+                    if (checkConnect != null){
+                        quickSyncRecords(domain);
+                    }
+                } catch (Exception e) {
+                    faultOrder = true;
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
+                }
+
+            }
+        }.execute();
+    }
+
+    public void syncProductNew(final Context context) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    Thread.sleep(300);
+                    ODomain domain = new ODomain();
+                    ProductProduct product = new ProductProduct(context, null);
+                    domain.add("id", "not in", product.getServerIds());
+                    product.quickSyncRecords(domain);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+            }
+        }.execute();
+    }
+
+    public static interface OnOperationSuccessListener {
+
+        public void OnSuccess();
+
+        public void OnFault();
+
+        public void OnCancelled();
+    }
+
 }
+
+
