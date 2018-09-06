@@ -116,7 +116,8 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnFault() {
             hideRefreshingProgress();
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();            hideRefreshingProgress();
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
+            hideRefreshingProgress();
         }
 
         @Override
@@ -161,6 +162,7 @@ public class Sales extends BaseFragment implements
                              @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         mType = Type.valueOf(getArguments().getString(KEY_MENU));
+        sale = new SaleOrder(getContext(), null);
         return inflater.inflate(R.layout.common_listview, container, false);
     }
 
@@ -327,14 +329,12 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onRefresh() {
-        sale = new SaleOrder(getContext(), null);
         if (inNetwork()) {
-                setSwipeRefreshing(false);
-                sale.syncOrders(getContext(), refreshSale);
+            setSwipeRefreshing(false);
+            sale.syncReady(getContext(), refreshSale);
         } else {
             hideRefreshingProgress();
-            Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
-                    .show();
+            Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
         }
     }
 

@@ -547,7 +547,7 @@ public class SaleOrder extends OModel {
         return nameOrder;
     }
 
-    public void syncOrders(final Context context, final OnOperationSuccessListener listener) {
+    public void syncReady(final Context context, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private Boolean faultOrder = false;
             private Object connect;

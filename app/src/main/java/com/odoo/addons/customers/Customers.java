@@ -44,6 +44,7 @@ import com.odoo.R;
 import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.CRMOpportunitiesPager;
 import com.odoo.addons.phonecall.PhoneCallDetail;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -87,6 +88,27 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     }
 
     private Type mType = Type.Customer;
+
+    ResPartner.OnOperationSuccessListener refreshPartners = new ResPartner.OnOperationSuccessListener() {
+
+        @Override
+        public void OnSuccess() {
+            hideRefreshingProgress();
+            parent().sync().requestSync(ResPartner.AUTHORITY);
+        }
+
+        @Override
+        public void OnFault() {
+            hideRefreshingProgress();
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();            hideRefreshingProgress();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -339,15 +361,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            try {
-                parent().sync().requestSync(ResPartner.AUTHORITY);
+                resPartner.syncReady(getContext(),refreshPartners );
                 setSwipeRefreshing(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(getActivity(), _s(R.string.label_crash_refresh), Toast.LENGTH_LONG)
-                        .show();
-            }
-
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)

@@ -44,7 +44,7 @@ import java.util.ArrayList;
 
 public class ProductProduct extends OModel {
     public static final String TAG = ProductProduct.class.getSimpleName();
-//    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.product_product";
+    //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.product_product";
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
             ".provider.content.sync.product_product";
 
@@ -57,7 +57,6 @@ public class ProductProduct extends OModel {
     OColumn default_code = new OColumn(_s(R.string.field_label_default_code), OVarchar.class);
     OColumn lst_price = new OColumn(_s(R.string.field_label_lst_price), OFloat.class);
     OColumn sale_ok = new OColumn(_s(R.string.field_label_sale_ok), OBoolean.class).setDefaultValue(false);
-
 
     public ProductProduct(Context context, OUser user) {
         super(context, "product.product", user);
@@ -114,7 +113,7 @@ public class ProductProduct extends OModel {
                 try {
                     Thread.sleep(300);
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
-                    if (checkConnect != null){
+                    if (checkConnect != null) {
                         quickSyncRecords(domain);
                     }
                 } catch (Exception e) {
@@ -170,13 +169,12 @@ public class ProductProduct extends OModel {
         }.execute();
     }
 
-    public static interface OnOperationSuccessListener {
+    public interface OnOperationSuccessListener {
+        void OnSuccess();
 
-        public void OnSuccess();
+        void OnFault();
 
-        public void OnFault();
-
-        public void OnCancelled();
+        void OnCancelled();
     }
 
 }

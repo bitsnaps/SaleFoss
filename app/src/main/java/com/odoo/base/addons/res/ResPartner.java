@@ -22,10 +22,12 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.AsyncTask;
 
 import com.odoo.R;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.BuildConfig;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -35,9 +37,12 @@ import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,4 +143,53 @@ public class ResPartner extends OModel {
     public void onModelUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Execute upgrade script
     }
+
+    public void syncReady(final Context context, final ResPartner.OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private Boolean faultOrder = false;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                OArguments args = new OArguments();
+                args.add(new JSONObject());
+                try {
+
+                    Object connect = getServerDataHelper().callMethod("exist_db", args);
+
+                } catch (Exception e) {
+                    faultOrder = true;
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (listener != null) {
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
+                }
+
+            }
+        }.execute();
+    }
+
+    public interface OnOperationSuccessListener {
+
+        void OnSuccess();
+
+        void OnFault();
+
+        void OnCancelled();
+    }
+
 }
