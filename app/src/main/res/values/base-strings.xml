@@ -30,6 +30,9 @@
     <string name="status_db_load_95">Loading Database 95%...</string>
     <string name="status_redirecting">Redirecting&#8230;</string>
     <string name="label_select_user">Login to User</string>
+    <string name="label_warning_duplicate_user">Warning...</string>
+    <string name="label_warning_duplicate_user_message">Error, you tried enter with existing credentials. Please make a choice on the start activity after push button Exit. </string>
+    <string name="label_warning_duplicate_user_exit">Exit</string>
     <string name="label_accounts">Accounts</string>
     <string name="label_settings">Preferences</string>
     <string name="label_save">Save</string>

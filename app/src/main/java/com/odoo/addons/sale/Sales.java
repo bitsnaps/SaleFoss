@@ -19,8 +19,10 @@
  */
 package com.odoo.addons.sale;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,6 +54,7 @@ import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.helper.OdooVersion;
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -64,6 +67,7 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.controls.ExpandableHeightGridView;
 import com.odoo.core.utils.controls.OBottomSheet;
 
 import org.json.JSONArray;
@@ -89,6 +93,11 @@ public class Sales extends BaseFragment implements
     private SaleOrder sale = null;
     private Boolean mSyncRequested = false;
     private int mPosition = 0;
+
+    private AlertDialog dialog;
+    private AlertDialog.Builder builder;
+    private ExpandableHeightGridView mGrid;
+    private OdooUserLoginSelectorDialog.IUserLoginSelectListener mIUserLoginSelectListener = null;
 
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
@@ -190,7 +199,24 @@ public class Sales extends BaseFragment implements
 
         setHasSyncStatusObserver(TAG, this, db());
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
-        getLoaderManager().initLoader(0, null, this);
+        try {
+            getLoaderManager().initLoader(0, null, this);
+        } catch (Exception e) {
+            builder = new AlertDialog.Builder(getContext());
+            builder.setTitle(R.string.label_warning_duplicate_user);
+            builder.setMessage(R.string.label_warning_duplicate_user_message);
+            builder.setCancelable(false);
+            builder.setPositiveButton(OResource.string(getContext(), R.string.label_warning_duplicate_user_exit),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            System.exit(1);
+                        }
+                    });
+            dialog = builder.create();
+            dialog.show();
+        }
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
 
     }
@@ -402,15 +428,8 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
-        ODataRow row = null;
         sheet.dismiss();
-
-        try {
-            row = OCursorUtils.toDatarow((Cursor) data);
-        } catch (Exception e) {
-            row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(getPosition()));
-        }
-
+        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(getPosition()));
         switch (item.getItemId()) {
             case R.id.menu_quotation_cancel:
                 ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);

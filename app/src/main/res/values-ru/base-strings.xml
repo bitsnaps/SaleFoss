@@ -3,7 +3,7 @@
     <string name="label_accounts_settings">Odoo</string>
     <string name="label_login">Логин</string>
     <string name="label_accept_login">Принять &amp; Войти в учетную запись</string>
-    <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_your_self_hosted_url">Введите URL сервера</string>
     <string name="label_username_or_email">Имя пользователя или email</string>
     <string name="label_password">Пароль</string>
     <string name="label_forgot_password">Забыли пароль ?</string>
@@ -30,6 +30,9 @@
     <string name="status_db_load_95">Загрузка Базы Данных 95%...</string>
     <string name="status_redirecting">Перенаправление&#8230;</string>
     <string name="label_select_user">Login to User</string>
+    <string name="label_warning_duplicate_user">Предупреждение...</string>
+    <string name="label_warning_duplicate_user_message">Ошибка входа, Вы попытались войти с уже имеющимися учетными данными. Пожалуйста сделайте выбор на стартовой странице после запуска приложения.</string>
+    <string name="label_warning_duplicate_user_exit">Выход</string>
     <string name="label_accounts">Учетные записи</string>
     <string name="label_settings">Параметры</string>
     <string name="label_save">Сохранить</string>
