@@ -239,24 +239,16 @@ public class SaleOrder extends OModel {
 
     public void deleteOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-//                dialog = new ProgressDialog(mContext);
-//                dialog.setTitle(R.string.title_please_wait);
-//                dialog.setMessage(OResource.string(mContext, R.string.title_working));
-//                dialog.setCancelable(false);
-//                dialog.show();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-                Object mCancel;
                 SalesOrderLine lineOrder = new SalesOrderLine(getContext(), null);
                 SaleOrder order = new SaleOrder(getContext(), null);
-                int count = 0;
 
                 try {
                     String sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
@@ -276,7 +268,6 @@ public class SaleOrder extends OModel {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-//                dialog.dismiss();
                 if (listener != null) {
                     listener.OnSuccess();
                 }
@@ -285,7 +276,6 @@ public class SaleOrder extends OModel {
             @Override
             protected void onCancelled() {
                 super.onCancelled();
-//                dialog.dismiss();
                 if (listener != null) {
                     listener.OnCancelled();
                 }

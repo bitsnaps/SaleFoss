@@ -81,6 +81,14 @@ public class Sales extends BaseFragment implements
 
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
+    private View mView;
+    private ListView mList;
+    private OCursorListAdapter mAdapter;
+    private String mFilter = null;
+    private Type mType = Type.Quotation;
+    private SaleOrder sale = null;
+    private Boolean mSyncRequested = false;
+
 
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
@@ -131,18 +139,11 @@ public class Sales extends BaseFragment implements
         public void OnCancelled() {
         }
     };
-    private View mView;
-    private ListView mList;
-    private OCursorListAdapter mAdapter;
-    private String mFilter = null;
-    private Type mType = Type.Quotation;
-    private SaleOrder sale = null;
-    private Boolean mSyncRequested = false;
 
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), mType + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), _s(R.string.field_label_draft) + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
         }
 
         @Override
