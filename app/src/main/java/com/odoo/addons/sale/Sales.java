@@ -88,7 +88,7 @@ public class Sales extends BaseFragment implements
     private Type mType = Type.Quotation;
     private SaleOrder sale = null;
     private Boolean mSyncRequested = false;
-
+    private int mPosition = 0;
 
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
@@ -380,6 +380,7 @@ public class Sales extends BaseFragment implements
     public void onItemClick(View view, int position) {
         if (mType == Type.Quotation) {
 //            onDoubleClick(position);
+            setPosition(position);
             showSheet((Cursor) mAdapter.getItem(position));
         } else
             onDoubleClick(position);
@@ -401,8 +402,15 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
+        ODataRow row = null;
         sheet.dismiss();
-        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+
+        try {
+            row = OCursorUtils.toDatarow((Cursor) data);
+        } catch (Exception e) {
+            row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(getPosition()));
+        }
+
         switch (item.getItemId()) {
             case R.id.menu_quotation_cancel:
                 ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);
@@ -426,6 +434,14 @@ public class Sales extends BaseFragment implements
                 }
                 break;
         }
+    }
+
+    private int getPosition(){
+       return mPosition;
+    }
+
+    private void setPosition(int position) {
+        mPosition = position;
     }
 
     @Override
