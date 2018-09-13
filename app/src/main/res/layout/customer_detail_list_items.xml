@@ -23,6 +23,13 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:fieldName="default_customer"
+                app:fieldTextAppearance="?android:textAppearanceMedium"
+                app:showLabel="false"></odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 app:fieldName="is_company"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 app:showLabel="false"></odoo.controls.OField>
@@ -143,6 +150,14 @@
                     app:showLabel="false"></odoo.controls.OField>
 
                 <View style="@style/ViewSeparator" />
+
+                <odoo.controls.OField
+                    android:id="@+id/is_default"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:fieldName="default_customer"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:showLabel="false"></odoo.controls.OField>
 
                 <odoo.controls.OField
                     android:id="@+id/is_company_edit"

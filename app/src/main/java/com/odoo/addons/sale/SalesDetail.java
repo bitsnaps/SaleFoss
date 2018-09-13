@@ -66,11 +66,17 @@ import static com.odoo.addons.sale.Sales.Type;
 public class SalesDetail extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
     public static final int REQUEST_ADD_ITEMS = 323;
+
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
             finish();
+        }
+
+        @Override
+        public void OnFault() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -85,6 +91,10 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
                     + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
             finish();
+        }
+        @Override
+        public void OnFault() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -288,10 +298,15 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 break;
             case R.id.menu_sale_save: // Save record Sale.Oder
                 if (values != null) {
-
-                    if (!values.contains("partner_id")) {
-                        values.put("partner_name", "false");
-                        values.put("partner_id", "false");
+                    record = sale.browse(extra.getInt(OColumn.ROW_ID));
+                    if (record == null){
+                        if (!values.contains("partner_id")) {
+                            values.put("partner_name", "false");
+                            values.put("partner_id", "false");
+                        }
+                    } else{
+                        values.put("partner_name", record.get("partner_name").toString());
+                        values.put("partner_id", record.getInt("partner_id").toString());
                     }
 
                     values.put("partner_name", partner.getName(values.getInt("partner_id")));
@@ -304,22 +319,25 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         } else {
                             List<ODataRow> rows = partner.select(
                                     new String[]{"name", "parent_id"},
-                                    "name = ?",
-                                    new String[]{"Customer"}
+                                    "default_customer = ?",
+                                    new String[]{"true"}
                             );
-                            for (ODataRow row : rows) {
-                                values.put("partner_name", partner.getName(row.getInt("_id")));
-                                values.put("partner_id", row.get("_id"));
-                                values.put("partner_invoice_id", "false");
-                                values.put("partner_shipping_id", "false");
-                                values.put("pricelist_id", "false");
-//                                values.put("payment_term_id", "false");
-                                values.put("fiscal_position", "false");
-                                saleOrderOperation.execute(values);
-                            }
+                            if (rows.size() <= 0){
+                                Toast.makeText(this, R.string.toast_has_partner, Toast.LENGTH_LONG).show();
+                            } else
+                                for (ODataRow row : rows) {
+                                    values.put("partner_name", partner.getName(row.getInt("_id")));
+                                    values.put("partner_id", row.get("_id"));
+                                    values.put("partner_invoice_id", "false");
+                                    values.put("partner_shipping_id", "false");
+                                    values.put("pricelist_id", "false");
+//                                    values.put("payment_term_id", "false");
+                                    values.put("fiscal_position", "false");
+                                    saleOrderOperation.execute(values);
+                                }
                         }
                     } else {
-                        Toast.makeText(this, R.string.toast_has_partner_and_lines, Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.toast_has_lines, Toast.LENGTH_LONG).show();
                     }
                 }
                 break;
@@ -327,7 +345,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 if (record != null) {
                     if (extra != null && record.getFloat("amount_total") > 0) {
                         if (app.inNetwork()) {
-// Close session and
                             sale.confirmSale(record, confirmSale);
                         } else {
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();

@@ -47,6 +47,8 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OStringColorUtil;
 
+import java.util.List;
+
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
@@ -118,6 +120,8 @@ public class CustomerDetails extends OdooCompatActivity
             findViewById(R.id.customer_view_layout).setVisibility(View.GONE);
             findViewById(R.id.customer_edit_layout).setVisibility(View.VISIBLE);
             OField is_company = (OField) findViewById(R.id.is_company_edit);
+            OField default_customer = (OField) findViewById(R.id.is_default);
+
             is_company.setOnValueChangeListener(this);
         } else {
             mForm = (OForm) findViewById(R.id.customerForm);
@@ -222,11 +226,13 @@ public class CustomerDetails extends OdooCompatActivity
                         values.put("large_image", newImage);
                     }
                     if (record != null) {
+                        defaultCustomer(resPartner);
                         resPartner.update(record.getInt(OColumn.ROW_ID), values);
                         Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupToolbar();
                     } else {
+                        defaultCustomer(resPartner);
                         final int row_id = resPartner.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
                             finish();
@@ -255,6 +261,20 @@ public class CustomerDetails extends OdooCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void defaultCustomer(OModel model){
+
+        List<ODataRow> recs = model.select(new String[]{"_id"},
+                "default_customer = ?", new String[]{"true"}
+        );
+
+        OValues makeFalse = new OValues();
+        makeFalse.put("default_customer", false);
+        for (ODataRow row : recs) {
+            model.update(row.getInt(OColumn.ROW_ID), makeFalse);
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

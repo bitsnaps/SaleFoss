@@ -44,6 +44,7 @@ import com.odoo.R;
 import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.CRMOpportunitiesPager;
 import com.odoo.addons.phonecall.PhoneCallDetail;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -79,11 +80,35 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
+    private ResPartner resPartner;
+    private String userName = null;
 
     public enum Type {
         Leads, Opportunities, Customer, Supplier, Company
     }
+
     private Type mType = Type.Customer;
+
+    ResPartner.OnOperationSuccessListener refreshPartners = new ResPartner.OnOperationSuccessListener() {
+
+        @Override
+        public void OnSuccess() {
+            hideRefreshingProgress();
+            parent().sync().requestSync(ResPartner.AUTHORITY);
+        }
+
+        @Override
+        public void OnFault() {
+            hideRefreshingProgress();
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();            hideRefreshingProgress();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -109,6 +134,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
+        resPartner = new ResPartner(getContext(), null);
+        userName = resPartner.getUser().getUsername();
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -134,7 +161,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         List<String> args = new ArrayList<>();
         switch (mType) {
             case Customer:
-                where = "customer = ? and name = ?";
+                where = "customer = ? and name not like ?";
                 break;
             case Supplier:
                 where = "supplier = ?";
@@ -144,9 +171,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 break;
         }
         args.add("true");
-        args.add("Customer");
+        args.add(userName);
+
         if (mCurFilter != null) {
-            where += " name like ? ";
+            where += " and name like ? ";
             args.add(mCurFilter + "%");
         }
         String selection = (args.size() > 0) ? where : null;
@@ -261,10 +289,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
         sheet.dismiss();
-        if (data instanceof Cursor){
+        if (data instanceof Cursor) {
             ODataRow row = OCursorUtils.toDatarow((Cursor) data);
 
-        try {
+            try {
                 if (row.getInt(OColumn.ROW_ID) == 0) {
                     CustomerQuickCreator customerQuickCreater =
                             new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
@@ -333,8 +361,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(ResPartner.AUTHORITY);
-            setSwipeRefreshing(true);
+                resPartner.syncReady(getContext(),refreshPartners );
+                setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)

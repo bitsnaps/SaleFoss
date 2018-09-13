@@ -139,6 +139,9 @@
     <string name="label_crash_refresh">Whooops!!!!! refresh crashed!</string>
     <string name="label_no_lines">You cannot a sales order which has no line</string>
     <string name="label_quotation_confirmed">Quotation confirmed!</string>
+    <string name="label_quotation_fault">Quotation not confirmed, check connection on the server!</string>
+    <string name="label_product_download_fault">Products were downloaded unsuccessful, check connection to the server!</string>
+
     <string name="label_updated">updated</string>
     <string name="label_created">created</string>
     <string name="title_no_lines">(No lines)</string>
@@ -161,6 +164,7 @@
     <string name="field_label_order_line">"Order Lines"</string>
     <string name="field_label_order_line_count">"Total Lines"</string>
     <string name="field_label_partner_invoice_id">"Partner Invoice Id"</string>
+    <string name="field_label_default_customer">"Default Customer"</string>
     <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
     <string name="field_label_pricelist_id">"Price List Id"</string>
     <string name="field_label_fiscal_position">"Fiscal Position"</string>

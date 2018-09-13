@@ -23,7 +23,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.odoo.BuildConfig;
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
@@ -54,10 +59,15 @@ import java.util.List;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
+    //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
+            ".provider.content.sync.sale_order";
+
     private static boolean isFirstUpdateProduct = false;
     private Context mContext = getContext();
     private Context idContext = getContext();
+    public List<ODataRow> have_id_zero_records = null;
+    private int have_zero = 0;
 
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
@@ -227,9 +237,57 @@ public class SaleOrder extends OModel {
     }
 
 
+    public void deleteOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                SalesOrderLine lineOrder = new SalesOrderLine(getContext(), null);
+                SaleOrder order = new SaleOrder(getContext(), null);
+
+                try {
+                    String sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                    List<ODataRow> rec = lineOrder.query(sql,
+                            new String[]{quotation.getInt(OColumn.ROW_ID).toString()});
+                    for (ODataRow row : rec) {
+                        lineOrder.delete(row.getInt(OColumn.ROW_ID));
+                    }
+                    order.delete(quotation.getInt(OColumn.ROW_ID));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
+
     public void cancelOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
+            private Boolean faultOrder = false;
 
             @Override
             protected void onPreExecute() {
@@ -249,7 +307,7 @@ public class SaleOrder extends OModel {
                     if (type == Sales.Type.SaleOrder) {
                         args.add(new JSONArray().put(quotation.getInt("id")));
                         args.add(new JSONObject());
-                        mCancel =  getServerDataHelper().callMethod("action_cancel", args);
+                        mCancel = getServerDataHelper().callMethod("action_cancel", args);
                     } else {
 
                         mCancel = getServerDataHelper().callMethod("action_cancel", args);
@@ -263,7 +321,9 @@ public class SaleOrder extends OModel {
                     update(quotation.getInt(OColumn.ROW_ID), values);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    faultOrder = true;
                 }
+                faultOrder = false;
                 return null;
             }
 
@@ -271,9 +331,12 @@ public class SaleOrder extends OModel {
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
-                if (listener != null) {
-                    listener.OnSuccess();
-                }
+                if (!faultOrder)
+                    if (listener != null) {
+                        listener.OnSuccess();
+                    } else if (listener != null) {
+                        listener.OnCancelled();
+                    }
             }
 
             @Override
@@ -290,13 +353,14 @@ public class SaleOrder extends OModel {
     public void confirmSale(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
+            private Boolean faultOrder = false;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
                 dialog = new ProgressDialog(mContext);
                 dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setMessage(OResource.string(mContext, R.string.title_please_wait_order));
                 dialog.setCancelable(false);
                 dialog.show();
             }
@@ -304,19 +368,22 @@ public class SaleOrder extends OModel {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
+                    ODomain domain = new ODomain();
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
 
-                    OArguments args = new OArguments();
-                    args.add(new JSONArray().put(quotation.getInt("id")));
-                    args.add(new JSONObject());
-                    getServerDataHelper().callMethod("action_confirm", args);
+                    domain.add("id", "=", "0");
+                    Log.e(TAG, "<< sale.order.line - syncing now >>");
+                    salesOrderLine.quickSyncRecords(domain);
 
-                    OValues values = new OValues();
-                    values.put("state", "done");
-                    values.put("state_title", getStateTitle(values));
-                    values.put("_is_dirty", "false");
-                    update(quotation.getInt(OColumn.ROW_ID), values);
+                    Log.e(TAG, "<< sale.order - syncing now >>");
+                    quickSyncRecords(domain);
+
+                    int temp = selectServerId(quotation.getInt(OColumn.ROW_ID));
+                    quotation.put("id", temp);
+                    doOrderFullConfirm(quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    faultOrder = true;
                 }
                 return null;
             }
@@ -326,7 +393,11 @@ public class SaleOrder extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (listener != null) {
-                    listener.OnSuccess();
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
                 }
             }
 
@@ -340,6 +411,63 @@ public class SaleOrder extends OModel {
             }
         }.execute();
     }
+
+    public void confirmAllSaleOrders(final Context context, final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
+
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+            private Boolean faultOrder = false;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(context);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(context, R.string.title_loading));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                final TextView mLoginProcessStatus = null;
+
+                try {
+                    ODomain domain = new ODomain();
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
+                    SaleOrder saleOrder = new SaleOrder(context, null);
+
+                    domain.add("id", "=", "0");
+
+                    Log.e(TAG, "<< sale.order.line - syncing now >>");
+                    salesOrderLine.quickSyncRecords(domain);
+                    Log.e(TAG, "<< sale.order - syncing now >>");
+                    saleOrder.quickSyncRecords(domain);
+
+                    doWorkflowFullConfirm(saleOrder, context, quotation);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    faultOrder = true;
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
+                }
+
+            }
+        }.execute();
+    }
+
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
@@ -419,31 +547,25 @@ public class SaleOrder extends OModel {
         return nameOrder;
     }
 
-    public void syncOrders(final Context context) {
+    public void syncReady(final Context context, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
+            private Boolean faultOrder = false;
+            private Object connect;
 
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog = new ProgressDialog(mContext);
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_working));
-                dialog.setCancelable(false);
-                dialog.show();
             }
 
             @Override
             protected Void doInBackground(Void... params) {
-
+                OArguments args = new OArguments();
+                args.add(new JSONObject());
                 try {
-                    Thread.sleep(500);
-                    ODomain domain = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
-                    SaleOrder saleOrder = new SaleOrder(context, null);
-                    salesOrderLine.quickSyncRecords(domain);
-                    saleOrder.quickSyncRecords(domain);
+                    connect = getServerDataHelper().callMethod("exist_db", args);
+
                 } catch (Exception e) {
+                    faultOrder = true;
                     e.printStackTrace();
                 }
                 return null;
@@ -452,13 +574,120 @@ public class SaleOrder extends OModel {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                dialog.dismiss();
+                if (listener != null) {
+                    if (!faultOrder) {
+                        listener.OnSuccess();
+                    } else {
+                        listener.OnFault();
+                    }
+                }
+
             }
         }.execute();
     }
 
+    private void doOrderFullConfirm(final ODataRow quotation) {
+        Object createInvoice = null;
+        Object createDelivery = null;
+        Object confirm = null;
+        OArguments args = new OArguments();
+
+        args.add(new JSONArray().put(quotation.getInt("id")));
+        args.add(new JSONObject());
+        try {
+            confirm = getServerDataHelper().callMethod("action_confirm", args);
+            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                    .show();
+        }
+
+        if (confirm != null && confirm.equals(true)) {
+            OValues values = new OValues();
+            values.put("state", "sale");
+            values.put("state_title", getStateTitle(values));
+            if (createDelivery.equals(true) && createInvoice.equals(true)) {
+                values.put("invoice_status", "invoiced");
+                values.put("invoice_status_title", getInvoiceStatusTitle(values));
+            }
+            values.put("_is_dirty", "false");
+            update(quotation.getInt(OColumn.ROW_ID), values);
+        }
+    }
+
+    private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
+        Object confirm = null;
+        Object createInvoice;
+        Object createDelivery;
+        Object confirm_full = null;
+
+        if (checkNewQuotations(context) != null) {
+            JSONArray idList = new JSONArray();
+            OArguments args = new OArguments();
+            for (final ODataRow qUpdate : quotation) {
+                idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+            }
+            args.add(idList);
+            args.add(new JSONObject());
+
+            try {
+                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
+                confirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+
+//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
+            }
+
+            if (confirm != null && confirm.equals(true)) {
+                for (final ODataRow qUpdate : quotation) {
+                    OValues values = new OValues();
+                    values.put("state", "sale");
+                    values.put("state_title", model.getStateTitle(values));
+                    if (confirm_full.equals(true)) {
+                        values.put("invoice_status", "invoiced");
+                        values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                    }
+                    values.put("_is_dirty", "false");
+                    model.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                }
+            } else {
+                Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                        .show();
+            }
+
+        }
+    }
+
+    public List<ODataRow> checkNewQuotations(Context context) {
+        boolean CheckOk = false;
+        try {
+            SaleOrder sale = new SaleOrder(context, null);
+            String sql = "SELECT name, _id, state FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
+            have_zero = have_id_zero_records.size();
+            if (have_zero != 0) {
+                CheckOk = true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (CheckOk)
+            return have_id_zero_records;
+        return null;
+    }
+
     public static interface OnOperationSuccessListener {
+
         public void OnSuccess();
+
+        public void OnFault();
 
         public void OnCancelled();
     }

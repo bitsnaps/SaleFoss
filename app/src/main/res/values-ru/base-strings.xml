@@ -3,7 +3,7 @@
     <string name="label_accounts_settings">Odoo</string>
     <string name="label_login">Логин</string>
     <string name="label_accept_login">Принять &amp; Войти в учетную запись</string>
-    <string name="label_your_self_hosted_url">Your self-hosted URL</string>
+    <string name="label_your_self_hosted_url">Введите URL сервера</string>
     <string name="label_username_or_email">Имя пользователя или email</string>
     <string name="label_password">Пароль</string>
     <string name="label_forgot_password">Забыли пароль ?</string>
@@ -30,6 +30,9 @@
     <string name="status_db_load_95">Загрузка Базы Данных 95%...</string>
     <string name="status_redirecting">Перенаправление&#8230;</string>
     <string name="label_select_user">Login to User</string>
+    <string name="label_warning_duplicate_user">Предупреждение...</string>
+    <string name="label_warning_duplicate_user_message">Ошибка входа, Вы попытались войти с уже имеющимися учетными данными. Пожалуйста сделайте выбор на стартовой странице после запуска приложения.</string>
+    <string name="label_warning_duplicate_user_exit">Выход</string>
     <string name="label_accounts">Учетные записи</string>
     <string name="label_settings">Параметры</string>
     <string name="label_save">Сохранить</string>
@@ -61,6 +64,7 @@
     <string name="title_loading_product">Продукты загружаются с сервера&#8230;</string>
     <string name="title_first_product">Нужно загрузить продукты!&#8230;</string>
     <string name="title_please_wait">Подождите пожалуйста&#8230;</string>
+    <string name="title_please_wait_order">Подождите пожалуйста Заказ продажи подтверждается и загружается на сервер !&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Поиск</string>
     <string name="label_delete">Удалить</string>
@@ -84,7 +88,8 @@
     <string name="toast_buy_a_new_smartphone">Что то пошло не так</string>
     <string name="toast_network_required">Необходимо подключение к сети интернет</string>
     <string name="toast_recs_updated">Записи были обновлены!</string>
-    <string name="toast_has_partner_and_lines">Пожалуйста выберите Позицию заказа!</string>
+    <string name="toast_has_lines">Пожалуйста выберите Позицию заказа !</string>
+    <string name="toast_has_partner">Пожалуйста выберите Покупателя по умолчанию !</string>
     <string name="toast_problem_on_server_odoo">Проблема на сервере Odoo Счет сформирован частично. Обратитесть к Администратору !</string>
     <string name="toast_account_removed">Учетная Запись Удалена Успешно</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>

@@ -30,6 +30,9 @@
     <string name="status_db_load_95">Loading Database 95%...</string>
     <string name="status_redirecting">Redirecting&#8230;</string>
     <string name="label_select_user">Login to User</string>
+    <string name="label_warning_duplicate_user">Warning...</string>
+    <string name="label_warning_duplicate_user_message">Error, you tried enter with existing credentials. Please make a choice on the start activity after push button Exit. </string>
+    <string name="label_warning_duplicate_user_exit">Exit</string>
     <string name="label_accounts">Accounts</string>
     <string name="label_settings">Preferences</string>
     <string name="label_save">Save</string>
@@ -61,6 +64,7 @@
     <string name="title_first_product">Need load product!&#8230;</string>
     <string name="title_loading_product">Loading product from server&#8230;</string>
     <string name="title_please_wait">Please wait&#8230;</string>
+    <string name="title_please_wait_order">Please wait, Order is confirming&#8230;</string>
     <string name="label_ok">OK</string>
     <string name="label_search">Search</string>
     <string name="label_delete">Delete</string>
@@ -85,7 +89,8 @@
     <string name="toast_network_required">Network required</string>
     <string name="toast_recs_updated">The records have been updated!</string>
     <string name="toast_problem_on_server_odoo">Problem with Odoo server request !</string>
-    <string name="toast_has_partner_and_lines">Please select a Order lines!</string>
+    <string name="toast_has_lines">Please select a Order lines!</string>
+    <string name="toast_has_partner">Please select a Default Customer !</string>
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Updating password</string>

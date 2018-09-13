@@ -125,8 +125,8 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             OControls.setText(v, R.id.productName,
                     row.getString(productProduct.getDefaultNameColumn()));
         else
-            OControls.setText(v, R.id.productName,
-                    "[" + defaultCode + "] " + row.getString(productProduct.getDefaultNameColumn()));
+            OControls.setText(v, R.id.productName, row.getString(productProduct.getDefaultNameColumn()));
+//            OControls.setText(v, R.id.productName,"[" + defaultCode + "] " + row.getString(productProduct.getDefaultNameColumn()));
 
         if (row.contains(OColumn.ROW_ID)
                 && selected_position == row.getInt(OColumn.ROW_ID)) {

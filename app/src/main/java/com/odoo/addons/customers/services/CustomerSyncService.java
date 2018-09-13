@@ -48,7 +48,7 @@ public class CustomerSyncService extends OSyncService {
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("res.partner")) {
             ODomain domain = new ODomain();
-            this.syncCustomers(getApplicationContext(), user);
+            syncCustomers(getApplicationContext(), user);
 
 //            ResPartner resPartner = new ResPartner(getApplicationContext(), user);
 //            domain.add("|");
@@ -72,7 +72,6 @@ public class CustomerSyncService extends OSyncService {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    Thread.sleep(300);
                     ODomain domain = new ODomain();
                     ResPartner resPartner = new ResPartner(getApplicationContext(), user);
                     resPartner.quickSyncRecords(domain);

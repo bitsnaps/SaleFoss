@@ -30,6 +30,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.odoo.addons.sale.Sales;
+import com.odoo.addons.sale.models.ProductProduct;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
@@ -37,7 +39,6 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OPreferenceManager;
-import com.odoo.core.utils.OResource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,41 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
 
+    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            App mContext = (App) getApplicationContext();
+            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void OnFault() {
+            App mContext = (App) getApplicationContext();
+            Toast.makeText(mContext, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+
+    ProductProduct.OnOperationSuccessListener confirmProduct = new ProductProduct.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            App mContext = (App) getApplicationContext();
+            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnFault() {
+            App mContext = (App) getApplicationContext();
+            Toast.makeText(mContext, R.string.label_product_download_fault, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +98,9 @@ public class SettingsActivity extends AppCompatActivity {
         }
     }
 
-
     @Override
     public void startActivity(Intent intent) {
+        Boolean checkConnection = true;
         if (intent.getAction() != null
                 && intent.getAction().equals(ACTION_ABOUT)) {
             Intent about = new Intent(this, About.class);
@@ -73,34 +109,40 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if (intent.getAction() != null) {
             Sales sales = new Sales();
+            SaleOrder salesOrders = new SaleOrder(this, null);
+            ProductProduct products = new ProductProduct(this, null);
             App app = (App) this.getApplicationContext();
             if (app.inNetwork()) {
                 if (intent.getAction().equals(ACTION_ORDER_SYNCHRONIZATION)) {
-                    this.updateOrders(sales);
+                    updateOrders(salesOrders);
                     return;
                 }
                 if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
-                    this.updateProducts(sales);
+                    updateProducts(products);
                     return;
                 }
-            } else
+            } else {
+                checkConnection = false;
                 Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+            }
         }
-        super.startActivity(intent);
+        if (checkConnection)
+            super.startActivity(intent);
     }
 
 
-    private void updateOrders(Sales sales) {
+    private void updateOrders(SaleOrder sales) {
         List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
         if (have_id_zero_records != null)
-            sales.syncLocalDatatoOdoo(this, have_id_zero_records);
-        else
-            Toast.makeText(this, OResource.string(this, R.string.toast_no_new_records),
-                    Toast.LENGTH_LONG).show();
+            sales.confirmAllSaleOrders(this, have_id_zero_records, confirmSale);
+        else {
+            App mContext = (App) getApplicationContext();
+            Toast.makeText(mContext, R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void updateProducts(Sales sales) {
-        sales.syncProduct(this);
+    private void updateProducts(ProductProduct product) {
+        product.syncProduct(this, confirmProduct);
     }
 
     @Override

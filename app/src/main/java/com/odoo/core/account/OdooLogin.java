@@ -101,10 +101,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         edtPassword = (EditText) findViewById(R.id.edtPassword);
 
         if (BuildConfig.DEBUG) {
-//            edtSelfHosted.setText("https://odoo.foss.ua");
-            edtSelfHosted.setText("http://192.168.1.2:8069/");
-
-            edtUsername.setText("admin");
+            edtSelfHosted.setText("https://odoo.foss.ua");
+//            edtSelfHosted.setText("http://192.168.1.2:8069/");
+            edtUsername.setText("");
             edtPassword.setText("");
         }
         // added to call database list
@@ -114,7 +113,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private void startOdooActivity() {
         startActivity(new Intent(this, OdooActivity.class));
         finish();
-
     }
 
     @Override
@@ -148,20 +146,20 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
     private void toggleSelfHostedURL() {
         TextView txvAddSelfHosted = (TextView) findViewById(R.id.txvAddSelfHosted);
-        if (!mSelfHostedURL) {
+//        if (!mSelfHostedURL) {
             mSelfHostedURL = true;
             findViewById(R.id.layoutSelfHosted).setVisibility(View.VISIBLE);
             edtSelfHosted.setOnFocusChangeListener(this);
             edtSelfHosted.requestFocus();
             txvAddSelfHosted.setText(R.string.label_login_with_odoo);
-        } else {
-            findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
-            findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
-            findViewById(R.id.layoutSelfHosted).setVisibility(View.GONE);
-            mSelfHostedURL = false;
-            txvAddSelfHosted.setText(R.string.label_add_self_hosted_url);
-            edtSelfHosted.setText("");
-        }
+//        } else {
+//            findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
+//            findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
+//            findViewById(R.id.layoutSelfHosted).setVisibility(View.GONE);
+//            mSelfHostedURL = false;
+//            txvAddSelfHosted.setText(R.string.label_add_self_hosted_url);
+//            edtSelfHosted.setText("");
+//        }
     }
 
     @Override
@@ -336,6 +334,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onCancelSelect() {
+        System.exit(0);
     }
 
     private void loginProcess(String database) {
@@ -397,12 +396,10 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
-//                    AccountPaymentTerm paymentTerm = new AccountPaymentTerm(OdooLogin.this, mUser);
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
 //                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
-                    ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
 //                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
-//                    sale.setFirsLoadProduct(false);
+                    ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override

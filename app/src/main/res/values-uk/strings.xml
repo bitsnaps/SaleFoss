@@ -139,6 +139,8 @@
     <string name="label_crash_refresh">Щось трапилось!!!!! оновлення зупинено !</string>
     <string name="label_no_lines">Ви не можете підтвердити продаж доки Рядок замовлення не заповнений</string>
     <string name="label_quotation_confirmed">Пропозиція Замовлення підтверджено!</string>
+    <string name="label_quotation_fault">Пропозиція Замовлення не підтверджено, перевірте з\'єднання з сервером!</string>
+    <string name="label_product_download_fault">Продукти були завантажені невдало, перевірте з\'єднання з сервером!</string>
     <string name="label_updated">оновлено</string>
     <string name="label_created">створена</string>
     <string name="title_no_lines">(Рядки відсутні)</string>
@@ -164,6 +166,7 @@
     <string name="field_label_partner_shipping_id">"Partner Shipping Id"</string>
     <string name="field_label_pricelist_id">"Price List Id"</string>
     <string name="field_label_fiscal_position">"Fiscal Position"</string>
+    <string name="field_label_default_customer">"Покупець по замовчуванню"</string>
     <!--Model order.line-->
     <string name="field_label_product_id">Product</string>
     <string name="field_label_product_uom_qty">Quantity</string>

@@ -61,7 +61,8 @@
                     android:layout_width="40dp"
                     android:visibility="gone"
                     android:layout_marginRight="@dimen/default_8dp"
-                    android:layout_height="40dp" />
+                    android:layout_height="40dp"
+                    />
 
                 <ImageView
                     android:visibility="gone"
@@ -75,11 +76,11 @@
 
                 <ImageView
                     android:id="@+id/btnRemoveAccount"
-                    android:padding="@dimen/default_8dp"
-                    android:src="@drawable/ic_action_navigation_close"
-                    android:background="@drawable/icon_bg_oval_red"
                     android:layout_width="40dp"
-                    android:layout_height="40dp" />
+                    android:layout_height="40dp"
+                    android:background="@drawable/icon_bg_oval_red"
+                    android:padding="@dimen/default_8dp"
+                    android:src="@drawable/ic_action_navigation_close" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
