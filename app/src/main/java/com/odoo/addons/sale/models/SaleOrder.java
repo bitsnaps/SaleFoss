@@ -24,7 +24,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,11 +63,13 @@ public class SaleOrder extends OModel {
             ".provider.content.sync.sale_order";
 
     private static boolean isFirstUpdateProduct = false;
+    public List<ODataRow> have_id_zero_records = null;
+    OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
+    @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
+    OColumn invoice_status_title = new OColumn("Invoice Title", OVarchar.class)
+            .setLocalColumn();
     private Context mContext = getContext();
     private Context idContext = getContext();
-    public List<ODataRow> have_id_zero_records = null;
-    private int have_zero = 0;
-
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
     @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
@@ -95,20 +96,13 @@ public class SaleOrder extends OModel {
             .setLocalColumn();
     OColumn order_line = new OColumn(_s(R.string.field_label_order_line), SalesOrderLine.class,
             OColumn.RelationType.OneToMany).setRelatedColumn("order_id");
-
     @Odoo.Functional(store = true, depends = {"order_line"}, method = "countOrderLines")
     OColumn order_line_count = new OColumn(_s(R.string.field_label_order_line_count), OVarchar.class).setLocalColumn();
-
     OColumn partner_invoice_id = new OColumn(_s(R.string.field_label_partner_invoice_id), OVarchar.class).setLocalColumn(); // Original
     OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn(); // Original
-
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
-
-    OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
-    @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
-    OColumn invoice_status_title = new OColumn("Invoice Title", OVarchar.class)
-            .setLocalColumn();
+    private int have_zero = 0;
 
     public SaleOrder(Context context, OUser user) {
         super(context, "sale.order", user);
@@ -628,21 +622,30 @@ public class SaleOrder extends OModel {
         Object createDelivery = null;
         Object confirm_full = null;
 
-        if (checkNewQuotations(context) != null) {
+        if (checkNewQuotations(context) != null) { // check only quotation!!! delete
             JSONArray idList = new JSONArray();
-            OArguments args = new OArguments();
-            for (final ODataRow qUpdate : quotation) {
-                idList.put(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
-            }
-            args.add(idList);
-            args.add(new JSONObject());
-
+//            OArguments args = new OArguments();
             try {
-                confirm = getServerDataHelper().callMethod("action_confirm", args);
+
+                for (final ODataRow qUpdate : quotation) {
+                    OArguments args = new OArguments();
+                    args.add(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+                    args.add(new JSONObject());
+//                    idList.put(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+                    confirm = getServerDataHelper().callMethod("action_confirm", args);
 //                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
 
-            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
-            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+                    createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+                    createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+                }
+//                args.add(idList);
+//                args.add(new JSONObject());
+
+//            confirm = getServerDataHelper().callMethod("action_confirm", args);
+////                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
+//
+//            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+//            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
