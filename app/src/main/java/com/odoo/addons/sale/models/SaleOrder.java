@@ -370,8 +370,11 @@ public class SaleOrder extends OModel {
                 try {
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
-
                     domain.add("id", "=", "0");
+                    domain.add("|");
+                    domain.add("id", "=", "false");
+
+
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
                     salesOrderLine.quickSyncRecords(domain);
 
@@ -412,7 +415,7 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
-    public void confirmAllSaleOrders(final Context context, final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
+    public void confirmAllSaleOrders(final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
 
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
@@ -421,9 +424,9 @@ public class SaleOrder extends OModel {
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-                dialog = new ProgressDialog(context);
+                dialog = new ProgressDialog(mContext);
                 dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(context, R.string.title_loading));
+                dialog.setMessage(OResource.string(mContext, R.string.title_loading));
                 dialog.setCancelable(false);
                 dialog.show();
             }
@@ -434,17 +437,18 @@ public class SaleOrder extends OModel {
 
                 try {
                     ODomain domain = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(context, null); // getuser
-                    SaleOrder saleOrder = new SaleOrder(context, null);
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
 
                     domain.add("id", "=", "0");
+                    domain.add("|");
+                    domain.add("id", "=", "false");
 
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
                     salesOrderLine.quickSyncRecords(domain);
                     Log.e(TAG, "<< sale.order - syncing now >>");
-                    saleOrder.quickSyncRecords(domain);
+                    quickSyncRecords(domain);
 
-                    doWorkflowFullConfirm(saleOrder, context, quotation);
+                    doWorkflowFullConfirm(mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
@@ -618,27 +622,27 @@ public class SaleOrder extends OModel {
         }
     }
 
-    private void doWorkflowFullConfirm(SaleOrder model, Context context, final List<ODataRow> quotation) {
+    private void doWorkflowFullConfirm(Context context, final List<ODataRow> quotation) {
         Object confirm = null;
-        Object createInvoice;
-        Object createDelivery;
+        Object createInvoice = null;
+        Object createDelivery = null;
         Object confirm_full = null;
 
         if (checkNewQuotations(context) != null) {
             JSONArray idList = new JSONArray();
             OArguments args = new OArguments();
             for (final ODataRow qUpdate : quotation) {
-                idList.put(model.selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+                idList.put(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
             }
             args.add(idList);
             args.add(new JSONObject());
 
             try {
-                confirm = model.getServerDataHelper().callMethod("action_confirm", args);
-                confirm_full = model.getServerDataHelper().callMethod("create_with_full_confirm", args);
+                confirm = getServerDataHelper().callMethod("action_confirm", args);
+//                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
 
-//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
-//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
+            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
@@ -649,13 +653,14 @@ public class SaleOrder extends OModel {
                 for (final ODataRow qUpdate : quotation) {
                     OValues values = new OValues();
                     values.put("state", "sale");
-                    values.put("state_title", model.getStateTitle(values));
-                    if (confirm_full.equals(true)) {
+                    values.put("state_title", getStateTitle(values));
+                    if (createDelivery.equals(true) && createInvoice.equals(true)) {
+//                      if (confirm_full.equals(true)) {
                         values.put("invoice_status", "invoiced");
-                        values.put("invoice_status_title", model.getInvoiceStatusTitle(values));
+                        values.put("invoice_status_title", getInvoiceStatusTitle(values));
                     }
                     values.put("_is_dirty", "false");
-                    model.update(qUpdate.getInt(OColumn.ROW_ID), values);
+                    update(qUpdate.getInt(OColumn.ROW_ID), values);
                 }
             } else {
                 Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
