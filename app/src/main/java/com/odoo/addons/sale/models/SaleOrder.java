@@ -362,18 +362,21 @@ public class SaleOrder extends OModel {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
-                    ODomain domain = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
-                    domain.add("id", "=", "0");
-                    domain.add("|");
-                    domain.add("id", "=", "false");
+                    ODomain domain;
+                    ODomain domainSaleOrder;
 
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
+                    SaleOrder salesOrder = new SaleOrder(mContext, null); // getuser
+                    domain = new ODomain();
 
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
+                    domain.add("order_id", "=", quotation.getInt(OColumn.ROW_ID));
                     salesOrderLine.quickSyncRecords(domain);
 
                     Log.e(TAG, "<< sale.order - syncing now >>");
-                    quickSyncRecords(domain);
+                    domainSaleOrder = new ODomain();
+                    domainSaleOrder.add("_id", "=", quotation.getInt(OColumn.ROW_ID));
+                    salesOrder.quickSyncRecords(domainSaleOrder);
 
                     int temp = selectServerId(quotation.getInt(OColumn.ROW_ID));
                     quotation.put("id", temp);
@@ -427,20 +430,19 @@ public class SaleOrder extends OModel {
 
             @Override
             protected Void doInBackground(Void... params) {
-                final TextView mLoginProcessStatus = null;
 
                 try {
                     ODomain domain = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
+                    SaleOrder salesOrder = new SaleOrder(mContext, null); // getuser
 
                     domain.add("id", "=", "0");
-                    domain.add("|");
-                    domain.add("id", "=", "false");
 
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
                     salesOrderLine.quickSyncRecords(domain);
+
                     Log.e(TAG, "<< sale.order - syncing now >>");
-                    quickSyncRecords(domain);
+                    salesOrder.quickSyncRecords(domain);
 
                     doWorkflowFullConfirm(mContext, quotation);
                 } catch (Exception e) {
@@ -618,34 +620,25 @@ public class SaleOrder extends OModel {
 
     private void doWorkflowFullConfirm(Context context, final List<ODataRow> quotation) {
         Object confirm = null;
-        Object createInvoice = null;
-        Object createDelivery = null;
+        Object createInvoice;
+        Object createDelivery;
         Object confirm_full = null;
 
-        if (checkNewQuotations(context) != null) { // check only quotation!!! delete
+        if (checkNewQuotations(context) != null) {
             JSONArray idList = new JSONArray();
-//            OArguments args = new OArguments();
+            OArguments args = new OArguments();
+            for (final ODataRow qUpdate : quotation) {
+                idList.put(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
+            }
+            args.add(idList);
+            args.add(new JSONObject());
+
             try {
+                confirm = getServerDataHelper().callMethod("action_confirm", args);
+                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
 
-                for (final ODataRow qUpdate : quotation) {
-                    OArguments args = new OArguments();
-                    args.add(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
-                    args.add(new JSONObject());
-//                    idList.put(selectServerId(qUpdate.getInt(OColumn.ROW_ID)));
-                    confirm = getServerDataHelper().callMethod("action_confirm", args);
-//                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
-
-                    createDelivery = getServerDataHelper().callMethod("create_delivery", args);
-                    createInvoice = getServerDataHelper().callMethod("create_invoice", args);
-                }
-//                args.add(idList);
-//                args.add(new JSONObject());
-
-//            confirm = getServerDataHelper().callMethod("action_confirm", args);
-////                confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
-//
-//            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
-//            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
+//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
@@ -657,8 +650,7 @@ public class SaleOrder extends OModel {
                     OValues values = new OValues();
                     values.put("state", "sale");
                     values.put("state_title", getStateTitle(values));
-                    if (createDelivery.equals(true) && createInvoice.equals(true)) {
-//                      if (confirm_full.equals(true)) {
+                    if (confirm_full.equals(true)) {
                         values.put("invoice_status", "invoiced");
                         values.put("invoice_status_title", getInvoiceStatusTitle(values));
                     }
@@ -677,7 +669,7 @@ public class SaleOrder extends OModel {
         boolean CheckOk = false;
         try {
             SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, _id, state FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
+            String sql = "SELECT name, id, _id, state FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
             have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
