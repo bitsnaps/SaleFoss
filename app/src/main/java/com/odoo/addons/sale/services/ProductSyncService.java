@@ -19,7 +19,7 @@ public class ProductSyncService extends OSyncService {
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         ODomain domain = new ODomain();
-        adapter.setDomain(domain).syncDataLimit(750);
+        adapter.setDomain(domain).syncDataLimit(3000);
     }
 }
 

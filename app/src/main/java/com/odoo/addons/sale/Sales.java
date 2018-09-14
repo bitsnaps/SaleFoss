@@ -119,7 +119,7 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnSuccess() {
             hideRefreshingProgress();
-            parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+//            parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
         }
 
         @Override
@@ -319,7 +319,15 @@ public class Sales extends BaseFragment implements
                 mSyncRequested = true;
                 if (sale == null)
                     sale = new SaleOrder(getContext(), null);
-                onRefresh();
+                if (inNetwork()) {
+                    setSwipeRefreshing(false);
+                    parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                } else {
+                    hideRefreshingProgress();
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
+                }
+
+                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
             }
             new Handler().postDelayed(new Runnable() {
                 @Override

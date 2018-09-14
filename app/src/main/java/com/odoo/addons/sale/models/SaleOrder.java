@@ -24,7 +24,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.BuildConfig;
@@ -370,10 +369,17 @@ public class SaleOrder extends OModel {
                     domain = new ODomain();
 
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
-                    domain.add("order_id", "=", quotation.getInt(OColumn.ROW_ID));
+                    List<Integer> newIds = new ArrayList<>();
+                    for (ODataRow row : salesOrderLine.select(new String[]{"id"}, "order_id = ?", new String[]{quotation.getInt(OColumn.ROW_ID).toString()})) {
+                        newIds.add(row.getInt("id"));
+                    }
+                    if (newIds.size() > 0) {
+                        domain.add("id", "in", newIds);
+                    }
                     salesOrderLine.quickSyncRecords(domain);
 
                     Log.e(TAG, "<< sale.order - syncing now >>");
+
                     domainSaleOrder = new ODomain();
                     domainSaleOrder.add("_id", "=", quotation.getInt(OColumn.ROW_ID));
                     salesOrder.quickSyncRecords(domainSaleOrder);
@@ -444,7 +450,8 @@ public class SaleOrder extends OModel {
                     Log.e(TAG, "<< sale.order - syncing now >>");
                     salesOrder.quickSyncRecords(domain);
 
-                    doWorkflowFullConfirm(mContext, quotation);
+//                    doWorkflowFullConfirm(mContext, quotation);
+                    doWorkflowFullConfirmEach(mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
@@ -662,6 +669,47 @@ public class SaleOrder extends OModel {
                         .show();
             }
 
+        }
+    }
+
+    private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation) {
+        Object confirm = null;
+        Object createInvoice = null;
+        Object createDelivery = null;
+
+        if (quotation.size() > 0 && quotation != null) {
+            JSONArray idList = new JSONArray();
+
+            for (final ODataRow qUpdate : quotation) {
+                OArguments args = new OArguments();
+                args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
+                args.add(new JSONObject());
+                try {
+                    confirm = getServerDataHelper().callMethod("action_confirm", args);
+                    createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+                    createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+                }
+
+                if (confirm != null && confirm.equals(true)) {
+                    OValues values = new OValues();
+                    values.put("state", "sale");
+                    values.put("state_title", getStateTitle(values));
+                    if (createDelivery.equals(true) && createInvoice.equals(true)) {
+                        values.put("invoice_status", "invoiced");
+                        values.put("invoice_status_title", getInvoiceStatusTitle(values));
+                    }
+                    values.put("_is_dirty", "false");
+                    update(qUpdate.getInt(OColumn.ROW_ID), values);
+                } else {
+                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
         }
     }
 

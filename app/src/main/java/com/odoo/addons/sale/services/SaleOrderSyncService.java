@@ -53,20 +53,19 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
 
         if (adapter.getModel().getModelName().equals("sale.order")) {
             ODomain domain = new ODomain();
-            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
-
-            List<Integer> newIds = new ArrayList<>();
-            for (ODataRow row : saleOrder.select(new String[]{}, "name = ? and id != ?", new String[]{"/", "0"})) {
-                newIds.add(row.getInt("id"));
-            }
-            if (newIds.size() > 0) {
-                domain.add("id", "in", newIds);
-            }
-
+//            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
+//
+//            List<Integer> newIds = new ArrayList<>();
+//            for (ODataRow row : saleOrder.select(new String[]{}, "name = ? and id != ?", new String[]{"/", "0"})) {
+//                newIds.add(row.getInt("id"));
+//            }
+//            if (newIds.size() > 0) {
+//                domain.add("id", "in", newIds);
+//            }
             if (!firstSync)
                 adapter.onSyncFinish(this);
             domain.add("user_id", "=", user.getUserId());
-            adapter.setDomain(domain).syncDataLimit(50);
+            adapter.setDomain(domain).syncDataLimit(30);
         }
 
         if (adapter.getModel().getModelName().equals("product.product")) {
