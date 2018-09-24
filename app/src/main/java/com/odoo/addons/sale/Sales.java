@@ -62,6 +62,7 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
@@ -76,6 +77,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static com.odoo.addons.sale.models.SaleOrder.*;
 
 public class Sales extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
@@ -99,7 +102,7 @@ public class Sales extends BaseFragment implements
     private ExpandableHeightGridView mGrid;
     private OdooUserLoginSelectorDialog.IUserLoginSelectListener mIUserLoginSelectListener = null;
 
-    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+    OnOperationSuccessListener confirmSale = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
@@ -115,11 +118,11 @@ public class Sales extends BaseFragment implements
         }
     };
 
-    SaleOrder.OnOperationSuccessListener refreshSale = new SaleOrder.OnOperationSuccessListener() {
+    OnOperationSuccessListener refreshSale = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             hideRefreshingProgress();
-//            parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+            parent().sync().requestSync(AUTHORITY); // Check for need
         }
 
         @Override
@@ -134,7 +137,7 @@ public class Sales extends BaseFragment implements
         }
     };
 
-    SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
+    OnOperationSuccessListener newCopyQuotation = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
@@ -150,7 +153,7 @@ public class Sales extends BaseFragment implements
         }
     };
 
-    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
+    OnOperationSuccessListener cancelOrder = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), _s(R.string.field_label_draft) + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
@@ -321,13 +324,13 @@ public class Sales extends BaseFragment implements
                     sale = new SaleOrder(getContext(), null);
                 if (inNetwork()) {
                     setSwipeRefreshing(false);
-                    parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                    parent().sync().requestSync(AUTHORITY); // Check for need
                 } else {
                     hideRefreshingProgress();
                     Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
 
-                parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                parent().sync().requestSync(AUTHORITY); // Check for need
             }
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -508,6 +511,9 @@ public class Sales extends BaseFragment implements
         Quotation,
         SaleOrder
     }
+//
+//
+
 
 }
 

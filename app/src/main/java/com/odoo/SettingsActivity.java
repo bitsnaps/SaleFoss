@@ -134,7 +134,10 @@ public class SettingsActivity extends AppCompatActivity {
     private void updateOrders(SaleOrder sales) {
         List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
         if (have_id_zero_records != null)
-            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
+//            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
+            sales.saleRecordCreate(confirmSale);
+//              sales.odooRecordsSend();
+
         else {
             App mContext = (App) getApplicationContext();
             Toast.makeText(mContext, R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
