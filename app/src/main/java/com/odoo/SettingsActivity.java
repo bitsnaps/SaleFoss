@@ -134,9 +134,8 @@ public class SettingsActivity extends AppCompatActivity {
     private void updateOrders(SaleOrder sales) {
         List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
         if (have_id_zero_records != null)
-//            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
-            sales.saleRecordCreate(confirmSale);
-//              sales.odooRecordsSend();
+            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
+//            sales.saleRecordCreate(confirmSale);
 
         else {
             App mContext = (App) getApplicationContext();

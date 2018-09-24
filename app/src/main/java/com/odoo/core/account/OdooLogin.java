@@ -102,8 +102,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
         if (BuildConfig.DEBUG) {
 //            edtSelfHosted.setText("https://odoo.foss.ua");
-//            edtSelfHosted.setText("http://192.168.1.2:8069/");
-            edtSelfHosted.setText("http://10.10.16.18:8069/");
+            edtSelfHosted.setText("http://192.168.1.2:8069/");
+//            edtSelfHosted.setText("http://10.10.16.18:8069/");
             edtUsername.setText("sal");
             edtPassword.setText("123");
         }
