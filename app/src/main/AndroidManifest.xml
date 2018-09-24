@@ -120,7 +120,8 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/customer_sync_adapter" />
         </service>
-<!--
+
+        <!--
         <provider
             android:name=".addons.calendar.providers.CalendarSyncProvider"
             android:authorities="${applicationId}.provider.content.sync.calendar_event"
