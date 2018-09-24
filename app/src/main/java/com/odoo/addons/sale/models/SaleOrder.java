@@ -437,6 +437,7 @@ public class SaleOrder extends OModel {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
             private Boolean faultOrder = false;
+            int countOrders = 0;
 
             @Override
             protected void onPreExecute() {
@@ -445,7 +446,7 @@ public class SaleOrder extends OModel {
                 dialog.setTitle(R.string.title_please_wait);
                 dialog.setMessage(OResource.string(mContext, R.string.title_loading));
                 dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setMax(100);
+                dialog.setMax(quotation.size());
                 dialog.setIndeterminate(true);
 
                 dialog.setCancelable(false);
@@ -466,6 +467,7 @@ public class SaleOrder extends OModel {
                     Thread.sleep(600);
                     sales.quickSyncRecords(domain);
 //                    doWorkflowFullConfirm(mContext, quotation);
+
                     this.doWorkflowFullConfirmEach(mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -479,6 +481,8 @@ public class SaleOrder extends OModel {
                 Object createInvoice = null;
                 Object createDelivery = null;
                 dialog.setIndeterminate(false);
+                dialog.setMax(quotation.size());
+
 
                 if (quotation.size() > 0 && quotation != null) {
                     JSONArray idList = new JSONArray();
@@ -487,19 +491,31 @@ public class SaleOrder extends OModel {
                         OArguments args = new OArguments();
                         args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                         args.add(new JSONObject());
+
+                        if (countOrders < dialog.getMax())
+                            ++countOrders;
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setProgress(countOrders);
+                            }
+                        });
+
                         try {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    dialog.incrementProgressBy(20);
+                                    dialog.setMessage("Confirm: " + qUpdate.getString("name"));
                                 }
                             });
 
                             confirm = getServerDataHelper().callMethod("action_confirm", args);
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    dialog.incrementProgressBy(50);
+                                    dialog.setMessage("Create delivery: " + qUpdate.getString("name"));
                                 }
                             });
 
@@ -508,18 +524,11 @@ public class SaleOrder extends OModel {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    dialog.incrementProgressBy(80);
+                                    dialog.setMessage("Create invoice: " + qUpdate.getString("name"));
                                 }
                             });
 
                             createInvoice = getServerDataHelper().callMethod("create_invoice", args);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.incrementProgressBy(100);
-                                }
-                            });
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -537,6 +546,7 @@ public class SaleOrder extends OModel {
                             }
                             values.put("_is_dirty", "false");
                             update(qUpdate.getInt(OColumn.ROW_ID), values);
+
                         } else {
                             Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
                                     .show();
@@ -885,23 +895,23 @@ public class SaleOrder extends OModel {
     }
 
 
-//
-public List<ODataRow> itemsOfOrderLines(int order_id) {
+    //
+    public List<ODataRow> itemsOfOrderLines(int order_id) {
 
-    List<ODataRow> items = new ArrayList<>();
-    try {
-        ProductProduct productProduct = new ProductProduct(mContext, getUser());
-        SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
+        List<ODataRow> items = new ArrayList<>();
+        try {
+            ProductProduct productProduct = new ProductProduct(mContext, getUser());
+            SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
 
-        String sql = "SELECT * FROM sale_order_line WHERE order_id = ? and _is_active = ?";
-        List<ODataRow> oders = salesOrderLine.query(sql, new String[]{Integer.toString(order_id), "true"});
+            String sql = "SELECT * FROM sale_order_line WHERE order_id = ? and _is_active = ?";
+            List<ODataRow> oders = salesOrderLine.query(sql, new String[]{Integer.toString(order_id), "true"});
 
-        for (ODataRow row : oders) {
-            // Fill in row values for insert in the local DB
-            OValues values = new OValues();
-            values.put("product_id", productProduct.selectServerId(row.getInt("product_id")));
+            for (ODataRow row : oders) {
+                // Fill in row values for insert in the local DB
+                OValues values = new OValues();
+                values.put("product_id", productProduct.selectServerId(row.getInt("product_id")));
 //            values.put("name", row.get("name")); // it is // mine
-            values.put("product_uom_qty", row.getInt("product_uom_qty"));
+                values.put("product_uom_qty", row.getInt("product_uom_qty"));
 //            values.put("product_uom", false);
 //            values.put("price_unit", row.getFloat("price_unit"));
 //            values.put("product_uos_qty", row.getInt("product_uom_qty"));
@@ -909,21 +919,21 @@ public List<ODataRow> itemsOfOrderLines(int order_id) {
 //            values.put("price_subtotal", row.getFloat("price_subtotal"));
 //            values.put("default_code", row.get("default_code"));
 
-            JSONArray tax_id = new JSONArray();
-            tax_id.put(6);
-            tax_id.put(false);
-            tax_id.put(false);
+                JSONArray tax_id = new JSONArray();
+                tax_id.put(6);
+                tax_id.put(false);
+                tax_id.put(false);
 //            values.put("tax_id", new JSONArray().put(tax_id));
 //            values.put("th_weight", 0);
 //            values.put("discount", 0);
 //            values.put("order_id", order_id);
-            items.add(values.toDataRow());
+                items.add(values.toDataRow());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+        return items;
     }
-    return items;
-}
 
 
     public void saleRecordCreate(final OnOperationSuccessListener listener) {
@@ -967,8 +977,8 @@ public List<ODataRow> itemsOfOrderLines(int order_id) {
                     args.add(new JSONObject());
 
 //                    getServerDataHelper().callMethod("create_sale_orders_from_mobile", args);
-                    result =  getServerDataHelper().callMethod("sale.order", "create_sale_orders_from_mobile",
-                            args, null,null);
+                    result = getServerDataHelper().callMethod("sale.order", "create_sale_orders_from_mobile",
+                            args, null, null);
 
                     Thread.sleep(600);
                 } catch (Exception e) {
@@ -1003,8 +1013,7 @@ public List<ODataRow> itemsOfOrderLines(int order_id) {
     }
 
 
-
-//
+    //
     public static interface OnOperationSuccessListener {
 
         public void OnSuccess();
