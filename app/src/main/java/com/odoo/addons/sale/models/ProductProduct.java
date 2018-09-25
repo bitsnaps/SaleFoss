@@ -121,30 +121,39 @@ public class ProductProduct extends OModel {
                 try {
                     Thread.sleep(300);
                     ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
+                    OdooFields fields = new OdooFields(new String[]{"id"});
                     List<Object> maxDate = new ArrayList<>();
-                    String sql = "SELECT max(write_date) as maxDate FROM product_template";
+
+                    List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domain, 3000);
+                    String sql = "SELECT id FROM product_template";
                     List<ODataRow> records = productTemplate.query(sql);
-                    for (ODataRow row : records) {
-                        maxDate.add(row.get("maxDate"));
-                    }
-                    ODomain domainDate = new ODomain();
-                    domainDate.add("write_date", ">", maxDate.get(0));
-                    List<Integer> newIds = new ArrayList<>();
-                    OdooFields fields = new OdooFields(new String[]{"id, write_date"});
-                    List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 10);
-                    for (ODataRow row : dates) {
-                        newIds.add(((Double) row.get("id")).intValue());
-                    }
-                    items = newIds.size();
-                    if (items > 0) {
-                        domain.add("product_tmpl_id", "in", newIds);
-                        if (items > 1)
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
-                                }
-                            });
+
+                    if (records.size() == dates.size()) {
+                        sql = "SELECT max(write_date) as maxDate FROM product_template";
+                        records = productTemplate.query(sql);
+
+                        for (ODataRow row : records) {
+                            maxDate.add(row.get("maxDate"));
+                        }
+                        ODomain domainDate = new ODomain();
+                        domainDate.add("write_date", ">", maxDate.get(0));
+                        List<Integer> newIds = new ArrayList<>();
+                        fields = new OdooFields(new String[]{"id, write_date"});
+                        dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 10);
+                        for (ODataRow row : dates) {
+                            newIds.add(((Double) row.get("id")).intValue());
+                        }
+                        items = newIds.size();
+                        if (items > 0) {
+                            domain.add("product_tmpl_id", "in", newIds);
+                            if (items > 1)
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
+                                    }
+                                });
+                        }
                     }
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
                     if (checkConnect != null) {
