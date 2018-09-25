@@ -53,7 +53,7 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void OnSuccess() {
             App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
         }
 
         @Override
