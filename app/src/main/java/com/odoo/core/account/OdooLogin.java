@@ -24,15 +24,19 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.addons.sale.services.SaleOrderSyncService;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.config.FirstLaunchConfig;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.rpc.Odoo;
 import com.odoo.core.rpc.handler.OdooVersionException;
+import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.listeners.IDatabaseListListener;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.IOdooLoginCallback;
@@ -42,6 +46,9 @@ import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.datas.OConstants;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +70,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private TextView mLoginProcessStatus = null;
     private App mApp;
     private Odoo mOdoo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,11 +156,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     private void toggleSelfHostedURL() {
         TextView txvAddSelfHosted = (TextView) findViewById(R.id.txvAddSelfHosted);
 //        if (!mSelfHostedURL) {
-            mSelfHostedURL = true;
-            findViewById(R.id.layoutSelfHosted).setVisibility(View.VISIBLE);
-            edtSelfHosted.setOnFocusChangeListener(this);
-            edtSelfHosted.requestFocus();
-            txvAddSelfHosted.setText(R.string.label_login_with_odoo);
+        mSelfHostedURL = true;
+        findViewById(R.id.layoutSelfHosted).setVisibility(View.VISIBLE);
+        edtSelfHosted.setOnFocusChangeListener(this);
+        edtSelfHosted.requestFocus();
+        txvAddSelfHosted.setText(R.string.label_login_with_odoo);
 //        } else {
 //            findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
 //            findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
@@ -398,8 +406,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
-//                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
-//                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
+
+                    SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
+                    SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
@@ -416,6 +425,17 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_40));
                         }
                     });
+
+                    List<Integer> newIds = new ArrayList<>();
+                    OdooFields fields = new OdooFields(new String[]{"id"});
+                    List<ODataRow> records = sale.getServerDataHelper().searchRecords(fields, domain, 40);
+                    for (ODataRow row : records) {
+                        newIds.add(((Double) row.get("id")).intValue());
+                    }
+                    domain.add("id", "in", newIds);
+                    sale.quickSyncRecords(domain);
+
+                    Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -423,8 +443,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
                     Thread.sleep(1000);
-//                    salesOrderLine.quickSyncRecords(domain);
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -440,9 +458,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             mLoginProcessStatus.setText(OResource.string(OdooLogin.this, R.string.status_db_load_95));
                         }
                     });
-//                    domain.add("user_id", "=", mUser.getUserId());
-//                    Thread.sleep(1000);
-//                    sale.quickSyncRecords(domain);
 
                 } catch (Exception e) {
                     e.printStackTrace();
