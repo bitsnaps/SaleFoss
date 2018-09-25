@@ -100,6 +100,7 @@ public class ProductProduct extends OModel {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
             private Boolean faultOrder = false;
+            private int items;
 
             @Override
             protected void onPreExecute() {
@@ -107,7 +108,7 @@ public class ProductProduct extends OModel {
                 dialog = new ProgressDialog(context);
                 dialog.setTitle(R.string.title_please_wait);
                 dialog.setMessage(OResource.string(context, R.string.title_loading_product));
-                dialog.setCancelable(false); // original false
+                dialog.setCancelable(false);
                 dialog.show();
             }
 
@@ -116,7 +117,6 @@ public class ProductProduct extends OModel {
                 ODomain domain = new ODomain();
                 OArguments args = new OArguments();
                 args.add(new JSONObject());
-                final int items;
 
                 try {
                     Thread.sleep(300);
@@ -127,7 +127,7 @@ public class ProductProduct extends OModel {
                     List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domain, 3000);
                     String sql = "SELECT id FROM product_template";
                     List<ODataRow> records = productTemplate.query(sql);
-
+                    items = dates.size();
                     if (records.size() == dates.size()) {
                         sql = "SELECT max(write_date) as maxDate FROM product_template";
                         records = productTemplate.query(sql);
@@ -146,15 +146,16 @@ public class ProductProduct extends OModel {
                         items = newIds.size();
                         if (items > 0) {
                             domain.add("product_tmpl_id", "in", newIds);
-                            if (items > 1)
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
-                                    }
-                                });
                         }
                     }
+                    if (items > 1)
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
+                            }
+                        });
+
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
                     if (checkConnect != null) {
                         quickSyncRecords(domain);
