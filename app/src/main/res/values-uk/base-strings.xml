@@ -58,7 +58,7 @@
     <string name="title_about">Про програму</string>
     <string name="title_synchronization">Синхронізація</string>
     <string name="title_confirm">Підтвердити</string>
-    <string name="title_working">Обрабляється&#8230;</string>
+    <string name="title_working">Обрoбляється&#8230;</string>
     <string name="title_loading">Завантаження комерційних пропозицій на сервер&#8230;</string>
     <string name="title_loading_product">Продукти завантажуються з серверу&#8230;</string>
     <string name="title_please_wait">Будь ласка почекайте&#8230;</string>
@@ -86,7 +86,7 @@
     <string name="toast_are_you_sure_delete_account"> Ви впевнені, що бажаєте видалити обліковий запис ?</string>
     <string name="toast_buy_a_new_smartphone"> Щось пішло не так</string>
     <string name="toast_network_required">Необхідно підключення до мережі інтернет</string>
-    <string name="toast_recs_updated">Записи были обновлены!</string>
+    <string name="toast_recs_updated">Записи були оновлені !</string>
     <string name="toast_has_lines">Будь ласка виберіть Рядки замовлення !</string>
     <string name="toast_has_partner">Будь ласка виберіть Покупця за замовчуванням !</string>
     <string name="toast_account_removed">Обліковий Запис Вилучений Успішно</string>

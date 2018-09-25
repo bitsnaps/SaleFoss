@@ -129,7 +129,6 @@ public class Sales extends BaseFragment implements
         public void OnFault() {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
-            hideRefreshingProgress();
         }
 
         @Override

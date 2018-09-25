@@ -23,24 +23,29 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 
 import com.odoo.BuildConfig;
 import com.odoo.R;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
+import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProductProduct extends OModel {
     public static final String TAG = ProductProduct.class.getSimpleName();
@@ -49,6 +54,7 @@ public class ProductProduct extends OModel {
             ".provider.content.sync.product_product";
 
     private Context idContext = getContext();
+    private final Handler handler;
 
     OColumn product_tmpl_id = new OColumn(_s(R.string.field_label_product_tmpl_id), ProductTemplate.class,
             OColumn.RelationType.ManyToOne);
@@ -60,6 +66,7 @@ public class ProductProduct extends OModel {
 
     public ProductProduct(Context context, OUser user) {
         super(context, "product.product", user);
+        handler = new Handler(context.getMainLooper());
         setDefaultNameColumn("name_template");
     }
 
@@ -109,9 +116,36 @@ public class ProductProduct extends OModel {
                 ODomain domain = new ODomain();
                 OArguments args = new OArguments();
                 args.add(new JSONObject());
+                final int items;
 
                 try {
                     Thread.sleep(300);
+                    ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
+                    List<Object> maxDate = new ArrayList<>();
+                    String sql = "SELECT max(write_date) as maxDate FROM product_template";
+                    List<ODataRow> records = productTemplate.query(sql);
+                    for (ODataRow row : records) {
+                        maxDate.add(row.get("maxDate"));
+                    }
+                    ODomain domainDate = new ODomain();
+                    domainDate.add("write_date", ">", maxDate.get(0));
+                    List<Integer> newIds = new ArrayList<>();
+                    OdooFields fields = new OdooFields(new String[]{"id, write_date"});
+                    List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 10);
+                    for (ODataRow row : dates) {
+                        newIds.add(((Double) row.get("id")).intValue());
+                    }
+                    items = newIds.size();
+                    if (items > 0) {
+                        domain.add("product_tmpl_id", "in", newIds);
+                        if (items > 1)
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
+                                }
+                            });
+                    }
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
                     if (checkConnect != null) {
                         quickSyncRecords(domain);
@@ -167,6 +201,10 @@ public class ProductProduct extends OModel {
                 super.onPostExecute(aVoid);
             }
         }.execute();
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
     }
 
     public interface OnOperationSuccessListener {

@@ -412,7 +412,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             int product_ids = 0;
             String sql = "";
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
                 OValues values = params[0];
                 // Creating oneToMany order lines
 
