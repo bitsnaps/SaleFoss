@@ -119,18 +119,19 @@ public class ProductProduct extends OModel {
                 args.add(new JSONObject());
 
                 try {
-                    Thread.sleep(300);
+                    Thread.sleep(600);
                     ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
+                    ProductProduct productProduct = new ProductProduct(getContext(), getUser());
                     OdooFields fields = new OdooFields(new String[]{"id"});
                     List<Object> maxDate = new ArrayList<>();
 
                     List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domain, 3000);
-                    String sql = "SELECT id FROM product_template";
-                    List<ODataRow> records = productTemplate.query(sql);
+//                    String sql = "SELECT id FROM product_template";
+//                    List<ODataRow> records = productTemplate.query(sql);
                     items = dates.size();
-                    if (records.size() == dates.size()) {
-                        sql = "SELECT max(write_date) as maxDate FROM product_template";
-                        records = productTemplate.query(sql);
+                    if (productTemplate.getServerIds().size() == dates.size()) {
+                        String sql = "SELECT max(write_date) as maxDate FROM product_template";
+                        List<ODataRow> records = productTemplate.query(sql);
 
                         for (ODataRow row : records) {
                             maxDate.add(row.get("maxDate"));
@@ -147,17 +148,21 @@ public class ProductProduct extends OModel {
                         if (items > 0) {
                             domain.add("product_tmpl_id", "in", newIds);
                         }
+                    } else{
+                        domain.add("id", "not in", productTemplate.getServerIds());
                     }
-                    if (items > 1)
+                    Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
+                    if (checkConnect != null) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                dialog.setMessage("Updating: " + ((Integer) items).toString() + " items");
+                                if (items > getServerIds().size())
+                                   dialog.setMessage("Updating: " + ((Integer) (items - getServerIds().size())).toString() + " items");
+                                else
+                                    dialog.setMessage("Updating: " + ((Integer) (items)).toString() + " items");
+
                             }
                         });
-
-                    Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
-                    if (checkConnect != null) {
                         quickSyncRecords(domain);
                     }
                 } catch (Exception e) {
