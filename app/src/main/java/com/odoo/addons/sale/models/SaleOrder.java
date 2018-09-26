@@ -311,7 +311,6 @@ public class SaleOrder extends OModel {
                     } else {
 
                         mCancel = ((JSONObject) getServerDataHelper().callMethod("action_cancel", args));
-                        //getServerDataHelper().executeWorkFlow(quotation.getInt("id"), "cancel");
                     }
 
                     OValues values = new OValues();
@@ -466,97 +465,15 @@ public class SaleOrder extends OModel {
                     salesOrderLine.quickSyncRecords(domain);
                     Thread.sleep(600);
                     sales.quickSyncRecords(domain);
-//                    doWorkflowFullConfirm(mContext, quotation, dialog);
 
-//                    this.doWorkflowFullConfirmEach(mContext, quotation);
                     sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
-//                    this.doWorkflowFullConfirmEach(mContext, quotation);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
                 }
                 return null;
             }
-
-            private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation) {
-                Object confirm = null;
-                Object createInvoice = null;
-                Object createDelivery = null;
-                dialog.setIndeterminate(false);
-                dialog.setMax(quotation.size());
-
-
-                if (quotation.size() > 0 && quotation != null) {
-                    JSONArray idList = new JSONArray();
-
-                    for (final ODataRow qUpdate : quotation) {
-                        OArguments args = new OArguments();
-                        args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
-                        args.add(new JSONObject());
-
-                        if (countOrders < dialog.getMax())
-                            ++countOrders;
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.setProgress(countOrders);
-                            }
-                        });
-
-                        try {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.setMessage("Confirm: " + qUpdate.getString("name"));
-                                }
-                            });
-
-//                            confirm = getServerDataHelper().callMethod("action_confirm", args);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.setMessage("Create delivery: " + qUpdate.getString("name"));
-                                }
-                            });
-
-//                            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
-
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    dialog.setMessage("Create invoice: " + qUpdate.getString("name"));
-                                }
-                            });
-
-//                            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-
-                        if (confirm != null && confirm.equals(true)) {
-                            OValues values = new OValues();
-                            values.put("state", "sale");
-                            values.put("state_title", getStateTitle(values));
-                            if (createDelivery.equals(true) && createInvoice.equals(true)) {
-                                values.put("invoice_status", "invoiced");
-                                values.put("invoice_status_title", getInvoiceStatusTitle(values));
-                            }
-                            values.put("_is_dirty", "false");
-                            update(qUpdate.getInt(OColumn.ROW_ID), values);
-
-                        } else {
-                            Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    }
-                }
-            }
-
 
             @Override
             protected void onPostExecute(Void aVoid) {
@@ -727,7 +644,7 @@ public class SaleOrder extends OModel {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    dialog.incrementProgressBy(83);
+                    dialog.incrementProgressBy(85);
                 }
             });
             createInvoice = getServerDataHelper().callMethod("create_invoice", args);
@@ -769,9 +686,6 @@ public class SaleOrder extends OModel {
             try {
                 confirm = getServerDataHelper().callMethod("action_confirm", args);
                 confirm_full = getServerDataHelper().callMethod("create_with_full_confirm", args);
-
-//            createDelivery = model.getServerDataHelper().callMethod("create_delivery", args);
-//            createInvoice = model.getServerDataHelper().callMethod("create_invoice", args);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
@@ -829,6 +743,7 @@ public class SaleOrder extends OModel {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+
                             dialog.setMessage("Confirm: " + qUpdate.getString("name"));
                         }
                     });
@@ -1049,8 +964,6 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
-
-    //
     public static interface OnOperationSuccessListener {
 
         public void OnSuccess();

@@ -148,7 +148,7 @@ public class ProductProduct extends OModel {
                         if (items > 0) {
                             domain.add("product_tmpl_id", "in", newIds);
                         }
-                    } else{
+                    } else {
                         domain.add("id", "not in", productTemplate.getServerIds());
                     }
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
@@ -157,7 +157,7 @@ public class ProductProduct extends OModel {
                             @Override
                             public void run() {
                                 if (items > getServerIds().size())
-                                   dialog.setMessage("Updating: " + ((Integer) (items - getServerIds().size())).toString() + " items");
+                                    dialog.setMessage("Updating: " + ((Integer) (items - getServerIds().size())).toString() + " items");
                                 else
                                     dialog.setMessage("Updating: " + ((Integer) (items)).toString() + " items");
 

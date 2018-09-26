@@ -122,7 +122,7 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnSuccess() {
             hideRefreshingProgress();
-            parent().sync().requestSync(AUTHORITY); // Check for need
+            parent().sync().requestSync(SaleOrder.AUTHORITY);
         }
 
         @Override
@@ -323,7 +323,7 @@ public class Sales extends BaseFragment implements
                     sale = new SaleOrder(getContext(), null);
                 if (inNetwork()) {
                     setSwipeRefreshing(false);
-                    parent().sync().requestSync(AUTHORITY); // Check for need
+                    parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
                 } else {
                     hideRefreshingProgress();
                     Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
@@ -510,9 +510,6 @@ public class Sales extends BaseFragment implements
         Quotation,
         SaleOrder
     }
-//
-//
-
 
 }
 
