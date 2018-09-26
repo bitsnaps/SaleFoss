@@ -430,6 +430,7 @@ public class SaleOrder extends OModel {
 
     private void runOnUiThread(Runnable runnable) {
         handler.post(runnable);
+
     }
 
     public void confirmAllSaleOrders(final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
@@ -465,10 +466,10 @@ public class SaleOrder extends OModel {
                     salesOrderLine.quickSyncRecords(domain);
                     Thread.sleep(600);
                     sales.quickSyncRecords(domain);
-                    doWorkflowFullConfirm(mContext, quotation);
+//                    doWorkflowFullConfirm(mContext, quotation, dialog);
 
 //                    this.doWorkflowFullConfirmEach(mContext, quotation);
-                    sales.doWorkflowFullConfirmEach(mContext, quotation);
+                    sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
 //                    this.doWorkflowFullConfirmEach(mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -797,21 +798,56 @@ public class SaleOrder extends OModel {
         }
     }
 
-    private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation) {
+    private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation, final ProgressDialog dialog ) {
         Object confirm = null;
         Object createInvoice = null;
         Object createDelivery = null;
+        int countOrders = 0;
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dialog.setIndeterminate(false);
+            }
+        });
 
         if (quotation.size() > 0 && quotation != null) {
             JSONArray idList = new JSONArray();
 
             for (final ODataRow qUpdate : quotation) {
+
                 OArguments args = new OArguments();
                 args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                 args.add(new JSONObject());
+
+                if (countOrders < dialog.getMax())
+                    ++countOrders;
+                dialog.setProgress(countOrders);
+
                 try {
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.setMessage("Confirm: " + qUpdate.getString("name"));
+                        }
+                    });
                     confirm = getServerDataHelper().callMethod("action_confirm", args);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.setMessage("Create delivery: " + qUpdate.getString("name"));
+                        }
+                    });
                     createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dialog.setMessage("Create invoice: " + qUpdate.getString("name"));
+                        }
+                    });
                     createInvoice = getServerDataHelper().callMethod("create_invoice", args);
 
                 } catch (Exception e) {
