@@ -455,7 +455,6 @@ public class SaleOrder extends OModel {
 
             @Override
             protected Void doInBackground(Void... params) {
-
                 try {
                     Thread.sleep(600);
                     ODomain domain = new ODomain();
@@ -466,9 +465,11 @@ public class SaleOrder extends OModel {
                     salesOrderLine.quickSyncRecords(domain);
                     Thread.sleep(600);
                     sales.quickSyncRecords(domain);
-//                    doWorkflowFullConfirm(mContext, quotation);
+                    doWorkflowFullConfirm(mContext, quotation);
 
-                    this.doWorkflowFullConfirmEach(mContext, quotation);
+//                    this.doWorkflowFullConfirmEach(mContext, quotation);
+                    sales.doWorkflowFullConfirmEach(mContext, quotation);
+//                    this.doWorkflowFullConfirmEach(mContext, quotation);
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
@@ -510,7 +511,7 @@ public class SaleOrder extends OModel {
                                 }
                             });
 
-                            confirm = getServerDataHelper().callMethod("action_confirm", args);
+//                            confirm = getServerDataHelper().callMethod("action_confirm", args);
 
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -519,7 +520,7 @@ public class SaleOrder extends OModel {
                                 }
                             });
 
-                            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+//                            createDelivery = getServerDataHelper().callMethod("create_delivery", args);
 
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -528,7 +529,7 @@ public class SaleOrder extends OModel {
                                 }
                             });
 
-                            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
+//                            createInvoice = getServerDataHelper().callMethod("create_invoice", args);
 
                         } catch (Exception e) {
                             e.printStackTrace();
