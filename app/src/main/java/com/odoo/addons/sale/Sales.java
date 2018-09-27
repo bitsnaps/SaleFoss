@@ -220,7 +220,6 @@ public class Sales extends BaseFragment implements
             dialog.show();
         }
         mView.findViewById(R.id.syncButton).setVisibility(View.GONE);
-
     }
 
     @Override
@@ -323,13 +322,12 @@ public class Sales extends BaseFragment implements
                     sale = new SaleOrder(getContext(), null);
                 if (inNetwork()) {
                     setSwipeRefreshing(false);
-                    parent().sync().requestSync(SaleOrder.AUTHORITY); // Check for need
+                    onRefresh();
+
                 } else {
                     hideRefreshingProgress();
                     Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
-
-                parent().sync().requestSync(AUTHORITY); // Check for need
             }
             new Handler().postDelayed(new Runnable() {
                 @Override
@@ -465,8 +463,8 @@ public class Sales extends BaseFragment implements
         }
     }
 
-    private int getPosition(){
-       return mPosition;
+    private int getPosition() {
+        return mPosition;
     }
 
     private void setPosition(int position) {

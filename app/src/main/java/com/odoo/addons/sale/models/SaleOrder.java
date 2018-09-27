@@ -462,19 +462,30 @@ public class SaleOrder extends OModel {
                     ODomain domainSale = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
                     SaleOrder sales = new SaleOrder(mContext, getUser());
-//                    domain.add("id", "=", 0); //return after
 
-                    domainLine.add("id", "not in", salesOrderLine.getServerIds());
-                    Log.e(TAG, "<< sale.order.line - syncing now >>");
-                    salesOrderLine.quickSyncRecords(domainLine);
-                    Thread.sleep(600);
+                    sync().requestSync(SaleOrder.AUTHORITY);
+//                    sync().wait();
+                    int counter = 0;
+                    String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
+                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
+                    while (rec.get(0).getInt("counts") > 0 && counter < 50 ){
+                        rec = salesOrderLine.query(sql, new String[]{"0"});
+                        if (rec.get(0).getInt("counts") == 0)
+                            break;
+                        Thread. sleep(1500);
+                        counter++;
+                    }
+//                    salesOrderLine.quickSyncRecords(domainLine);
 
-
-                    domainSale.add("id", "not in", sales.getServerIds());
-
-                    Log.e(TAG, "<< sale.order - syncing now >>");
-                    sales.quickSyncRecords(domainSale);
-//                    sales.quickSyncRecords(domain);
+//                    String sql = "SELECT id FROM sale_order_line WHERE id = ?";
+//                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
+//                    if (rec.size() > 0){
+//                        domainLine.add("id", "=", 0);
+//                        Log.e(TAG, "<< sale.order.line - syncing now >>");
+//                        salesOrderLine.quickSyncRecords(domainLine);
+//                    }
+//                    domainSale.addэтуже а("id", "=", "0");
+//                    sales.quickSyncRecords(domainSale);
 
                     sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
 
@@ -722,7 +733,7 @@ public class SaleOrder extends OModel {
         }
     }
 
-    private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation, final ProgressDialog dialog ) {
+    private void doWorkflowFullConfirmEach(Context context, final List<ODataRow> quotation, final ProgressDialog dialog) {
         Object confirm = null;
         Object createInvoice = null;
         Object createDelivery = null;
@@ -739,7 +750,8 @@ public class SaleOrder extends OModel {
             JSONArray idList = new JSONArray();
 
             for (final ODataRow qUpdate : quotation) {
-
+                if (selectServerId(qUpdate.getInt(OColumn.ROW_ID)) == 0)
+                    continue;
                 OArguments args = new OArguments();
                 args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                 args.add(new JSONObject());

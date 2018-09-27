@@ -140,7 +140,7 @@ public class ProductProduct extends OModel {
                         domainDate.add("write_date", ">", maxDate.get(0));
                         List<Integer> newIds = new ArrayList<>();
                         fields = new OdooFields(new String[]{"id, write_date"});
-                        dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 10);
+                        dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 150);
                         for (ODataRow row : dates) {
                             newIds.add(((Double) row.get("id")).intValue());
                         }
@@ -149,7 +149,7 @@ public class ProductProduct extends OModel {
                             domain.add("product_tmpl_id", "in", newIds);
                         }
                     } else {
-                        domain.add("id", "not in", productTemplate.getServerIds());
+                        domain.add("product_tmpl_id", "not in", productTemplate.getServerIds());
                     }
                     Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
                     if (checkConnect != null) {
