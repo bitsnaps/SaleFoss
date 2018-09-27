@@ -46,6 +46,7 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OResource;
@@ -457,14 +458,23 @@ public class SaleOrder extends OModel {
             protected Void doInBackground(Void... params) {
                 try {
                     Thread.sleep(600);
-                    ODomain domain = new ODomain();
+                    ODomain domainLine = new ODomain();
+                    ODomain domainSale = new ODomain();
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
                     SaleOrder sales = new SaleOrder(mContext, getUser());
-                    domain.add("id", "=", 0);
+//                    domain.add("id", "=", 0); //return after
+
+                    domainLine.add("id", "not in", salesOrderLine.getServerIds());
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
-                    salesOrderLine.quickSyncRecords(domain);
+                    salesOrderLine.quickSyncRecords(domainLine);
                     Thread.sleep(600);
-                    sales.quickSyncRecords(domain);
+
+
+                    domainSale.add("id", "not in", sales.getServerIds());
+
+                    Log.e(TAG, "<< sale.order - syncing now >>");
+                    sales.quickSyncRecords(domainSale);
+//                    sales.quickSyncRecords(domain);
 
                     sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
 
@@ -743,7 +753,6 @@ public class SaleOrder extends OModel {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-
                             dialog.setMessage("Confirm: " + qUpdate.getString("name"));
                         }
                     });
