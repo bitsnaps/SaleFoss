@@ -49,9 +49,6 @@ import java.util.List;
 
 public class ProductProduct extends OModel {
     public static final String TAG = ProductProduct.class.getSimpleName();
-    //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.product_product";
-    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
-            ".provider.content.sync.product_product";
 
     private Context idContext = getContext();
     private final Handler handler;
@@ -91,10 +88,6 @@ public class ProductProduct extends OModel {
         return domain;
     }
 
-    @Override
-    public Uri uri() {
-        return buildURI(AUTHORITY);
-    }
 
     public void syncProduct(final Context context, final ProductProduct.OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
