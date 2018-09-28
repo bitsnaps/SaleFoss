@@ -179,7 +179,6 @@
                 android:resource="@xml/sale_sync_adapter" />
         </service>
 
-        <!--
         <provider
             android:name=".addons.phonecall.providers.PhoneCallProvider"
             android:authorities="${applicationId}.provider.content.sync.crm_phonecall"
@@ -198,8 +197,7 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/phonecall_sync_adapter" />
         </service>
--->
-<!--
+
         <activity
             android:name=".addons.calendar.EventDetail"
             android:windowSoftInputMode="adjustPan" />
@@ -217,7 +215,7 @@
         <activity
             android:name=".addons.phonecall.PhoneCallDetail"
             android:windowSoftInputMode="adjustPan" />
--->
+
         <activity
             android:name=".addons.sale.SalesDetail"
             android:screenOrientation="portrait"
