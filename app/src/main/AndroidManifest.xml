@@ -179,25 +179,6 @@
                 android:resource="@xml/sale_sync_adapter" />
         </service>
 
-        <provider
-            android:name=".addons.sale.providers.ProductProvider"
-            android:authorities="${applicationId}.provider.content.sync.product_product"
-            android:label="@string/sync_label_products"
-            android:multiprocess="true" />
-
-        <service
-            android:name=".addons.sale.services.ProductSyncService"
-            android:exported="true"
-            android:process=":sync_products">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/product_sync_adapter" />
-        </service>
-
         <!--
         <provider
             android:name=".addons.phonecall.providers.PhoneCallProvider"
