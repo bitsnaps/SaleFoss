@@ -179,25 +179,6 @@
                 android:resource="@xml/sale_sync_adapter" />
         </service>
 
-        <provider
-            android:name=".addons.phonecall.providers.PhoneCallProvider"
-            android:authorities="${applicationId}.provider.content.sync.crm_phonecall"
-            android:label="@string/sync_label_phonecalls"
-            android:multiprocess="true" />
-
-        <service
-            android:name=".addons.phonecall.services.PhoneCallSyncService"
-            android:exported="true"
-            android:process=":sync_phone_calls">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/phonecall_sync_adapter" />
-        </service>
-
         <activity
             android:name=".addons.calendar.EventDetail"
             android:windowSoftInputMode="adjustPan" />
@@ -212,23 +193,11 @@
             android:name=".addons.crm.ConvertToQuotation"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
             android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".addons.phonecall.PhoneCallDetail"
-            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".addons.sale.SalesDetail"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
-        <!-- Phone state receiver// -->
-        <receiver android:name=".addons.phonecall.features.receivers.PhoneStateReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".addons.sale.AddProductLineWizard"

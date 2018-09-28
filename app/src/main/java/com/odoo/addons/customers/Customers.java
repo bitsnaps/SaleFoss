@@ -41,14 +41,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
-import com.odoo.addons.crm.CRMLeads;
-import com.odoo.addons.crm.CRMOpportunitiesPager;
-import com.odoo.addons.phonecall.PhoneCallDetail;
-import com.odoo.addons.sale.models.SaleOrder;
+//import com.odoo.addons.crm.CRMLeads;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -74,7 +70,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public static final String KEY = Customers.class.getSimpleName();
     public static final String KEY_FILTER_REQUEST = "key_filter_request";
     public static final String KEY_CUSTOMER_ID = "key_customer_id";
-    public static final String KEY_FILTER_TYPE = CRMLeads.KEY_MENU;
+//    public static final String KEY_FILTER_TYPE = CRMLeads.KEY_MENU;
     private View mView;
     private String mCurFilter = null;
     private ListView mPartnersList = null;

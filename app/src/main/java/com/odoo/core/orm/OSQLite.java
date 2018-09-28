@@ -26,8 +26,6 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.odoo.App;
-import com.odoo.addons.crm.models.CRMCaseCateg;
-import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.base.addons.mail.MailMessageSubType;
 import com.odoo.core.support.OUser;
@@ -79,12 +77,12 @@ public class OSQLite extends SQLiteOpenHelper {
         // Updating crm case stage model name for saas-6
         if (mUser.getOdooVersion().getServerSerie().equals("8.saas~6")) {
             osqlHelper = new OSQLHelper(mContext);
-            CRMCaseCateg caseCateg = new CRMCaseCateg(mContext, mUser);
-            CRMCaseStage caseStage = new CRMCaseStage(mContext, mUser);
-            osqlHelper.createStatements(caseCateg);
-            osqlHelper.createStatements(caseStage);
-            db.execSQL("ALTER TABLE crm_case_stage RENAME TO crm_stage");
-            db.execSQL("ALTER TABLE crm_case_categ RENAME TO crm_lead_tag");
+//            CRMCaseCateg caseCateg = new CRMCaseCateg(mContext, mUser);
+//            CRMCaseStage caseStage = new CRMCaseStage(mContext, mUser);
+//            osqlHelper.createStatements(caseCateg);
+//            osqlHelper.createStatements(caseStage);
+//            db.execSQL("ALTER TABLE crm_case_stage RENAME TO crm_stage");
+//            db.execSQL("ALTER TABLE crm_case_categ RENAME TO crm_lead_tag");
         }
 
         ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
