@@ -463,19 +463,24 @@ public class SaleOrder extends OModel {
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
                     SaleOrder sales = new SaleOrder(mContext, getUser());
 
-                    sync().requestSync(SaleOrder.AUTHORITY);
+                    sales.sync().requestSync(SaleOrder.AUTHORITY);
 //                    sync().wait();
                     int counter = 0;
                     String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
                     List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
-                    while (rec.get(0).getInt("counts") > 0 && counter < 50 ){
+                    while (rec.get(0).getInt("counts") > 0 && counter < 50) {
                         rec = salesOrderLine.query(sql, new String[]{"0"});
                         if (rec.get(0).getInt("counts") == 0)
                             break;
-                        Thread. sleep(1500);
+                        Thread.sleep(1000);
                         counter++;
                     }
-//                    salesOrderLine.quickSyncRecords(domainLine);
+
+                    if (rec.get(0).getInt("counts") > 0) {
+                        domainLine.add("id", "=", "0");
+                        salesOrderLine.quickSyncRecords(domainLine);
+                        sales.sync().cancelSync(SaleOrder.AUTHORITY);
+                    }
 
 //                    String sql = "SELECT id FROM sale_order_line WHERE id = ?";
 //                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
@@ -484,11 +489,10 @@ public class SaleOrder extends OModel {
 //                        Log.e(TAG, "<< sale.order.line - syncing now >>");
 //                        salesOrderLine.quickSyncRecords(domainLine);
 //                    }
-//                    domainSale.addэтуже а("id", "=", "0");
+//                    domainSale.add("id", "=", "0");
 //                    sales.quickSyncRecords(domainSale);
 
                     sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
@@ -803,11 +807,17 @@ public class SaleOrder extends OModel {
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
                 } else {
-                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                            .show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
                 }
             }
         }
+        return;
     }
 
     public List<ODataRow> checkNewQuotations(Context context) {
