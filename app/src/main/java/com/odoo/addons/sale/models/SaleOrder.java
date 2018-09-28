@@ -451,7 +451,7 @@ public class SaleOrder extends OModel {
                 dialog.setMax(quotation.size());
                 dialog.setIndeterminate(true);
 
-                dialog.setCancelable(false);
+                dialog.setCancelable(true);
                 dialog.show();
             }
 
@@ -470,13 +470,14 @@ public class SaleOrder extends OModel {
                     String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
                     List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
                     while (rec.get(0).getInt("counts") > 0 && counter < 50) {
+                        if (isCancelled())
+                            return null;
                         rec = salesOrderLine.query(sql, new String[]{"0"});
                         if (rec.get(0).getInt("counts") == 0)
                             break;
                         Thread.sleep(1000);
                         counter++;
                     }
-
                     if (rec.get(0).getInt("counts") > 0) {
                         domainLine.add("id", "=", "0");
                         salesOrderLine.quickSyncRecords(domainLine);
@@ -514,6 +515,7 @@ public class SaleOrder extends OModel {
                 }
 
             }
+
         }.execute();
     }
 

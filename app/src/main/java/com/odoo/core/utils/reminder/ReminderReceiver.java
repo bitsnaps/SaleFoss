@@ -24,14 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-//import com.odoo.addons.calendar.EventDetail;
-//import com.odoo.addons.calendar.models.CalendarEvent;
-//import com.odoo.addons.crm.CRMDetail;
-//import com.odoo.addons.crm.models.CRMLead;
-import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.R;
 

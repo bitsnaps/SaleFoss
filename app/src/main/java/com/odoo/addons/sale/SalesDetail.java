@@ -563,6 +563,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             progressDialog.setTitle(R.string.title_please_wait);
             progressDialog.setMessage(OResource.string(SalesDetail.this, R.string.title_working));
             progressDialog.show();
+
         }
 
         @Override

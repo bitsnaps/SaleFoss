@@ -101,7 +101,7 @@ public class ProductProduct extends OModel {
                 dialog = new ProgressDialog(context);
                 dialog.setTitle(R.string.title_please_wait);
                 dialog.setMessage(OResource.string(context, R.string.title_loading_product));
-                dialog.setCancelable(false);
+                dialog.setCancelable(true);
                 dialog.show();
             }
 
@@ -112,7 +112,7 @@ public class ProductProduct extends OModel {
                 args.add(new JSONObject());
 
                 try {
-                    Thread.sleep(600);
+                    Thread.sleep(2000);
                     ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
                     ProductProduct productProduct = new ProductProduct(getContext(), getUser());
                     OdooFields fields = new OdooFields(new String[]{"id"});

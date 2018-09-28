@@ -41,7 +41,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
-//import com.odoo.addons.crm.CRMLeads;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
