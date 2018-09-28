@@ -29,6 +29,7 @@ import android.view.ViewDebug;
 import android.widget.Toast;
 
 import com.odoo.BuildConfig;
+import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
@@ -74,7 +75,7 @@ public class SaleOrder extends OModel {
     @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
     OColumn invoice_status_title = new OColumn("Invoice Title", OVarchar.class)
             .setLocalColumn();
-    private Context mContext = getContext();
+    private Context mContext;
     private Context idContext = getContext();
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
@@ -463,7 +464,7 @@ public class SaleOrder extends OModel {
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
                     SaleOrder sales = new SaleOrder(mContext, getUser());
 
-                    sales.sync().requestSync(SaleOrder.AUTHORITY);
+                    sync().requestSync(SaleOrder.AUTHORITY);
 //                    sync().wait();
                     int counter = 0;
                     String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
@@ -479,7 +480,7 @@ public class SaleOrder extends OModel {
                     if (rec.get(0).getInt("counts") > 0) {
                         domainLine.add("id", "=", "0");
                         salesOrderLine.quickSyncRecords(domainLine);
-                        sales.sync().cancelSync(SaleOrder.AUTHORITY);
+                        sync().cancelSync(SaleOrder.AUTHORITY);
                     }
 
 //                    String sql = "SELECT id FROM sale_order_line WHERE id = ?";
@@ -515,7 +516,6 @@ public class SaleOrder extends OModel {
             }
         }.execute();
     }
-
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {

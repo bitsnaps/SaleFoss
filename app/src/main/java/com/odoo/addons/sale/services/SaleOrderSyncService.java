@@ -28,6 +28,7 @@ import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.ISyncFinishListener;
@@ -68,17 +69,17 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
 
             if (!firstSync)
                 adapter.onSyncFinish(this);
-            adapter.setDomain(domain).syncDataLimit(30);
+            adapter.setDomain(domain);
         }
 
-        if (adapter.getModel().getModelName().equals("product.product")) {
+        if (adapter.getModel().getModelName().equals("sale.order.line")) {
             adapter.onSyncFinish(syncFinishListener);
         }
     }
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-        return new OSyncAdapter(getApplicationContext(), ProductProduct.class, SaleOrderSyncService.this, true);
+        return new OSyncAdapter(getApplicationContext(), SalesOrderLine.class, SaleOrderSyncService.this, true);
     }
 
     ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
