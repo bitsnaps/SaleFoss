@@ -130,16 +130,28 @@ public class SettingsActivity extends AppCompatActivity {
             super.startActivity(intent);
     }
 
-
-    private void updateOrders(SaleOrder sales) {
-        List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-        if (have_id_zero_records != null)
-            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
-//            sales.saleRecordCreate(confirmSale);
-
-        else {
+    private void updateOrders(final SaleOrder sales) {
+        final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
+        if (have_id_zero_records != null) {
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sales.confirmAllThread(have_id_zero_records);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
             App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
+
+//            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
+//            sales.saleRecordCreate(confirmSale);
+        } else {
+//            App mContext = (App) getApplicationContext();
+            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -171,7 +183,8 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             Account mAccount = user.getAccount();
             OPreferenceManager mPref = new OPreferenceManager(this);
-            int sync_interval = mPref.getInt("sync_interval", 1440);
+            int sync_interval = mPref.getInt("sync_interval", 1);
+//            int sync_interval = mPref.getInt("sync_interval", 1440);
 
             List<String> default_authorities = new ArrayList<>();
 //            default_authorities.add("com.android.calendar");

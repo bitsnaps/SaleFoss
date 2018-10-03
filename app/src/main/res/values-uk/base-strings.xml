@@ -76,11 +76,14 @@
     <string name="label_our_apps">Наші програми</string>
     <string name="label_attach_a_file"> + Приєднати файл</string>
     <string name="label_be_patient_we_are_configuring_account_update">Будьте терплячі, ми оновлюємо ваш обліковий запис</string>
+    <string name="label_not_sync">(не синхронизовано)</string>
+
     <!-- Toasts -->
     <string name="developer_2_tap">Need 2 tap for developer mode</string>
     <string name="developer_5_tap">Developer mode activated</string>
     <string name="toast_setting_saved">Налаштування збережені.</string>
     <string name="toast_no_new_records">Немає записів для синхронізації !</string>
+    <string name="toast_process_started">Стартував процес синхронізації !!!</string>
     <string name="toast_update_database">Увійдіть у Налаштування додатка для синхронізації бази даних</string>
     <string name="toast_are_you_sure_logout">Ви впевнені що бажаєте вийти ?</string>
     <string name="toast_are_you_sure_delete_account"> Ви впевнені, що бажаєте видалити обліковий запис ?</string>

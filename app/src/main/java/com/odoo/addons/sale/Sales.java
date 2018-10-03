@@ -241,7 +241,11 @@ public class Sales extends BaseFragment implements
         if (row.getString("state").equals("sale")) {
             OControls.setText(view, R.id.state, saleOrder.getInvoiceStatusTitle(state));
         } else {
-            OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
+            if (row.getInt("id") == 0) {
+                OControls.setText(view, R.id.state, saleOrder.getStateTitle(state) + " " + OResource.string(getContext(), R.string.label_not_sync));
+            } else{
+                OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
+            }
         }
 
         if (row.getString("partner_name").equals("false")) {
@@ -282,8 +286,8 @@ public class Sales extends BaseFragment implements
         List<String> args = new ArrayList<>();
         switch (mType) {
             case Quotation:
-                where = " (state = ? or state = ? or state = ?)";
-                args.addAll(Arrays.asList(new String[]{"draft", "sent", "cancel"}));
+                where = " (state = ? or state = ?)";
+                args.addAll(Arrays.asList(new String[]{"draft", "sent"}));
                 break;
             case SaleOrder:
                 where = "(state = ? or state = ? or state = ? or state = ?)";

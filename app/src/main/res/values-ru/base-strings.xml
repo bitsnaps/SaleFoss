@@ -82,6 +82,7 @@
     <string name="developer_5_tap">Developer mode activated</string>
     <string name="toast_setting_saved">Установки сохранены.</string>
     <string name="toast_no_new_records">Нет записей для синхронизации !</string>
+    <string name="toast_process_started">Запущен процесс синхронизации !!!</string>
     <string name="toast_update_database">Войдите в Параметры приложения для синхронизации базы данных</string>
     <string name="toast_are_you_sure_logout">Вы уверены что хотите выйти ?</string>
     <string name="toast_are_you_sure_delete_account">Вы уверены, что хотите удалить учетную запись ?</string>

@@ -82,6 +82,7 @@
     <string name="developer_5_tap">Developer mode activated</string>
     <string name="toast_setting_saved">Setting saved.</string>
     <string name="toast_no_new_records">No new records to sync!</string>
+    <string name="toast_process_started">Sync process is running !!!</string>
     <string name="toast_update_database">Enter Settings to sync databaes</string>
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
     <string name="toast_are_you_sure_delete_account">Are you sure want to delete account ?</string>

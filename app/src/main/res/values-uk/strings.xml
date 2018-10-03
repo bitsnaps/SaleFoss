@@ -109,6 +109,7 @@
 
     <string name="field_label_new">Новий</string>
 
+    <string name="field_label_draft_no">Пропозиція локальна</string>
     <string name="field_label_draft">Комерційна пропозиція</string>
     <string name="field_label_sent">Замовлення відіслано</string>
     <string name="field_label_canceled">Скасовано</string>
@@ -146,6 +147,8 @@
     <string name="title_no_lines">(Рядки відсутні)</string>
     <string name="label_lines">рядки замовлення</string>
     <string name="field_label_name">ім\'я</string>
+    <string name="field_label_sync">Sync"</string>
+
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата підтвердження"</string>
     <string name="field_label_partner_id">Клієнт</string>

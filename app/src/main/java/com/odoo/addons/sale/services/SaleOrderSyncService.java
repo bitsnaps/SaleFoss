@@ -57,8 +57,8 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
 //            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
 //
 //            List<Integer> newIds = new ArrayList<>();
-////            for (ODataRow row : saleOrder.select(new String[]{}, "name = ? and id != ?", new String[]{"/", "0"})) {
-//            for (ODataRow row : saleOrder.select(new String[]{}, "id = ?", new String[]{"0"})) {
+//            for (ODataRow row : saleOrder.select(new String[]{}, "id != ?", new String[]{"0"})) {
+////            for (ODataRow row : saleOrder.select(new String[]{}, "id = ?", new String[]{"0"})) {
 //                newIds.add(row.getInt("id"));
 //            }
 //            if (newIds.size() > 0) {
@@ -72,21 +72,29 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             adapter.setDomain(domain);
         }
 
-        if (adapter.getModel().getModelName().equals("sale.order.line")) {
-            adapter.onSyncFinish(syncFinishListener);
-        }
+//        if (adapter.getModel().getModelName().equals("sale.order.line")) {
+//            adapter.onSyncFinish(syncFinishListener);
+//        }
+
+        ODomain domainLine = new ODomain();
+        final SalesOrderLine salesOrderLine = new SalesOrderLine(getApplicationContext(), user);
+        domainLine.add("id","=", 0);
+        salesOrderLine.quickSyncRecords(domainLine);
     }
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-        return new OSyncAdapter(getApplicationContext(), SalesOrderLine.class, SaleOrderSyncService.this, true);
+        firstSync = true;
+
+        return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
+        //        return new OSyncAdapter(getApplicationContext(), SalesOrderLine.class, SaleOrderSyncService.this, true);
     }
 
-    ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
-        @Override
-        public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-            firstSync = true;
-            return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
-        }
-    };
+//    ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
+//        @Override
+//        public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+//            firstSync = true;
+//            return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
+//        }
+//    };
 }

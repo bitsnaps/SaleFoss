@@ -2,6 +2,7 @@
 <resources>
 
     <!-- Application Base Theme Colors -->
+    <color name="theme_primary_local">#4c177b</color>
     <color name="theme_primary">#4c177b</color>
     <color name="theme_primary_dark">#6d2f5c</color>
     <color name="theme_primary_medium">#7986CB</color>

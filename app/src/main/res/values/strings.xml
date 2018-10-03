@@ -27,6 +27,7 @@
     <string name="label_quotation_not_sync">Closed Session</string>
     <string name="label_opportunity">Opportunity</string>
     <string name="label_load_database_odo">Synchronization</string>
+    <string name="label_not_sync">(no sync)</string>
     <string name="label_sale_orders">Sales Orders</string>
     <string name="label_sync_data">Syncronazation</string>
     <string name="label_phone_calls">Phone calls</string>
@@ -109,6 +110,7 @@
 
     <string name="field_label_new">New</string>
 
+    <string name="field_label_draft_no">Quotation not sync</string>
     <string name="field_label_draft">Quotation</string>
     <string name="field_label_sent">Quotation Sent</string>
     <string name="field_label_canceled">Cancelled</string>
@@ -147,6 +149,8 @@
     <string name="title_no_lines">(No lines)</string>
     <string name="label_lines">lines</string>
     <string name="field_label_name">Name"</string>
+    <string name="field_label_sync">Sync"</string>
+
     <!--Model sale.order-->
     <string name="field_label_date_order">"Confirmation Date"</string>
     <string name="field_label_partner_id">Customer</string>

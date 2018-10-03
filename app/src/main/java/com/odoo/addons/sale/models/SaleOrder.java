@@ -24,6 +24,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ViewDebug;
 import android.widget.Toast;
@@ -41,6 +42,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
@@ -89,7 +91,7 @@ public class SaleOrder extends OModel {
     OColumn client_order_ref = new OColumn(_s(R.string.field_label_client_order_ref),
             OVarchar.class).setSize(100);
     OColumn state = new OColumn(_s(R.string.field_label_state), OVarchar.class).setSize(10)
-            .setDefaultValue("draft");
+            .setDefaultValue("no");
     @Odoo.Functional(method = "getStateTitle", store = true, depends = {"state"})
     OColumn state_title = new OColumn(_s(R.string.field_label_state_title), OVarchar.class)
             .setLocalColumn();
@@ -109,6 +111,8 @@ public class SaleOrder extends OModel {
     OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn(); // Original
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
+    OColumn _is_local_only = new OColumn(_s(R.string.field_label_sync),  OBoolean.class).setDefaultValue(false).setLocalColumn();
+
     private int have_zero = 0;
 
     public SaleOrder(Context context, OUser user) {
@@ -178,6 +182,7 @@ public class SaleOrder extends OModel {
 
     public String getStateTitle(OValues row) {
         HashMap<String, String> mStates = new HashMap<String, String>();
+        mStates.put("no", mContext.getString(R.string.field_label_draft_no));
         mStates.put("draft", mContext.getString(R.string.field_label_draft));
         mStates.put("sent", mContext.getString(R.string.field_label_sent));
         mStates.put("cancel", mContext.getString(R.string.field_label_canceled));
@@ -434,6 +439,59 @@ public class SaleOrder extends OModel {
 
     }
 
+
+    public void confirmAllThread(final List<ODataRow> quotation) {
+        final SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
+        final SaleOrder sales = new SaleOrder(mContext, getUser());
+
+//        sync().requestSync(SaleOrder.AUTHORITY);
+//
+        try {
+//            Thread threadOfTimer = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    int counter = 0;
+//                    String sql = "SELECT count(id) as counts FROM sale_order WHERE id = ?";
+//                    List<ODataRow> rec = sales.query(sql, new String[]{"0"});
+//                    while (rec.get(0).getInt("counts") > 0) {
+//                        rec = sales.query(sql, new String[]{"0"});
+//                        if (rec.get(0).getInt("counts") == 0) {
+//                            Log.d("Counter: ", "It is over!!!");
+//                            break;
+//                        }
+//                        try {
+//                            Thread.sleep(1000);
+//                        } catch (Exception e) {
+//                        }
+//                        Log.d("Counter: ", ((Integer) counter).toString());
+//                        counter++;
+//                    }
+//                }
+//            });
+//
+//            threadOfTimer.start(); // запускаем
+//            threadOfTimer.join();
+//            Thread.sleep(2000);
+//
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sales.doWorkflowFullConfirmEach(mContext, quotation, null);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
+            Log.d("Confirm: ", "Start and wait");
+            threadOfConfirm.join();
+        } catch (Exception e) {
+        }
+    }
+
+
     public void confirmAllSaleOrders(final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
 
         new AsyncTask<Void, Void, Void>() {
@@ -461,28 +519,68 @@ public class SaleOrder extends OModel {
                     Thread.sleep(600);
                     ODomain domainLine = new ODomain();
                     ODomain domainSale = new ODomain();
-                    SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
-                    SaleOrder sales = new SaleOrder(mContext, getUser());
+                    final SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
+                    final SaleOrder sales = new SaleOrder(mContext, getUser());
 
                     sync().requestSync(SaleOrder.AUTHORITY);
-//                    sync().wait();
-                    int counter = 0;
-                    String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
-                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
-                    while (rec.get(0).getInt("counts") > 0 && counter < 50) {
-                        if (isCancelled())
-                            return null;
-                        rec = salesOrderLine.query(sql, new String[]{"0"});
-                        if (rec.get(0).getInt("counts") == 0)
-                            break;
-                        Thread.sleep(1000);
-                        counter++;
-                    }
-                    if (rec.get(0).getInt("counts") > 0) {
-                        domainLine.add("id", "=", "0");
-                        salesOrderLine.quickSyncRecords(domainLine);
-                        sync().cancelSync(SaleOrder.AUTHORITY);
-                    }
+
+                    Thread threadOfTimer = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            int counter = 0;
+                            String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
+                            List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
+                            while (rec.get(0).getInt("counts") > 0 && counter < 50) {
+                                rec = salesOrderLine.query(sql, new String[]{"0"});
+                                if (rec.get(0).getInt("counts") == 0) {
+                                    Log.d("Counter: ", "It is over!!!");
+                                    break;
+                                }
+                                try {
+                                    Thread.sleep(1000);
+                                } catch (Exception e) {
+                                }
+                                Log.d("Counter: ", ((Integer) counter).toString());
+                                counter++;
+                            }
+                        }
+                    });
+                    threadOfTimer.start(); // запускаем
+                    threadOfTimer.join(60000);
+
+                    Thread threadOfConfirm = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
+
+                            try {
+                                Thread.sleep(1000);
+                            } catch (Exception e) {
+                            }
+                        }
+                    });
+                    threadOfConfirm.start(); // запускаем
+                    Log.d("Confirm: ", "Start and wait");
+                    threadOfConfirm.join();
+
+//                    int counter = 0;
+//                    String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
+//                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
+//                    while (rec.get(0).getInt("counts") > 0 && counter < 50) {
+//                        if (isCancelled())
+//                            return null;
+//                        rec = salesOrderLine.query(sql, new String[]{"0"});
+//                        if (rec.get(0).getInt("counts") == 0)
+//                            break;
+//                        Thread.sleep(1000);
+//                        counter++;
+//                    }
+
+//                    if (rec.get(0).getInt("counts") > 0) {
+//                        sync().cancelSync(SaleOrder.AUTHORITY);
+//                        domainLine.add("id", "=", "0");
+//                        salesOrderLine.quickSyncRecords(domainLine);
+//                    }
 
 //                    String sql = "SELECT id FROM sale_order_line WHERE id = ?";
 //                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
@@ -494,7 +592,8 @@ public class SaleOrder extends OModel {
 //                    domainSale.add("id", "=", "0");
 //                    sales.quickSyncRecords(domainSale);
 
-                    sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
+//                    sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     faultOrder = true;
@@ -518,6 +617,7 @@ public class SaleOrder extends OModel {
 
         }.execute();
     }
+
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
@@ -744,58 +844,76 @@ public class SaleOrder extends OModel {
         Object createInvoice = null;
         Object createDelivery = null;
         int countOrders = 0;
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dialog.setIndeterminate(false);
-            }
-        });
-
+        if (dialog != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.setIndeterminate(false);
+                }
+            });
+        }
         if (quotation.size() > 0 && quotation != null) {
-            JSONArray idList = new JSONArray();
 
+//            for (final ODataRow qUpdate : quotation) {
+//                OValues values = new OValues();
+//                values.put("state", "manual");
+//                values.put("state_title", getStateTitle(values));
+//                update(qUpdate.getInt(OColumn.ROW_ID), values);
+//            }
+
+            JSONArray idList = new JSONArray();
             for (final ODataRow qUpdate : quotation) {
                 if (selectServerId(qUpdate.getInt(OColumn.ROW_ID)) == 0)
                     continue;
                 OArguments args = new OArguments();
                 args.add(new JSONArray().put(selectServerId(qUpdate.getInt(OColumn.ROW_ID))));
                 args.add(new JSONObject());
-
-                if (countOrders < dialog.getMax())
-                    ++countOrders;
-                dialog.setProgress(countOrders);
-
+                if (dialog != null) {
+                    if (countOrders < dialog.getMax())
+                        ++countOrders;
+                    dialog.setProgress(countOrders);
+                }
                 try {
+                    if (dialog != null) {
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setMessage("Confirm: " + qUpdate.getString("name"));
-                        }
-                    });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setMessage("Confirm: " + qUpdate.getString("name"));
+                            }
+                        });
+                    }
                     confirm = getServerDataHelper().callMethod("action_confirm", args);
+                    if (dialog != null) {
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setMessage("Create delivery: " + qUpdate.getString("name"));
-                        }
-                    });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setMessage("Create delivery: " + qUpdate.getString("name"));
+                            }
+                        });
+                    }
                     createDelivery = getServerDataHelper().callMethod("create_delivery", args);
+                    if (dialog != null) {
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            dialog.setMessage("Create invoice: " + qUpdate.getString("name"));
-                        }
-                    });
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                dialog.setMessage("Create invoice: " + qUpdate.getString("name"));
+                            }
+                        });
+                    }
                     createInvoice = getServerDataHelper().callMethod("create_invoice", args);
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(context, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                            .show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        });
                 }
 
                 if (confirm != null && confirm.equals(true)) {
@@ -809,13 +927,16 @@ public class SaleOrder extends OModel {
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
                 } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
+                    if (dialog != null) {
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                                        .show();
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -826,7 +947,7 @@ public class SaleOrder extends OModel {
         boolean CheckOk = false;
         try {
             SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id = ? or state = ? ) and _is_active = ?";
+            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id != ? and state = ? ) and _is_active = ?";
             have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
