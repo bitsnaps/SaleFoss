@@ -48,7 +48,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
-
+    Thread threadOfConfirm = null;
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
@@ -133,20 +133,19 @@ public class SettingsActivity extends AppCompatActivity {
     private void updateOrders(final SaleOrder sales) {
         final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
         if (have_id_zero_records != null) {
-            Thread threadOfConfirm = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sales.confirmAllThread(have_id_zero_records);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
+                Thread threadOfConfirm = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        sales.confirmAllThread(have_id_zero_records);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (Exception e) {
+                        }
                     }
-                }
-            });
-            threadOfConfirm.start(); // запускаем
-            App mContext = (App) getApplicationContext();
-            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
-
+                });
+                threadOfConfirm.start(); // запускаем
+                App mContext = (App) getApplicationContext();
+                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
 //            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
 //            sales.saleRecordCreate(confirmSale);
         } else {
