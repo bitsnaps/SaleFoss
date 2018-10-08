@@ -21,10 +21,12 @@ package com.odoo.addons.sale.models;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.ViewDebug;
 import android.widget.Toast;
@@ -50,9 +52,13 @@ import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
+import com.odoo.core.rpc.listeners.IOdooResponse;
+import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.datas.OConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -111,7 +117,7 @@ public class SaleOrder extends OModel {
     OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn(); // Original
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
-    OColumn _is_local_only = new OColumn(_s(R.string.field_label_sync),  OBoolean.class).setDefaultValue(false).setLocalColumn();
+    OColumn _is_local_only = new OColumn(_s(R.string.field_label_sync), OBoolean.class).setDefaultValue(false).setLocalColumn();
 
     private int have_zero = 0;
 
@@ -119,12 +125,13 @@ public class SaleOrder extends OModel {
         super(context, "sale.order", user);
         mContext = context;
         handler = new Handler(context.getMainLooper());
-        setHasMailChatter(true);
+//        setHasMailChatter(true);
     }
 
     public boolean setFirsLoadProduct(boolean isThere) {
         return this.isFirstUpdateProduct = isThere;
     }
+
 
     public boolean getFirsLoadProduct() {
         return this.isFirstUpdateProduct;
@@ -132,6 +139,12 @@ public class SaleOrder extends OModel {
 
     private String _s(int res_id) {
         return OResource.string(idContext, res_id);
+    }
+
+
+    @Override
+    public boolean allowDeleteRecordOnServer() {
+        return true;
     }
 
     @Override
@@ -256,14 +269,13 @@ public class SaleOrder extends OModel {
             protected Void doInBackground(Void... params) {
                 SalesOrderLine lineOrder = new SalesOrderLine(getContext(), null);
                 SaleOrder order = new SaleOrder(getContext(), null);
-
                 try {
-                    String sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
-                    List<ODataRow> rec = lineOrder.query(sql,
-                            new String[]{quotation.getInt(OColumn.ROW_ID).toString()});
-                    for (ODataRow row : rec) {
-                        lineOrder.delete(row.getInt(OColumn.ROW_ID));
-                    }
+                    Object mDelete;
+                    OArguments args = new OArguments();
+                    args.add(new JSONArray().put(quotation.getInt("id")));
+                    args.add(new JSONObject());
+                    if (quotation.getInt("id") != 0)
+                        mDelete = getServerDataHelper().callMethod("delete_order", args);
                     order.delete(quotation.getInt(OColumn.ROW_ID));
 
                 } catch (Exception e) {
@@ -476,6 +488,7 @@ public class SaleOrder extends OModel {
             Thread threadOfConfirm = new Thread(new Runnable() {
                 @Override
                 public void run() {
+
                     sales.doWorkflowFullConfirmEach(mContext, quotation, null);
 
                     try {
@@ -486,7 +499,7 @@ public class SaleOrder extends OModel {
             });
             threadOfConfirm.start(); // запускаем
             Log.d("Confirm: ", "Start and wait");
-            threadOfConfirm.join();
+//            threadOfConfirm.join();
         } catch (Exception e) {
         }
     }
@@ -697,49 +710,95 @@ public class SaleOrder extends OModel {
         return nameOrder;
     }
 
-    public void syncReady(final Context context, final OnOperationSuccessListener listener) {
-        new AsyncTask<Void, Void, Void>() {
-            private Boolean faultOrder = false;
-            private Object connect;
+    public void syncReady(final OnOperationSuccessListener listener) {
+        final OArguments args = new OArguments();
+        args.add(new JSONObject());
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
+        try {
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Object connect = getServerDataHelper().callMethod("exist_db", args);
+                        if (connect.equals(true)) {
+                            listener.OnSuccess();
+                            Log.d(TAG, "exist_db returned TRUE ");
+                        } else {
+                            Log.d(TAG, "exist_db returned FALSE ");
+                        }
 
-            @Override
-            protected Void doInBackground(Void... params) {
-                OArguments args = new OArguments();
-                args.add(new JSONObject());
-                try {
-                    connect = getServerDataHelper().callMethod("exist_db", args);
-                    if (connect.equals(true)) {
-                        Log.d(TAG, "exist_db returned TRUE ");
-                    } else {
-                        Log.d(TAG, "exist_db returned FALSE ");
-                    }
-
-                } catch (Exception e) {
-                    faultOrder = true;
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                if (listener != null) {
-                    if (!faultOrder) {
-                        listener.OnSuccess();
-                    } else {
+                    } catch (Exception e) {
+                        Log.d(TAG, "exist_db returned EXCEPTION ");
+                        e.printStackTrace();
                         listener.OnFault();
                     }
-                }
 
-            }
-        }.execute();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
+            threadOfConfirm.join();
+        } catch (Exception e) {
+        }
+
     }
+
+
+//    public void syncReady(final Context context, final OnOperationSuccessListener listener) {
+//        new AsyncTask<Void, Void, Void>() {
+//            private Boolean faultOrder = false;
+//            private Object connect;
+//
+//            @Override
+//            protected void onPreExecute() {
+//                super.onPreExecute();
+//            }
+//
+//            @Override
+//            protected Void doInBackground(Void... params) {
+//                OArguments args = new OArguments();
+//                args.add(new JSONObject());
+//                com.odoo.core.rpc.Odoo mOdoo = null;
+//
+//                try {
+////                    connect = getServerDataHelper().callMethod("exist_db", args);
+//                    if (mOdoo == null)
+//                        mOdoo = OSyncAdapter.createOdooInstance(mContext, getUser());
+//                    OdooResult result = mOdoo
+//                            .withRetryPolicy(30000, 1)
+//                            .getVersionInfo();
+//
+//                    if (connect.equals(true)) {
+//                        Log.d(TAG, "exist_db returned TRUE ");
+//                    } else {
+//                        Log.d(TAG, "exist_db returned FALSE ");
+//                    }
+//
+//                } catch (Exception e) {
+//                    faultOrder = true;
+//                    Log.d(TAG, "exist_db returned EXCEPTION ");
+//                    e.printStackTrace();
+//                }
+//                return null;
+//            }
+//
+//            @Override
+//            protected void onPostExecute(Void aVoid) {
+//                super.onPostExecute(aVoid);
+//                if (listener != null) {
+//                    if (!faultOrder) {
+//                        listener.OnSuccess();
+//                    } else {
+//                        listener.OnFault();
+//                    }
+//                }
+//
+//            }
+//        }.execute();
+//    }
 
     private void doOrderFullConfirm(final ODataRow quotation, final ProgressDialog dialog) {
         Object createInvoice = null;
@@ -844,6 +903,26 @@ public class SaleOrder extends OModel {
         Object createInvoice = null;
         Object createDelivery = null;
         int countOrders = 0;
+        boolean rollback = false;
+
+//        com.odoo.core.rpc.Odoo mOdoo = null;
+//        try {
+//            if (mOdoo == null)
+//                mOdoo = OSyncAdapter.createOdooInstance(mContext, getUser());
+//            OdooResult result = mOdoo
+//                    .withRetryPolicy(10000, 1)
+//                    .getVersionInfo();
+//        } catch (Exception e){
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+//                            .show();
+//                }
+//            });
+//            return;
+//        }
+
         if (dialog != null) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -852,17 +931,19 @@ public class SaleOrder extends OModel {
                 }
             });
         }
-        if (quotation.size() > 0 && quotation != null) {
 
-//            for (final ODataRow qUpdate : quotation) {
-//                OValues values = new OValues();
-//                values.put("state", "manual");
-//                values.put("state_title", getStateTitle(values));
-//                update(qUpdate.getInt(OColumn.ROW_ID), values);
-//            }
+
+        if (quotation.size() > 0 && quotation != null) {
+            for (final ODataRow qUpdate : quotation) {
+                OValues values = new OValues();
+                values.put("state", "manual");
+                values.put("state_title", getStateTitle(values));
+                update(qUpdate.getInt(OColumn.ROW_ID), values);
+            }
 
             JSONArray idList = new JSONArray();
             for (final ODataRow qUpdate : quotation) {
+
                 if (selectServerId(qUpdate.getInt(OColumn.ROW_ID)) == 0)
                     continue;
                 OArguments args = new OArguments();
@@ -907,13 +988,14 @@ public class SaleOrder extends OModel {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                        .show();
-                            }
-                        });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
+                    return;
                 }
 
                 if (confirm != null && confirm.equals(true)) {
@@ -927,16 +1009,13 @@ public class SaleOrder extends OModel {
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
                 } else {
-                    if (dialog != null) {
-
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                        .show();
-                            }
-                        });
-                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                                    .show();
+                        }
+                    });
                 }
             }
         }
@@ -947,8 +1026,8 @@ public class SaleOrder extends OModel {
         boolean CheckOk = false;
         try {
             SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id != ? and state = ? ) and _is_active = ?";
-            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "true"}); // crooked nail
+            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id != ? and state = ? or state = ? ) and _is_active = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "manual", "true"}); // crooked nail
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
                 CheckOk = true;

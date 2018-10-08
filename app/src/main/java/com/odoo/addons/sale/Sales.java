@@ -32,6 +32,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,6 +79,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.os.Looper.getMainLooper;
 import static com.odoo.addons.sale.models.SaleOrder.*;
 
 public class Sales extends BaseFragment implements
@@ -88,6 +90,7 @@ public class Sales extends BaseFragment implements
 
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
+    private Handler handler;
     private View mView;
     private ListView mList;
     private OCursorListAdapter mAdapter;
@@ -121,20 +124,35 @@ public class Sales extends BaseFragment implements
     OnOperationSuccessListener refreshSale = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            hideRefreshingProgress();
-            parent().sync().requestSync(SaleOrder.AUTHORITY);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideRefreshingProgress();
+                    parent().sync().requestSync(SaleOrder.AUTHORITY);
+                }
+            });
         }
 
         @Override
         public void OnFault() {
-            hideRefreshingProgress();
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideRefreshingProgress();
+                    Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
+                }
+            });
         }
 
         @Override
         public void OnCancelled() {
         }
     };
+
+    private void runOnUiThread(Runnable runnable) {
+        handler.post(runnable);
+
+    }
 
     OnOperationSuccessListener newCopyQuotation = new OnOperationSuccessListener() {
         @Override
@@ -174,6 +192,8 @@ public class Sales extends BaseFragment implements
         setHasOptionsMenu(true);
         mType = Type.valueOf(getArguments().getString(KEY_MENU));
         sale = new SaleOrder(getContext(), null);
+        handler = new Handler(getMainLooper());
+
         return inflater.inflate(R.layout.common_listview, container, false);
     }
 
@@ -243,7 +263,7 @@ public class Sales extends BaseFragment implements
         } else {
             if (row.getInt("id") == 0) {
                 OControls.setText(view, R.id.state, saleOrder.getStateTitle(state) + " " + OResource.string(getContext(), R.string.label_not_sync));
-            } else{
+            } else {
                 OControls.setText(view, R.id.state, saleOrder.getStateTitle(state));
             }
         }
@@ -369,7 +389,21 @@ public class Sales extends BaseFragment implements
     public void onRefresh() {
         if (inNetwork()) {
             setSwipeRefreshing(false);
-            sale.syncReady(getContext(), refreshSale);
+
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sale.syncReady(refreshSale);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
+
+//            sale.syncReady(getContext(), refreshSale);
+
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
@@ -444,7 +478,16 @@ public class Sales extends BaseFragment implements
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(getPosition()));
         switch (item.getItemId()) {
             case R.id.menu_quotation_cancel:
-                ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);
+                if (row.getInt("id") != 0) {
+                    if (inNetwork()) {
+                        ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    ((SaleOrder) db()).deleteOrder(mType, row, cancelOrder);
+                }
+
                 break;
             case R.id.menu_quotation_new:
                 if (inNetwork()) {
@@ -512,6 +555,7 @@ public class Sales extends BaseFragment implements
         Quotation,
         SaleOrder
     }
+
 
 }
 

@@ -54,6 +54,11 @@ public class SalesOrderLine extends OModel {
         return domain;
     }
 
+    @Override
+    public boolean allowDeleteRecordOnServer(){
+        return true;
+    }
+
     public SalesOrderLine(Context context, OUser user) {
         super(context, "sale.order.line", user);
     }

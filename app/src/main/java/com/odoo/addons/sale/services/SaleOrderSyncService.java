@@ -53,6 +53,13 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
 
         if (adapter.getModel().getModelName().equals("sale.order")) {
+
+            ODomain domainLine = new ODomain();
+            final SalesOrderLine salesOrderLine = new SalesOrderLine(getApplicationContext(), user);
+            domainLine.add("id", "=", 0);
+            salesOrderLine.quickSyncRecords(domainLine);
+
+
             ODomain domain = new ODomain();
             SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
 
@@ -63,23 +70,14 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             }
             if (newIds.size() > 0) {
                 domain.add("id", "not in", newIds);
-//                domain.add("&");
-//                domain.add("user_id", "=", user.getUserId());
             }
-
+            saleOrder.quickSyncRecords(domain);
             if (!firstSync)
                 adapter.onSyncFinish(this);
+
             adapter.setDomain(domain).syncDataLimit(30);
+//            saleOrder.quickSyncRecords(domain);
         }
-
-//        if (adapter.getModel().getModelName().equals("sale.order.line")) {
-//            adapter.onSyncFinish(syncFinishListener);
-//        }
-
-        ODomain domainLine = new ODomain();
-        final SalesOrderLine salesOrderLine = new SalesOrderLine(getApplicationContext(), user);
-        domainLine.add("id","=", 0);
-        salesOrderLine.quickSyncRecords(domainLine);
     }
 
     @Override

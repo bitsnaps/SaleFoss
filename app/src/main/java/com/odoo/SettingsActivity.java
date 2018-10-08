@@ -21,6 +21,7 @@ package com.odoo;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
     Thread threadOfConfirm = null;
+
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
@@ -66,6 +68,36 @@ public class SettingsActivity extends AppCompatActivity {
         public void OnCancelled() {
         }
     };
+
+    SaleOrder.OnOperationSuccessListener refreshSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    App mContext = (App) getApplicationContext();
+//                    Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
+//                }
+//            });
+        }
+
+        @Override
+        public void OnFault() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    App mContext = (App) getApplicationContext();
+                    Toast.makeText(mContext, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
+                }
+            });
+
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+
 
     ProductProduct.OnOperationSuccessListener confirmProduct = new ProductProduct.OnOperationSuccessListener() {
         @Override
@@ -108,7 +140,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         if (intent.getAction() != null) {
-            Sales sales = new Sales();
+//            Sales sales = new Sales();
             SaleOrder salesOrders = new SaleOrder(this, null);
             ProductProduct products = new ProductProduct(this, null);
             App app = (App) this.getApplicationContext();
@@ -182,8 +214,7 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             Account mAccount = user.getAccount();
             OPreferenceManager mPref = new OPreferenceManager(this);
-            int sync_interval = mPref.getInt("sync_interval", 1);
-//            int sync_interval = mPref.getInt("sync_interval", 1440);
+            int sync_interval = mPref.getInt("sync_interval", 1440);
 
             List<String> default_authorities = new ArrayList<>();
 //            default_authorities.add("com.android.calendar");

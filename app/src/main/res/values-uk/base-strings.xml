@@ -88,6 +88,7 @@
     <string name="toast_are_you_sure_logout">Ви впевнені що бажаєте вийти ?</string>
     <string name="toast_are_you_sure_delete_account"> Ви впевнені, що бажаєте видалити обліковий запис ?</string>
     <string name="toast_buy_a_new_smartphone"> Щось пішло не так</string>
+    <string name="toast_delete_unable">Пропозиція не може бути видалена якщо вона вже знаходиться на сервері !</string>
     <string name="toast_network_required">Необхідно підключення до мережі інтернет</string>
     <string name="toast_recs_updated">Записи були оновлені !</string>
     <string name="toast_has_lines">Будь ласка виберіть Рядки замовлення !</string>
