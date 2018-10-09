@@ -69,37 +69,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
     };
 
-    SaleOrder.OnOperationSuccessListener refreshSale = new SaleOrder.OnOperationSuccessListener() {
-
-        @Override
-        public void OnSuccess() {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    App mContext = (App) getApplicationContext();
-//                    Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
-//                }
-//            });
-        }
-
-        @Override
-        public void OnFault() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    App mContext = (App) getApplicationContext();
-                    Toast.makeText(mContext, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
-                }
-            });
-
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-
-
     ProductProduct.OnOperationSuccessListener confirmProduct = new ProductProduct.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {

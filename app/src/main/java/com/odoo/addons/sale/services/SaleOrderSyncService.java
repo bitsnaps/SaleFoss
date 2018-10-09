@@ -82,6 +82,7 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+
         firstSync = true;
         return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
         //        return new OSyncAdapter(getApplicationContext(), SalesOrderLine.class, SaleOrderSyncService.this, true);
