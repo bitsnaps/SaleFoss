@@ -451,13 +451,14 @@ public class SaleOrder extends OModel {
 
     }
 
+    public void refreshSync() {
+        sync().requestSync(SaleOrder.AUTHORITY);
+    }
 
     public void confirmAllThread(final List<ODataRow> quotation) {
         final SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
         final SaleOrder sales = new SaleOrder(mContext, getUser());
 
-//        sync().requestSync(SaleOrder.AUTHORITY);
-//
         try {
 //            Thread threadOfTimer = new Thread(new Runnable() {
 //                @Override

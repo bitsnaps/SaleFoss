@@ -70,6 +70,7 @@ public class SettingsActivity extends AppCompatActivity {
     };
 
     SaleOrder.OnOperationSuccessListener refreshSale = new SaleOrder.OnOperationSuccessListener() {
+
         @Override
         public void OnSuccess() {
 //            runOnUiThread(new Runnable() {
@@ -176,13 +177,22 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
                 threadOfConfirm.start(); // запускаем
-                App mContext = (App) getApplicationContext();
                 Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
 //            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
 //            sales.saleRecordCreate(confirmSale);
         } else {
-//            App mContext = (App) getApplicationContext();
             Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
+            Thread threadOfsyncReady = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    sales.refreshSync();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfsyncReady.start();
         }
     }
 
