@@ -165,8 +165,8 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void updateOrders(final SaleOrder sales) {
         final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-        try {
-            if (have_id_zero_records != null) {
+        if (have_id_zero_records != null) {
+            if (!SaleOrder.getSyncToServer()) {
                 Thread threadOfConfirm = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -178,31 +178,27 @@ public class SettingsActivity extends AppCompatActivity {
                     }
                 });
                 threadOfConfirm.start(); // запускаем
-//                threadOfConfirm.join();
-
-                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
+            }
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
 //            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
 //            sales.saleRecordCreate(confirmSale);
-            } else {
-                Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
-            }
-
-            Thread threadOfSync = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    sales.refreshSync();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
-                }
-            });
-            threadOfSync.start();
-//            threadOfSync.join();
-
-        } catch (Exception e) {
+        } else {
+            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
         }
+
+        Thread threadOfSync = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sales.refreshSync();
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+            }
+        });
+        threadOfSync.start();
     }
+
     private void updateProducts(ProductProduct product) {
         product.syncProduct(this, confirmProduct);
     }

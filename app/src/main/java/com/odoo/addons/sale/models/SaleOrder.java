@@ -128,13 +128,13 @@ public class SaleOrder extends OModel {
 //        setHasMailChatter(true);
     }
 
-    public boolean setFirsLoadProduct(boolean isThere) {
-        return this.isFirstUpdateProduct = isThere;
+    public static void setSyncToServer(boolean isThere) {
+        SaleOrder.isFirstUpdateProduct = isThere;
     }
 
 
-    public boolean getFirsLoadProduct() {
-        return this.isFirstUpdateProduct;
+    public static boolean getSyncToServer() {
+        return SaleOrder.isFirstUpdateProduct;
     }
 
     private String _s(int res_id) {
@@ -905,6 +905,7 @@ public class SaleOrder extends OModel {
         Object createDelivery = null;
         int countOrders = 0;
         boolean rollback = false;
+        SaleOrder.setSyncToServer(true);
 
 //        com.odoo.core.rpc.Odoo mOdoo = null;
 //        try {
@@ -1020,6 +1021,7 @@ public class SaleOrder extends OModel {
                 }
             }
         }
+        SaleOrder.setSyncToServer(false);
         return;
     }
 

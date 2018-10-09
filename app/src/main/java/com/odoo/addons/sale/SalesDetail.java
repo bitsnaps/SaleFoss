@@ -142,16 +142,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         lineOrder = new SalesOrderLine(this, null);
         productProduct = new ProductProduct(this, null);
         sales = new Sales();
-
-        boolean temp = sale.getFirsLoadProduct();
-        if (!temp) {
-//            sales.syncProduct(this);
-//            sales.syncProductNew(this);
-            temp = sale.setFirsLoadProduct(true);
-        }
         init();
         initAdapter();
-
     }
 
     @Nullable
