@@ -455,10 +455,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     }
 
-    public void refreshSync() {
-        sync().requestSync(SaleOrder.AUTHORITY);
-    }
-
     public void confirmAllOrders(final List<ODataRow> quotation) {
         Thread threadOfConfirm = new Thread(new Runnable() {
             @Override
@@ -549,7 +545,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     }
 
     public void syncReady() {
-        Thread threadOfConfirm = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -559,9 +555,9 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 }
             }
         });
-        threadOfConfirm.start();
+        thread.start();
 //        try {
-//            threadOfConfirm.join();
+//            thread.join();
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }

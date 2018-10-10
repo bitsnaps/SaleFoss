@@ -389,19 +389,20 @@ public class Sales extends BaseFragment implements
     public void onRefresh() {
         if (inNetwork()) {
             setSwipeRefreshing(false);
+            sale.syncReady();
 
-            Thread threadOfConfirm = new Thread(new Runnable() {
-                @Override
-                public void run() {
-//                    sale.syncReady(refreshSale);
-                    sale.syncReady();
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
-                }
-            });
-            threadOfConfirm.start(); // запускаем
+//            Thread threadOfConfirm = new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+////                    sale.syncReady(refreshSale);
+//                    sale.syncReady();
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (Exception e) {
+//                    }
+//                }
+//            });
+//            threadOfConfirm.start(); // запускаем
 
 //            sale.syncReady(getContext(), refreshSale);
 
