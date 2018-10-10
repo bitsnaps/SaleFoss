@@ -39,6 +39,7 @@ import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
+import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -49,11 +50,14 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.helper.utils.gson.OdooResult;
+import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.IOdooResponse;
+import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
@@ -70,7 +74,7 @@ import java.util.List;
 
 import static java.lang.Thread.sleep;
 
-public class SaleOrder extends OModel {
+public class SaleOrder extends OModel implements IOdooConnectionListener {
     public static final String TAG = SaleOrder.class.getSimpleName();
     //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
@@ -711,7 +715,8 @@ public class SaleOrder extends OModel {
         return nameOrder;
     }
 
-    public void syncReady(final OnOperationSuccessListener listener) {
+    //    public void syncReady(final OnOperationSuccessListener listener) {
+    public void syncReady() {
         final OArguments args = new OArguments();
         args.add(new JSONObject());
 
@@ -720,19 +725,25 @@ public class SaleOrder extends OModel {
                 @Override
                 public void run() {
                     try {
-                        Object connect = getServerDataHelper().callMethod("exist_db", args);
-                        if (connect.equals(true)) {
-                            listener.OnSuccess();
-                            Log.d(TAG, "exist_db returned TRUE ");
-                        } else {
-                            Log.d(TAG, "exist_db returned FALSE ");
-                        }
-
-                    } catch (Exception e) {
-                        Log.d(TAG, "exist_db returned EXCEPTION ");
+                        com.odoo.core.rpc.Odoo.createInstance(getContext(), getUser().getHost()).setOnConnect(SaleOrder.this);
+                    } catch (OdooVersionException e) {
                         e.printStackTrace();
-                        listener.OnFault();
                     }
+//
+//                    try {
+//                        Object connect = getServerDataHelper().callMethod("exist_db", args);
+//                        if (connect.equals(true)) {
+//                            listener.OnSuccess();
+//                            Log.d(TAG, "exist_db returned TRUE ");
+//                        } else {
+//                            Log.d(TAG, "exist_db returned FALSE ");
+//                        }
+//
+//                    } catch (Exception e) {
+//                        Log.d(TAG, "exist_db returned EXCEPTION ");
+//                        e.printStackTrace();
+//                        listener.OnFault();
+//                    }
 
                     try {
                         Thread.sleep(1000);
@@ -990,6 +1001,7 @@ public class SaleOrder extends OModel {
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    SaleOrder.setSyncToServer(false);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -1198,6 +1210,17 @@ public class SaleOrder extends OModel {
                 }
             }
         }.execute();
+    }
+
+    @Override
+    public void onConnect(com.odoo.core.rpc.Odoo odoo) {
+        sync().requestSync(SaleOrder.AUTHORITY);
+    }
+
+    @Override
+    public void onError(OdooError error) {
+        Log.d(TAG, "exist_db returned FALSE ");
+        Toast.makeText(getContext(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
     }
 
     public static interface OnOperationSuccessListener {

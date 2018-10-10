@@ -158,7 +158,8 @@ public class SettingsActivity extends AppCompatActivity {
         Thread threadOfSync = new Thread(new Runnable() {
             @Override
             public void run() {
-                sales.refreshSync();
+                sales.syncReady();
+//                sales.refreshSync();
                 try {
                     Thread.sleep(1000);
                 } catch (Exception e) {

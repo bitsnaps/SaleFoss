@@ -393,7 +393,8 @@ public class Sales extends BaseFragment implements
             Thread threadOfConfirm = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    sale.syncReady(refreshSale);
+//                    sale.syncReady(refreshSale);
+                    sale.syncReady();
                     try {
                         Thread.sleep(1000);
                     } catch (Exception e) {
