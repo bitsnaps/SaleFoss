@@ -459,183 +459,16 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         sync().requestSync(SaleOrder.AUTHORITY);
     }
 
-    public void confirmAllThread(final List<ODataRow> quotation) {
-        final SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
-        final SaleOrder sales = new SaleOrder(mContext, getUser());
-
-        try {
-//            Thread threadOfTimer = new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    int counter = 0;
-//                    String sql = "SELECT count(id) as counts FROM sale_order WHERE id = ?";
-//                    List<ODataRow> rec = sales.query(sql, new String[]{"0"});
-//                    while (rec.get(0).getInt("counts") > 0) {
-//                        rec = sales.query(sql, new String[]{"0"});
-//                        if (rec.get(0).getInt("counts") == 0) {
-//                            Log.d("Counter: ", "It is over!!!");
-//                            break;
-//                        }
-//                        try {
-//                            Thread.sleep(1000);
-//                        } catch (Exception e) {
-//                        }
-//                        Log.d("Counter: ", ((Integer) counter).toString());
-//                        counter++;
-//                    }
-//                }
-//            });
-//
-//            threadOfTimer.start(); // запускаем
-//            threadOfTimer.join();
-//            Thread.sleep(2000);
-//
-            Thread threadOfConfirm = new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    sales.doWorkflowFullConfirmEach(mContext, quotation, null);
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
-                }
-            });
-            threadOfConfirm.start(); // запускаем
-            Log.d("Confirm: ", "Start and wait");
-//            threadOfConfirm.join();
-        } catch (Exception e) {
-        }
+    public void confirmAllOrders(final List<ODataRow> quotation) {
+        Thread threadOfConfirm = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+            }
+        });
+        threadOfConfirm.start(); // запускаем
+        Log.d("Confirm: ", "Start and wait");
     }
-
-
-    public void confirmAllSaleOrders(final List<ODataRow> quotation, final OnOperationSuccessListener listener) {
-
-        new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
-            private Boolean faultOrder = false;
-            int countOrders = 0;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                dialog = new ProgressDialog(mContext);
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(mContext, R.string.title_loading));
-                dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                dialog.setMax(quotation.size());
-                dialog.setIndeterminate(true);
-
-                dialog.setCancelable(true);
-                dialog.show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    Thread.sleep(600);
-                    ODomain domainLine = new ODomain();
-                    ODomain domainSale = new ODomain();
-                    final SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, getUser());
-                    final SaleOrder sales = new SaleOrder(mContext, getUser());
-
-                    sync().requestSync(SaleOrder.AUTHORITY);
-
-                    Thread threadOfTimer = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            int counter = 0;
-                            String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
-                            List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
-                            while (rec.get(0).getInt("counts") > 0 && counter < 50) {
-                                rec = salesOrderLine.query(sql, new String[]{"0"});
-                                if (rec.get(0).getInt("counts") == 0) {
-                                    Log.d("Counter: ", "It is over!!!");
-                                    break;
-                                }
-                                try {
-                                    Thread.sleep(1000);
-                                } catch (Exception e) {
-                                }
-                                Log.d("Counter: ", ((Integer) counter).toString());
-                                counter++;
-                            }
-                        }
-                    });
-                    threadOfTimer.start(); // запускаем
-                    threadOfTimer.join(60000);
-
-                    Thread threadOfConfirm = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
-
-                            try {
-                                Thread.sleep(1000);
-                            } catch (Exception e) {
-                            }
-                        }
-                    });
-                    threadOfConfirm.start(); // запускаем
-                    Log.d("Confirm: ", "Start and wait");
-                    threadOfConfirm.join();
-
-//                    int counter = 0;
-//                    String sql = "SELECT count(id) as counts FROM sale_order_line WHERE id = ?";
-//                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
-//                    while (rec.get(0).getInt("counts") > 0 && counter < 50) {
-//                        if (isCancelled())
-//                            return null;
-//                        rec = salesOrderLine.query(sql, new String[]{"0"});
-//                        if (rec.get(0).getInt("counts") == 0)
-//                            break;
-//                        Thread.sleep(1000);
-//                        counter++;
-//                    }
-
-//                    if (rec.get(0).getInt("counts") > 0) {
-//                        sync().cancelSync(SaleOrder.AUTHORITY);
-//                        domainLine.add("id", "=", "0");
-//                        salesOrderLine.quickSyncRecords(domainLine);
-//                    }
-
-//                    String sql = "SELECT id FROM sale_order_line WHERE id = ?";
-//                    List<ODataRow> rec = salesOrderLine.query(sql, new String[]{"0"});
-//                    if (rec.size() > 0){
-//                        domainLine.add("id", "=", 0);
-//                        Log.e(TAG, "<< sale.order.line - syncing now >>");
-//                        salesOrderLine.quickSyncRecords(domainLine);
-//                    }
-//                    domainSale.add("id", "=", "0");
-//                    sales.quickSyncRecords(domainSale);
-
-//                    sales.doWorkflowFullConfirmEach(mContext, quotation, dialog);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    faultOrder = true;
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                dialog.dismiss();
-                if (listener != null) {
-                    if (!faultOrder) {
-                        listener.OnSuccess();
-                    } else {
-                        listener.OnFault();
-                    }
-                }
-
-            }
-
-        }.execute();
-    }
-
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
@@ -715,102 +548,24 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         return nameOrder;
     }
 
-    //    public void syncReady(final OnOperationSuccessListener listener) {
     public void syncReady() {
-        final OArguments args = new OArguments();
-        args.add(new JSONObject());
-
-        try {
-            Thread threadOfConfirm = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        com.odoo.core.rpc.Odoo.createInstance(getContext(), getUser().getHost()).setOnConnect(SaleOrder.this);
-                    } catch (OdooVersionException e) {
-                        e.printStackTrace();
-                    }
-//
-//                    try {
-//                        Object connect = getServerDataHelper().callMethod("exist_db", args);
-//                        if (connect.equals(true)) {
-//                            listener.OnSuccess();
-//                            Log.d(TAG, "exist_db returned TRUE ");
-//                        } else {
-//                            Log.d(TAG, "exist_db returned FALSE ");
-//                        }
-//
-//                    } catch (Exception e) {
-//                        Log.d(TAG, "exist_db returned EXCEPTION ");
-//                        e.printStackTrace();
-//                        listener.OnFault();
-//                    }
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (Exception e) {
-                    }
+        Thread threadOfConfirm = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    com.odoo.core.rpc.Odoo.createInstance(getContext(), getUser().getHost()).setOnConnect(SaleOrder.this);
+                } catch (OdooVersionException e) {
+                    e.printStackTrace();
                 }
-            });
-            threadOfConfirm.start(); // запускаем
-            threadOfConfirm.join();
-        } catch (Exception e) {
-        }
-
+            }
+        });
+        threadOfConfirm.start();
+//        try {
+//            threadOfConfirm.join();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
-
-
-//    public void syncReady(final Context context, final OnOperationSuccessListener listener) {
-//        new AsyncTask<Void, Void, Void>() {
-//            private Boolean faultOrder = false;
-//            private Object connect;
-//
-//            @Override
-//            protected void onPreExecute() {
-//                super.onPreExecute();
-//            }
-//
-//            @Override
-//            protected Void doInBackground(Void... params) {
-//                OArguments args = new OArguments();
-//                args.add(new JSONObject());
-//                com.odoo.core.rpc.Odoo mOdoo = null;
-//
-//                try {
-////                    connect = getServerDataHelper().callMethod("exist_db", args);
-//                    if (mOdoo == null)
-//                        mOdoo = OSyncAdapter.createOdooInstance(mContext, getUser());
-//                    OdooResult result = mOdoo
-//                            .withRetryPolicy(30000, 1)
-//                            .getVersionInfo();
-//
-//                    if (connect.equals(true)) {
-//                        Log.d(TAG, "exist_db returned TRUE ");
-//                    } else {
-//                        Log.d(TAG, "exist_db returned FALSE ");
-//                    }
-//
-//                } catch (Exception e) {
-//                    faultOrder = true;
-//                    Log.d(TAG, "exist_db returned EXCEPTION ");
-//                    e.printStackTrace();
-//                }
-//                return null;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Void aVoid) {
-//                super.onPostExecute(aVoid);
-//                if (listener != null) {
-//                    if (!faultOrder) {
-//                        listener.OnSuccess();
-//                    } else {
-//                        listener.OnFault();
-//                    }
-//                }
-//
-//            }
-//        }.execute();
-//    }
 
     private void doOrderFullConfirm(final ODataRow quotation, final ProgressDialog dialog) {
         Object createInvoice = null;
@@ -918,24 +673,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         boolean rollback = false;
         SaleOrder.setSyncToServer(true);
 
-//        com.odoo.core.rpc.Odoo mOdoo = null;
-//        try {
-//            if (mOdoo == null)
-//                mOdoo = OSyncAdapter.createOdooInstance(mContext, getUser());
-//            OdooResult result = mOdoo
-//                    .withRetryPolicy(10000, 1)
-//                    .getVersionInfo();
-//        } catch (Exception e){
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-//                            .show();
-//                }
-//            });
-//            return;
-//        }
-
         if (dialog != null) {
             runOnUiThread(new Runnable() {
                 @Override
@@ -944,7 +681,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 }
             });
         }
-
 
         if (quotation.size() > 0 && quotation != null) {
             for (final ODataRow qUpdate : quotation) {
@@ -1214,6 +950,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     @Override
     public void onConnect(com.odoo.core.rpc.Odoo odoo) {
+        Log.d(TAG, "exist_db returned TRUE ");
         sync().requestSync(SaleOrder.AUTHORITY);
     }
 

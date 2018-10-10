@@ -179,20 +179,20 @@
                 android:resource="@xml/sale_sync_adapter" />
         </service>
 
-        <activity
-            android:name=".addons.calendar.EventDetail"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".addons.crm.CRMDetail"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".addons.crm.ConvertToOpportunityWizard"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".addons.crm.ConvertToQuotation"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan" />
+        <!--<activity-->
+            <!--android:name=".addons.calendar.EventDetail"-->
+            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--<activity-->
+            <!--android:name=".addons.crm.CRMDetail"-->
+            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--<activity-->
+            <!--android:name=".addons.crm.ConvertToOpportunityWizard"-->
+            <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
+            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--<activity-->
+            <!--android:name=".addons.crm.ConvertToQuotation"-->
+            <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
+            <!--android:windowSoftInputMode="adjustPan" />-->
 
         <activity
             android:name=".addons.sale.SalesDetail"

@@ -2,4 +2,4 @@
     android:accountType="com.odoo.auth"
     android:contentAuthority="com.odoo.crm.provider.content.sync.sale_order"
     android:supportsUploading="true"
-    android:userVisible="true" />
+    android:userVisible="false" />

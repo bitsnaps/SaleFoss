@@ -49,25 +49,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
-    Thread threadOfConfirm = null;
-
-    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
 
     ProductProduct.OnOperationSuccessListener confirmProduct = new ProductProduct.OnOperationSuccessListener() {
         @Override
@@ -110,7 +91,6 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         if (intent.getAction() != null) {
-//            Sales sales = new Sales();
             SaleOrder salesOrders = new SaleOrder(this, null);
             ProductProduct products = new ProductProduct(this, null);
             App app = (App) this.getApplicationContext();
@@ -136,37 +116,14 @@ public class SettingsActivity extends AppCompatActivity {
         final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
         if (have_id_zero_records != null) {
             if (!SaleOrder.getSyncToServer()) {
-                Thread threadOfConfirm = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        sales.confirmAllThread(have_id_zero_records);
-                        try {
-                            Thread.sleep(1000);
-                        } catch (Exception e) {
-                        }
-                    }
-                });
-                threadOfConfirm.start(); // запускаем
-            }
-            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
-//            sales.confirmAllSaleOrders(have_id_zero_records, confirmSale);
-//            sales.saleRecordCreate(confirmSale);
+                sales.confirmAllOrders(have_id_zero_records);
+                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_LONG).show();
+            } else
+                Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
         }
-
-        Thread threadOfSync = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sales.syncReady();
-//                sales.refreshSync();
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-            }
-        });
-        threadOfSync.start();
+        sales.syncReady();
     }
 
     private void updateProducts(ProductProduct product) {
