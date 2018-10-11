@@ -30,6 +30,7 @@ import com.odoo.addons.sale.models.ProductTemplate;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.OModel;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
@@ -53,29 +54,32 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
 
         if (adapter.getModel().getModelName().equals("sale.order")) {
+//            ODomain domainLine = new ODomain();
+//            final SalesOrderLine salesOrderLine = new SalesOrderLine(getApplicationContext(), user);
+//            domainLine.add("id", "=", 0);
+//            salesOrderLine.quickSyncRecords(domainLine);
 
-            ODomain domainLine = new ODomain();
-            final SalesOrderLine salesOrderLine = new SalesOrderLine(getApplicationContext(), user);
-            domainLine.add("id", "=", 0);
-            salesOrderLine.quickSyncRecords(domainLine);
-
+//            new SalesOrderLine(getApplicationContext(), user).quickSyncRecords(new ODomain().add("id", "=", 0));
 
             ODomain domain = new ODomain();
-            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
+//            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
+//            List<Integer> newIds = new ArrayList<>();
+//            for (ODataRow row : saleOrder.select(new String[]{}, "id != ? and (state = ? or state = ?)", new String[]{"0", "draft", "manual"})) {
+//                newIds.add(row.getInt("id"));
+//            }
+//            if (newIds.size() > 0) {
+//                domain.add("id", "in", newIds);
+//                domain.add("|");
+            domain.add("state", "=", "draft");
+            domain.add("|");
+            domain.add("state", "=", "manual");
+//            }
 
-            List<Integer> newIds = new ArrayList<>();
-            for (ODataRow row : saleOrder.select(new String[]{}, "id != ?", new String[]{"0"})) {
-//            for (ODataRow row : saleOrder.select(new String[]{}, "id = ?", new String[]{"0"})) {
-                newIds.add(row.getInt("id"));
-            }
-            if (newIds.size() > 0) {
-                domain.add("id", "not in", newIds);
-            }
-            saleOrder.quickSyncRecords(domain);
+//            saleOrder.quickSyncRecords(domain);
             if (!firstSync)
                 adapter.onSyncFinish(this);
 
-            adapter.setDomain(domain).syncDataLimit(30);
+            adapter.setDomain(domain);
 //            saleOrder.quickSyncRecords(domain);
         }
     }

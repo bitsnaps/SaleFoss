@@ -91,6 +91,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         if (intent.getAction() != null) {
+//            Sales sales = new Sales();
             SaleOrder salesOrders = new SaleOrder(this, null);
             ProductProduct products = new ProductProduct(this, null);
             App app = (App) this.getApplicationContext();
@@ -123,7 +124,17 @@ public class SettingsActivity extends AppCompatActivity {
         } else {
             Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
         }
-        sales.syncReady();
+        Thread threadOfConfirm = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                sales.syncReady();
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+            }
+        });
+        threadOfConfirm.start(); // запускаем
     }
 
     private void updateProducts(ProductProduct product) {

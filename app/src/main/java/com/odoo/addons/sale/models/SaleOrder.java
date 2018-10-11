@@ -947,7 +947,19 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     @Override
     public void onConnect(com.odoo.core.rpc.Odoo odoo) {
         Log.d(TAG, "exist_db returned TRUE ");
-        sync().requestSync(SaleOrder.AUTHORITY);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                new SalesOrderLine(getContext(), getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
+                sync().requestSync(SaleOrder.AUTHORITY);
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                }
+            }
+        });
+        thread.start(); // запускаем
+//        sync().requestSync(SaleOrder.AUTHORITY);
     }
 
     @Override
