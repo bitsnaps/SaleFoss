@@ -58,6 +58,7 @@ import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.IOdooResponse;
 import com.odoo.core.rpc.listeners.OdooError;
+import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
@@ -121,7 +122,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     OColumn partner_shipping_id = new OColumn(_s(R.string.field_label_partner_shipping_id), OVarchar.class).setLocalColumn(); // Original
     OColumn pricelist_id = new OColumn(_s(R.string.field_label_pricelist_id), OVarchar.class).setLocalColumn();
     OColumn fiscal_position = new OColumn(_s(R.string.field_label_fiscal_position), OVarchar.class).setLocalColumn();
-    OColumn _is_local_only = new OColumn(_s(R.string.field_label_sync), OBoolean.class).setDefaultValue(false).setLocalColumn();
+    OColumn _is_local_only = new OColumn("Local Status", OVarchar.class).setSize(10)
+            .setDefaultValue("oldsync").setLocalColumn();
 
     private int have_zero = 0;
 
@@ -143,12 +145,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     private String _s(int res_id) {
         return OResource.string(idContext, res_id);
-    }
-
-
-    @Override
-    public boolean allowDeleteRecordOnServer() {
-        return true;
     }
 
     @Override
@@ -273,15 +269,21 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             protected Void doInBackground(Void... params) {
                 SalesOrderLine lineOrder = new SalesOrderLine(getContext(), null);
                 SaleOrder order = new SaleOrder(getContext(), null);
+                Object mDelete;
+                OArguments args = new OArguments();
+
                 try {
-                    Object mDelete;
-                    OArguments args = new OArguments();
+                    String sql = "SELECT _id FROM sale_order_line WHERE order_id = ?";
+                    List<ODataRow> rec = lineOrder.query(sql,
+                            new String[]{quotation.getInt(OColumn.ROW_ID).toString()});
+                    for (ODataRow row : rec) {
+                        lineOrder.delete(row.getInt(OColumn.ROW_ID));
+                    }
                     args.add(new JSONArray().put(quotation.getInt("id")));
                     args.add(new JSONObject());
                     if (quotation.getInt("id") != 0)
                         mDelete = getServerDataHelper().callMethod("delete_order", args);
                     order.delete(quotation.getInt(OColumn.ROW_ID));
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -455,11 +457,98 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     }
 
+    public void confirmAllOrders() {
+        if (!SaleOrder.getSyncToServer()) {
+            final List<ODataRow> quotation = checkNewQuotations(mContext);
+            if (quotation != null) {
+                Thread thLines = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        for (final ODataRow qUpdate : quotation) {
+                            OValues values = new OValues();
+                            values.put("state", "draft");
+                            values.put("_is_local_only", "sync");
+                            update(qUpdate.getInt(OColumn.ROW_ID), values);
+                        }
+                    }
+                });
+                thLines.start();
+            }
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Thread thLines = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            SaleOrder.setSyncToServer(true);
+                            Log.d("quickSyncRecords: ", "TRUE");
+                            new SalesOrderLine(mContext, getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
+//                            quickSyncRecords(new ODomain().add("state", "=", "draft"));
+                        }
+                    });
+                    thLines.start();
+                    try {
+                        thLines.join();
+
+                    } catch (InterruptedException e) {
+                    }
+
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (quotation != null) {
+                                Log.d("doWorkflowFull: ", "TRUE");
+                                new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+                                Log.d("doWorkflowFull: : ", "FALSE");
+                                SaleOrder.setSyncToServer(false);
+                            } else {
+                                Log.d("else doWorkflowFull: : ", "FALSE");
+                                SaleOrder.setSyncToServer(false);
+                            }
+                        }
+                    });
+                    thread.start();
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
+            Log.d("Confirm: ", "Start and wait");
+        }
+    }
+
     public void confirmAllOrders(final List<ODataRow> quotation) {
         Thread threadOfConfirm = new Thread(new Runnable() {
             @Override
             public void run() {
-                new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+                Thread thLines = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new SalesOrderLine(mContext, getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
+                    }
+                });
+                thLines.start();
+                try {
+                    thLines.join();
+
+                } catch (InterruptedException e) {
+                }
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+                    }
+                });
+                thread.start();
+                try {
+                    thread.join();
+
+                } catch (InterruptedException e) {
+                }
             }
         });
         threadOfConfirm.start(); // запускаем
@@ -751,6 +840,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     if (createDelivery.equals(true) && createInvoice.equals(true)) {
                         values.put("invoice_status", "invoiced");
                         values.put("invoice_status_title", getInvoiceStatusTitle(values));
+                        values.put("_is_local_only", "oldsync");
                     }
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
@@ -773,8 +863,10 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         boolean CheckOk = false;
         try {
             SaleOrder sale = new SaleOrder(context, null);
-            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id != ? and state = ? or state = ? ) and _is_active = ?";
-            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "manual", "true"}); // crooked nail
+//            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (id != ? and state = ? or state = ? ) and _is_active = ?";
+            String sql = "SELECT name, id, _id, state, partner_id, date_order  FROM sale_order WHERE (state = ? or state = ? ) and _is_active = ?";
+            have_id_zero_records = sale.query(sql, new String[]{"draft", "manual", "true"}); // crooked nail
+//            have_id_zero_records = sale.query(sql, new String[]{"0", "draft", "manual", "true"}); // crooked nail
             have_zero = have_id_zero_records.size();
             if (have_zero != 0) {
                 CheckOk = true;
@@ -947,19 +1039,20 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     @Override
     public void onConnect(com.odoo.core.rpc.Odoo odoo) {
         Log.d(TAG, "exist_db returned TRUE ");
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                new SalesOrderLine(getContext(), getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
-                sync().requestSync(SaleOrder.AUTHORITY);
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-            }
-        });
-        thread.start(); // запускаем
+//        Thread thSaleOrderLine = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                new SalesOrderLine(getContext(), getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (Exception e) {
+//                }
+//            }
+//        });
+//        thSaleOrderLine.start(); // запускаем
+
 //        sync().requestSync(SaleOrder.AUTHORITY);
+
     }
 
     @Override

@@ -115,9 +115,11 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void updateOrders(final SaleOrder sales) {
         final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-        if (have_id_zero_records != null) {
+//        if (have_id_zero_records != null) {
+        if (true) {
             if (!SaleOrder.getSyncToServer()) {
-                sales.confirmAllOrders(have_id_zero_records);
+                        sales.confirmAllOrders();
+//                sales.confirmAllOrders(have_id_zero_records);
                 Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_LONG).show();
             } else
                 Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();

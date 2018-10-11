@@ -306,13 +306,15 @@ public class Sales extends BaseFragment implements
         List<String> args = new ArrayList<>();
         switch (mType) {
             case Quotation:
-                where = " (state = ? or state = ?)";
-                args.addAll(Arrays.asList(new String[]{"draft", "sent"}));
+//                where = " (state = ? or state = ? or _is_local_only = ?)";
+//                args.addAll(Arrays.asList(new String[]{"draft", "sent", "no"}));
+                where = " (_is_local_only = ? and state = ?)";
+                args.addAll(Arrays.asList(new String[]{"no", "draft"}));
                 break;
             case SaleOrder:
-                where = "(state = ? or state = ? or state = ? or state = ?)";
+                where = "(state = ? or state = ? or state = ? or state = ? or _is_local_only = ? or _is_local_only = ?)";
                 args.addAll(Arrays.asList(new String[]{"manual", "sale", "progress",
-                        "done"}));
+                        "done", "sync", "oldsync"}));
                 break;
         }
         if (mFilter != null) {

@@ -412,6 +412,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
                     values.put("name", nameOrder);
                     values.put("state", "draft");
+                    values.put("_is_local_only", "no");
                 }
                 if (record == null) {
                     runOnUiThread(new Runnable() {
@@ -431,6 +432,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+
                     values.put("_is_dirty", "false");
                     values.put("_write_date", ODateUtils.getUTCDate());
 
@@ -465,6 +467,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
+                    values.put("_is_local_only", "no");
 
                     sale.update(record.getInt("_id"), values);
 
