@@ -770,8 +770,10 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         if (quotation.size() > 0 && quotation != null) {
             for (final ODataRow qUpdate : quotation) {
                 OValues values = new OValues();
-                values.put("state", "manual");
-                values.put("state_title", getStateTitle(values));
+                values.put("invoice_status", "no");
+                values.put("invoice_status_title", getInvoiceStatusTitle(values));
+//                values.put("state", "manual");
+//                values.put("state_title", getStateTitle(values));
                 update(qUpdate.getInt(OColumn.ROW_ID), values);
             }
 
@@ -917,7 +919,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         }
         return null;
     }
-
 
     //
     public List<ODataRow> itemsOfOrderLines(int order_id) {
