@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.ViewDebug;
 import android.widget.Toast;
 
+import com.odoo.App;
 import com.odoo.BuildConfig;
 import com.odoo.OdooActivity;
 import com.odoo.R;
@@ -457,6 +458,35 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     }
 
+    ISyncServiceListener ServerProblem = new ISyncServiceListener() {
+        @Override
+        public void onSyncStarted() {
+
+        }
+
+        @Override
+        public void onSyncFinished() {
+
+        }
+
+        @Override
+        public void onSyncFailed() {
+
+        }
+
+        @Override
+        public void onSyncTimedOut() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+
+        }
+    };
+
     public void confirmAllOrders() {
         if (!SaleOrder.getSyncToServer()) {
             final List<ODataRow> quotation = checkNewQuotations(mContext);
@@ -483,8 +513,76 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                         public void run() {
                             SaleOrder.setSyncToServer(true);
                             Log.d("quickSyncRecords: ", "TRUE");
-                            new SalesOrderLine(mContext, getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
-//                            quickSyncRecords(new ODomain().add("state", "=", "draft"));
+                            SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
+                            try {
+                                JSONArray serverIds = new JSONArray();
+
+                                List<Integer> localIds = new ArrayList<>();
+                                List<Integer> localIdsZero = new ArrayList<>();
+
+                                String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
+                                List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
+                                for (ODataRow row : linesIds) {
+                                    if (selectServerId(row.getInt("order_id")) == 0) {
+                                        localIdsZero.add(row.getInt("order_id"));
+                                        continue;
+                                    }
+
+                                    serverIds.put(selectServerId(row.getInt("order_id")));
+                                    localIds.add(row.getInt("order_id"));
+                                }
+                                if (serverIds.length() > 0) {
+                                    OArguments args = new OArguments();
+                                    args.add(serverIds);
+                                    args.add(new JSONObject());
+                                    getServerDataHelper().callMethod("delete_order", args);
+
+                                    for (int _id : localIds) {
+                                        OValues values = new OValues();
+                                        values.put("id", 0);
+                                        update(_id, values);
+                                    }
+
+                                    sql = "SELECT id, _id FROM sale_order_line WHERE order_id in (?)";
+                                    linesIds = lines.query(sql, new String[]{
+                                            TextUtils.join(",", localIds)
+                                    });
+
+                                    for (ODataRow row : linesIds) {
+                                        OValues values = new OValues();
+                                        values.put("id", 0);
+                                        lines.update(row.getInt(OColumn.ROW_ID), values);
+                                    }
+                                } else {
+                                    List<String> namesOrders = new ArrayList<>();
+                                    sql = "SELECT name, _id, id FROM sale_order WHERE id = ?";
+                                    linesIds = query(sql, new String[]{"0"});
+                                    for (ODataRow row : linesIds) {
+                                        namesOrders.add(row.getString("name"));
+                                    }
+
+                                    OdooFields fields = new OdooFields(new String[]{"id"});
+                                    ODomain domain = new ODomain();
+                                    domain.add("name","in", namesOrders);
+                                    List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+                                    for (ODataRow row : records) {
+                                        serverIds.put(((Double) row.get("id")).intValue());
+                                    }
+                                    if (serverIds.length() > 0) {
+                                        OArguments args = new OArguments();
+                                        args.add(serverIds);
+                                        args.add(new JSONObject());
+                                        getServerDataHelper().callMethod("delete_order", args);
+                                    }
+                                }
+                                try {
+                                    lines.quickSyncRecords(new ODomain().add("id", "=", 0));
+                                } catch (Exception e) {
+                                    ServerProblem.onSyncTimedOut();
+                                }
+                            } catch (Exception e) {
+                                ServerProblem.onSyncTimedOut();
+                            }
                         }
                     });
                     thLines.start();
