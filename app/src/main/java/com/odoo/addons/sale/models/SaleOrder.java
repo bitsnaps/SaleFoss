@@ -515,74 +515,70 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                             Log.d("quickSyncRecords: ", "TRUE");
                             SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
                             try {
-                                JSONArray serverIds = new JSONArray();
-
+//                                JSONArray serverIds = new JSONArray(); // if call server
+                                List<Integer>  serverIds = new ArrayList<>(); // if QuickSyncRecord
                                 List<Integer> localIds = new ArrayList<>();
-                                List<Integer> localIdsZero = new ArrayList<>();
 
                                 String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
                                 List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
                                 for (ODataRow row : linesIds) {
+                                    localIds.add(row.getInt("order_id"));
                                     if (selectServerId(row.getInt("order_id")) == 0) {
-                                        localIdsZero.add(row.getInt("order_id"));
                                         continue;
                                     }
-
-                                    serverIds.put(selectServerId(row.getInt("order_id")));
-                                    localIds.add(row.getInt("order_id"));
+                                    serverIds.add(selectServerId(row.getInt("order_id")));
                                 }
-                                if (serverIds.length() > 0) {
-                                    OArguments args = new OArguments();
-                                    args.add(serverIds);
-                                    args.add(new JSONObject());
-                                    getServerDataHelper().callMethod("delete_order", args);
-
-                                    for (int _id : localIds) {
-                                        OValues values = new OValues();
-                                        values.put("id", 0);
-                                        update(_id, values);
-                                    }
-
-                                    sql = "SELECT id, _id FROM sale_order_line WHERE order_id in (?)";
-                                    linesIds = lines.query(sql, new String[]{
-                                            TextUtils.join(",", localIds)
-                                    });
-
-                                    for (ODataRow row : linesIds) {
-                                        OValues values = new OValues();
-                                        values.put("id", 0);
-                                        lines.update(row.getInt(OColumn.ROW_ID), values);
-                                    }
-                                } else {
-                                    List<String> namesOrders = new ArrayList<>();
-                                    sql = "SELECT name, _id, id FROM sale_order WHERE id = ?";
-                                    linesIds = query(sql, new String[]{"0"});
-                                    for (ODataRow row : linesIds) {
-                                        namesOrders.add(row.getString("name"));
-                                    }
-
-                                    OdooFields fields = new OdooFields(new String[]{"id"});
-                                    ODomain domain = new ODomain();
-                                    domain.add("name","in", namesOrders);
-                                    List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
-                                    for (ODataRow row : records) {
-                                        serverIds.put(((Double) row.get("id")).intValue());
-                                    }
-                                    if (serverIds.length() > 0) {
-                                        OArguments args = new OArguments();
-                                        args.add(serverIds);
-                                        args.add(new JSONObject());
-                                        getServerDataHelper().callMethod("delete_order", args);
-                                    }
+                                if (serverIds.size() > 0) {
+                                    quickSyncRecords(new ODomain().add("id", "in", serverIds));
+//
+//                                    OArguments args = new OArguments();
+//                                    args.add(serverIds);
+//                                    args.add(new JSONObject());
+//                                    getServerDataHelper().callMethod("delete_order", args);
+//
+//                                    for (int _id : localIds) {
+//                                        OValues values = new OValues();
+//                                        values.put("id", 0);
+//                                        update(_id, values);
+//                                    }
+//
+//                                    sql = "SELECT id, _id FROM sale_order_line WHERE order_id in (?)";
+//                                    linesIds = lines.query(sql, new String[]{
+//                                            TextUtils.join(",", localIds)
+//                                    });
+//
+//                                    for (ODataRow row : linesIds) {
+//                                        OValues values = new OValues();
+//                                        values.put("id", 0);
+//                                        lines.update(row.getInt(OColumn.ROW_ID), values);
+//                                    }
                                 }
-                                try {
-                                    lines.quickSyncRecords(new ODomain().add("id", "=", 0));
-                                } catch (Exception e) {
-                                    ServerProblem.onSyncTimedOut();
-                                }
+//                                else {
+//                                    List<String> namesOrders = new ArrayList<>();
+//                                    sql = "SELECT name, _id, id FROM sale_order WHERE id = ?";
+//                                    linesIds = query(sql, new String[]{"0"});
+//                                    for (ODataRow row : linesIds) {
+//                                        namesOrders.add(row.getString("name"));
+//                                    }
+//
+//                                    OdooFields fields = new OdooFields(new String[]{"id"});
+//                                    ODomain domain = new ODomain();
+//                                    domain.add("name","in", namesOrders);
+//                                    List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+//                                    for (ODataRow row : records) {
+//                                        serverIds.put(((Double) row.get("id")).intValue());
+//                                    }
+//                                    if (serverIds.length() > 0) {
+//                                        OArguments args = new OArguments();
+//                                        args.add(serverIds);
+//                                        args.add(new JSONObject());
+//                                        getServerDataHelper().callMethod("delete_order", args);
+//                                    }
+//                                }
                             } catch (Exception e) {
                                 ServerProblem.onSyncTimedOut();
                             }
+                            lines.quickSyncRecords(new ODomain().add("id", "=", 0));
                         }
                     });
                     thLines.start();
@@ -591,6 +587,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
                     } catch (InterruptedException e) {
                     }
+
 
                     Thread thread = new Thread(new Runnable() {
                         @Override
