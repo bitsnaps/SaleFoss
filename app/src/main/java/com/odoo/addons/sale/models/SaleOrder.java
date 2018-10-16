@@ -516,7 +516,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                             SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
                             try {
 //                                JSONArray serverIds = new JSONArray(); // if call server
-                                List<Integer>  serverIds = new ArrayList<>(); // if QuickSyncRecord
+                                List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
                                 List<Integer> localIds = new ArrayList<>();
 
                                 String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
@@ -552,29 +552,40 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 //                                        values.put("id", 0);
 //                                        lines.update(row.getInt(OColumn.ROW_ID), values);
 //                                    }
+                                } else {
+                                    List<String> namesOrders = new ArrayList<>();
+                                    List<Integer> idServerOrders = new ArrayList<>();
+                                    List<Integer> idLocalOrders = new ArrayList<>();
+                                    JSONArray serverIdsJSON = new JSONArray(); // if call server
+
+                                    sql = "SELECT name, id, _id FROM sale_order WHERE id = ? or state = ?";
+                                    linesIds = query(sql, new String[]{"0", "draft"});
+                                    for (ODataRow row : linesIds) {
+                                        namesOrders.add(row.getString("name"));
+                                        if (row.getInt("id") > 0)
+                                            idLocalOrders.add(selectServerId(row.getInt(OColumn.ROW_ID)));
+                                    }
+
+                                    OdooFields fields = new OdooFields(new String[]{"id"});
+                                    ODomain domain = new ODomain();
+                                    domain.add("name", "in", namesOrders);
+                                    List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+                                    for (ODataRow row : records) {
+                                        idServerOrders.add(((Double) row.get("id")).intValue());
+                                    }
+                                    idServerOrders.removeAll(idLocalOrders);
+
+                                    for (int idRec : idServerOrders) {
+                                        serverIdsJSON.put(idRec);
+                                    }
+
+                                    if (serverIdsJSON.length() > 0) {
+                                        OArguments args = new OArguments();
+                                        args.add(serverIdsJSON);
+                                        args.add(new JSONObject());
+                                        getServerDataHelper().callMethod("delete_order", args);
+                                    }
                                 }
-//                                else {
-//                                    List<String> namesOrders = new ArrayList<>();
-//                                    sql = "SELECT name, _id, id FROM sale_order WHERE id = ?";
-//                                    linesIds = query(sql, new String[]{"0"});
-//                                    for (ODataRow row : linesIds) {
-//                                        namesOrders.add(row.getString("name"));
-//                                    }
-//
-//                                    OdooFields fields = new OdooFields(new String[]{"id"});
-//                                    ODomain domain = new ODomain();
-//                                    domain.add("name","in", namesOrders);
-//                                    List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
-//                                    for (ODataRow row : records) {
-//                                        serverIds.put(((Double) row.get("id")).intValue());
-//                                    }
-//                                    if (serverIds.length() > 0) {
-//                                        OArguments args = new OArguments();
-//                                        args.add(serverIds);
-//                                        args.add(new JSONObject());
-//                                        getServerDataHelper().callMethod("delete_order", args);
-//                                    }
-//                                }
                             } catch (Exception e) {
                                 ServerProblem.onSyncTimedOut();
                             }
@@ -592,7 +603,10 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            if (quotation != null) {
+                            SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
+                            String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
+                            List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
+                            if (quotation != null && linesIds.size() == 0) {
                                 Log.d("doWorkflowFull: ", "TRUE");
                                 new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
                                 Log.d("doWorkflowFull: : ", "FALSE");
