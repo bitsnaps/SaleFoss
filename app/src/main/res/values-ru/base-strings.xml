@@ -94,6 +94,7 @@
     <string name="toast_has_lines">Пожалуйста выберите Позицию заказа !</string>
     <string name="toast_has_partner">Пожалуйста выберите Покупателя по умолчанию !</string>
     <string name="toast_problem_on_server_odoo">Проблема на сервере Odoo Счет сформирован частично. Обратитесть к Администратору !</string>
+    <string name="toast_problem_with_sync">Проблема с синхронизацией на сервер. Пожалуйста запустите синхронизацию после восстановления связи.</string>
     <string name="toast_account_removed">Учетная Запись Удалена Успешно</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Обновление пароля</string>

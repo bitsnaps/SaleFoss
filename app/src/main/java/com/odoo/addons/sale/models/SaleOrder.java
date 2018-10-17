@@ -481,6 +481,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 public void run() {
                     Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
                             .show();
+                    Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                            .show();
                 }
             });
 
@@ -515,7 +517,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                             Log.d("quickSyncRecords: ", "TRUE");
                             SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
                             try {
-//                                JSONArray serverIds = new JSONArray(); // if call server
                                 List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
                                 List<Integer> localIds = new ArrayList<>();
 
@@ -530,28 +531,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                 }
                                 if (serverIds.size() > 0) {
                                     quickSyncRecords(new ODomain().add("id", "in", serverIds));
-//
-//                                    OArguments args = new OArguments();
-//                                    args.add(serverIds);
-//                                    args.add(new JSONObject());
-//                                    getServerDataHelper().callMethod("delete_order", args);
-//
-//                                    for (int _id : localIds) {
-//                                        OValues values = new OValues();
-//                                        values.put("id", 0);
-//                                        update(_id, values);
-//                                    }
-//
-//                                    sql = "SELECT id, _id FROM sale_order_line WHERE order_id in (?)";
-//                                    linesIds = lines.query(sql, new String[]{
-//                                            TextUtils.join(",", localIds)
-//                                    });
-//
-//                                    for (ODataRow row : linesIds) {
-//                                        OValues values = new OValues();
-//                                        values.put("id", 0);
-//                                        lines.update(row.getInt(OColumn.ROW_ID), values);
-//                                    }
                                 } else {
                                     List<String> namesOrders = new ArrayList<>();
                                     List<Integer> idServerOrders = new ArrayList<>();
@@ -569,6 +548,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                     OdooFields fields = new OdooFields(new String[]{"id"});
                                     ODomain domain = new ODomain();
                                     domain.add("name", "in", namesOrders);
+//                                    domain.add("or");
+//                                    domain.add("state", "=", "draft");
                                     List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
                                     for (ODataRow row : records) {
                                         idServerOrders.add(((Double) row.get("id")).intValue());
@@ -588,7 +569,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                 }
                             } catch (Exception e) {
                                 ServerProblem.onSyncTimedOut();
-                            }
+                             }
                             lines.quickSyncRecords(new ODomain().add("id", "=", 0));
                         }
                     });
