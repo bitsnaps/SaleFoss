@@ -569,7 +569,13 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                 }
                             } catch (Exception e) {
                                 ServerProblem.onSyncTimedOut();
-                             }
+                            }
+                            if (quotation != null) {
+                                for (ODataRow row : quotation) {
+                                    if (row.getInt("id") != 0)
+                                        quickSyncRecords(new ODomain().add("id", "in", row.getInt("id")));
+                                }
+                            }
                             lines.quickSyncRecords(new ODomain().add("id", "=", 0));
                         }
                     });
@@ -721,6 +727,22 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             nameOrder = pream + "001";
         }
         return nameOrder;
+    }
+
+    public void syncReady(final OnOperationSuccessListener listener) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    com.odoo.core.rpc.Odoo.createInstance(getContext(), getUser().getHost()).setOnConnect(SaleOrder.this);
+                } catch (OdooVersionException e) {
+                    e.printStackTrace();
+                    listener.OnFault();
+                }
+                listener.OnSuccess();
+            }
+        });
+        thread.start();
     }
 
     public void syncReady() {

@@ -57,19 +57,14 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             ODomain domain = new ODomain();
 //            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user); // Original
 //            List<Integer> newIds = new ArrayList<>();
-//            for (ODataRow row : saleOrder.select(new String[]{}, "id != ? and (state = ? or state = ?)", new String[]{"0", "draft", "manual"})) {
+//            for (ODataRow row : saleOrder.select(new String[]{}, "id != ? and state = ?", new String[]{"0", "draft"})) {
 //                newIds.add(row.getInt("id"));
 //            }
 //            if (newIds.size() > 0) {
 //                domain.add("id", "in", newIds);
-//                domain.add("|");
-            domain.add("state", "=", "draft");
-            domain.add("|");
-            domain.add("state", "=", "manual");
 //            }
-
-//            saleOrder.quickSyncRecords(domain);
-            if (!firstSync)
+            domain.add("state", "=", "draft");
+          if (!firstSync)
                 adapter.onSyncFinish(this);
 
             adapter.setDomain(domain);
@@ -81,14 +76,5 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
 
         firstSync = true;
         return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
-        //        return new OSyncAdapter(getApplicationContext(), SalesOrderLine.class, SaleOrderSyncService.this, true);
     }
-
-//    ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
-//        @Override
-//        public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-//            firstSync = true;
-//            return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
-//        }
-//    };
 }
