@@ -586,6 +586,16 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     } catch (InterruptedException e) {
                     }
 
+                    Thread thZeroAmount = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                        }
+                    });
+                    thZeroAmount.start();
+                    try {
+                        thZeroAmount.join();
+                    } catch (InterruptedException e) {
+                    }
 
                     Thread thread = new Thread(new Runnable() {
                         @Override
@@ -1152,20 +1162,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     @Override
     public void onConnect(com.odoo.core.rpc.Odoo odoo) {
         Log.d(TAG, "exist_db returned TRUE ");
-//        Thread thSaleOrderLine = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                new SalesOrderLine(getContext(), getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (Exception e) {
-//                }
-//            }
-//        });
-//        thSaleOrderLine.start(); // запускаем
-
 //        sync().requestSync(SaleOrder.AUTHORITY);
-
     }
 
     @Override
