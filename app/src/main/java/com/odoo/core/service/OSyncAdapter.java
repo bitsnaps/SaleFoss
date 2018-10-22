@@ -337,6 +337,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 "(id = ? or id = ?)", new String[]{"0", "false"});
         int counter = 0;
         for (ODataRow record : records) {
+            if (counter < 0)
+                break;
             if (validateRelationRecords(model, record)) {
                 /*
                  Need to check server id for record.
@@ -353,6 +355,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         counter++;
                     } else {
                         Log.e(TAG, "Unable to create record on server.");
+                        counter = -1;
                     }
                 }
             }
