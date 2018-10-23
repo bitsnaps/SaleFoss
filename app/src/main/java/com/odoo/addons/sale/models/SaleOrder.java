@@ -609,6 +609,24 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                 Log.d("doWorkflowFull: : ", "FALSE");
                                 SaleOrder.setSyncToServer(false);
                             } else {
+                                if (quotation == null){
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), R.string.toast_no_recs_sync, Toast.LENGTH_LONG)
+                                                    .show();
+                                        }
+                                    });
+                                }
+                                if (linesIds.size() != 0) {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                                                    .show();
+                                        }
+                                    });
+                                }
                                 Log.d("else doWorkflowFull: : ", "FALSE");
                                 SaleOrder.setSyncToServer(false);
                             }

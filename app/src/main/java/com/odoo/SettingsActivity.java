@@ -120,9 +120,9 @@ public class SettingsActivity extends AppCompatActivity {
             if (!SaleOrder.getSyncToServer()) {
                         sales.confirmAllOrders();
 //                sales.confirmAllOrders(have_id_zero_records);
-                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
             } else
-                Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
         }

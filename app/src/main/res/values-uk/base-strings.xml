@@ -96,6 +96,7 @@
     <string name="toast_has_partner">Будь ласка виберіть Покупця за замовчуванням !</string>
     <string name="toast_account_removed">Обліковий Запис Вилучений Успішно</string>
     <string name="toast_problem_on_server_odoo">Проблема на сервері Odoo Рахунок сформован частково. Зверніться до Администратора !</string>
+    <string name="toast_no_recs_sync">Нема записів для синхронизації !</string>
     <string name="toast_problem_with_sync">Проблема з синхронізацією на сервері. Будь ласка запустіть синхронізацію після відновлення зв\'язку.</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Оновлення паролю</string>

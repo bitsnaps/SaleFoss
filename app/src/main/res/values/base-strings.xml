@@ -92,6 +92,7 @@
     <string name="toast_network_required">Network required</string>
     <string name="toast_recs_updated">The records have been updated!</string>
     <string name="toast_problem_on_server_odoo">Problem with Odoo server request !</string>
+    <string name="toast_no_recs_sync">No records to sync !</string>
     <string name="toast_problem_with_sync">Problem with sync to serrver. Please launch sync after recovery network.</string>
     <string name="toast_has_lines">Please select a Order lines!</string>
     <string name="toast_has_partner">Please select a Default Customer !</string>
