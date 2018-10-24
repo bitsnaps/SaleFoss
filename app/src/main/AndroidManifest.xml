@@ -179,6 +179,12 @@
                 android:resource="@xml/sale_sync_adapter" />
         </service>
 
+        <service
+            android:name=".addons.sale.services.ProductSyncIntentService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
+
         <!--<activity-->
             <!--android:name=".addons.calendar.EventDetail"-->
             <!--android:windowSoftInputMode="adjustPan" />-->

@@ -479,8 +479,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                            .show();
                     Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
                             .show();
                 }
@@ -548,8 +546,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                     OdooFields fields = new OdooFields(new String[]{"id"});
                                     ODomain domain = new ODomain();
                                     domain.add("name", "in", namesOrders);
-//                                    domain.add("or");
-//                                    domain.add("state", "=", "draft");
                                     List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
                                     for (ODataRow row : records) {
                                         idServerOrders.add(((Double) row.get("id")).intValue());
@@ -586,14 +582,22 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     } catch (InterruptedException e) {
                     }
 
-                    Thread thZeroAmount = new Thread(new Runnable() {
+                    Thread thSyncOrder = new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            String dateOrder = null;
+                            List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
+                            if (maxOrder.size() > 0) {
+                                for (ODataRow row : maxOrder) {
+                                    dateOrder = row.getString("date_order");
+                                }
+                                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
+                            }
                         }
                     });
-                    thZeroAmount.start();
+                    thSyncOrder.start();
                     try {
-                        thZeroAmount.join();
+                        thSyncOrder.join();
                     } catch (InterruptedException e) {
                     }
 
@@ -609,7 +613,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                                 Log.d("doWorkflowFull: : ", "FALSE");
                                 SaleOrder.setSyncToServer(false);
                             } else {
-                                if (quotation == null){
+                                if (quotation == null) {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
@@ -642,41 +646,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             threadOfConfirm.start(); // запускаем
             Log.d("Confirm: ", "Start and wait");
         }
-    }
-
-    public void confirmAllOrders(final List<ODataRow> quotation) {
-        Thread threadOfConfirm = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Thread thLines = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new SalesOrderLine(mContext, getUser()).quickSyncRecords(new ODomain().add("id", "=", 0));
-                    }
-                });
-                thLines.start();
-                try {
-                    thLines.join();
-
-                } catch (InterruptedException e) {
-                }
-
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
-                    }
-                });
-                thread.start();
-                try {
-                    thread.join();
-
-                } catch (InterruptedException e) {
-                }
-            }
-        });
-        threadOfConfirm.start(); // запускаем
-        Log.d("Confirm: ", "Start and wait");
     }
 
     public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {

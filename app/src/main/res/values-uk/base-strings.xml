@@ -82,7 +82,7 @@
     <string name="developer_2_tap">Need 2 tap for developer mode</string>
     <string name="developer_5_tap">Developer mode activated</string>
     <string name="toast_setting_saved">Налаштування збережені.</string>
-    <string name="toast_no_new_records">Стартував процес синхронізації! Дочекайтесь кінця синхронізації та спробуйте ще раз.</string>
+    <string name="toast_no_new_records">Немає записів для синхронізації.</string>
     <string name="toast_process_started_already">Процес синхронізації вже був запущений !!!</string>
     <string name="toast_process_started">Стартував процес синхронізації !!!</string>
     <string name="toast_update_database">Увійдіть у Налаштування додатка для синхронізації бази даних</string>

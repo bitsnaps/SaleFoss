@@ -142,6 +142,8 @@
     <string name="label_no_lines">You cannot a sales order which has no line</string>
     <string name="label_quotation_confirmed">Quotation confirmed!</string>
     <string name="label_quotation_fault">Quotation not confirmed, check connection on the server!</string>
+    <string name="label_product_download_start">Start sync of the Products from the server!</string>
+    <string name="label_product_download_end">Products were downloaded successful!</string>
     <string name="label_product_download_fault">Products were downloaded unsuccessful, check connection to the server!</string>
 
     <string name="label_updated">updated</string>

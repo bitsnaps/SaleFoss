@@ -24,6 +24,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.odoo.BuildConfig;
 import com.odoo.R;
@@ -88,6 +90,65 @@ public class ProductProduct extends OModel {
         return domain;
     }
 
+    public void syncProduct() {
+        int items;
+        ODomain domain = new ODomain();
+        OArguments args = new OArguments();
+        args.add(new JSONObject());
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getContext(), _s(R.string.label_product_download_start), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        try {
+            ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
+            ProductProduct productProduct = new ProductProduct(getContext(), getUser());
+            OdooFields fields = new OdooFields(new String[]{"id"});
+            List<Object> maxDate = new ArrayList<>();
+
+            List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domain, 3000);
+            if (productTemplate.getServerIds().size() == dates.size()) {
+                String sql = "SELECT max(write_date) as maxDate FROM product_template";
+                List<ODataRow> records = productTemplate.query(sql);
+
+                for (ODataRow row : records) {
+                    maxDate.add(row.get("maxDate"));
+                }
+                ODomain domainDate = new ODomain();
+                domainDate.add("write_date", ">", maxDate.get(0));
+                List<Integer> newIds = new ArrayList<>();
+                fields = new OdooFields(new String[]{"id, write_date"});
+                dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 150);
+                for (ODataRow row : dates) {
+                    newIds.add(((Double) row.get("id")).intValue());
+                }
+                items = newIds.size();
+                if (items > 0) {
+                    domain.add("product_tmpl_id", "in", newIds);
+                }
+            } else {
+                domain.add("product_tmpl_id", "not in", productTemplate.getServerIds());
+            }
+                quickSyncRecords(domain);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), _s(R.string.label_product_download_end), Toast.LENGTH_LONG).show();
+                    }
+                });
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), _s(R.string.label_product_download_fault), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
+    }
 
     public void syncProduct(final Context context, final ProductProduct.OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {

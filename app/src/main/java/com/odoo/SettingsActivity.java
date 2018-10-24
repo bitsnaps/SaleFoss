@@ -21,8 +21,8 @@ package com.odoo;
 
 import android.accounts.Account;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
+import android.app.Activity;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -30,9 +30,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.odoo.addons.sale.Sales;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
@@ -140,7 +140,11 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void updateProducts(ProductProduct product) {
-        product.syncProduct(this, confirmProduct);
+//        product.syncProduct(this, confirmProduct);
+        if (!ProductSyncIntentService.getSyncToServer()) {
+            startService(new Intent(this, ProductSyncIntentService.class));
+        } else
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
     }
 
     @Override

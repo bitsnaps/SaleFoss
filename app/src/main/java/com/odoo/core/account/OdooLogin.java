@@ -24,6 +24,7 @@ import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
+import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.addons.sale.services.SaleOrderSyncService;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResPartner;
@@ -406,10 +407,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
-
+                    startService(new Intent(getApplicationContext(), ProductSyncIntentService.class));
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
+
                     Thread.sleep(1000);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -418,7 +420,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
                     resPartner.quickSyncRecords(domain);
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
