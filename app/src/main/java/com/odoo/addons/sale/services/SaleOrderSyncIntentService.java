@@ -9,20 +9,20 @@ import com.odoo.addons.sale.models.ProductProduct;
 
 import java.util.concurrent.TimeUnit;
 
-public class ProductSyncIntentService extends IntentService {
-    final String TAG = "ProductSync";
+public class SaleOrderSyncIntentService extends IntentService {
+    final String TAG = "SaleOrderSync";
     private static boolean isFirstUpdateProduct = false;
 
-    public ProductSyncIntentService() {
-        super("Product Sync Service");
-    }
-
     public static void setSyncToServer(boolean isThere) {
-        ProductSyncIntentService.isFirstUpdateProduct = isThere;
+        SaleOrderSyncIntentService.isFirstUpdateProduct = isThere;
     }
 
     public static boolean getSyncToServer() {
-        return ProductSyncIntentService.isFirstUpdateProduct;
+        return SaleOrderSyncIntentService.isFirstUpdateProduct;
+    }
+
+    public SaleOrderSyncIntentService() {
+        super("SaleOrder Sync Service");
     }
 
     @Override
@@ -30,12 +30,12 @@ public class ProductSyncIntentService extends IntentService {
         Log.d(TAG, "onHandleIntent START!");
         setSyncToServer(true);
         try {
-            ProductProduct productProduct = new ProductProduct(getApplicationContext(), null);
-            productProduct.syncProduct();
+//
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         Log.d(TAG, "onHandleIntent END!");
     }
 
@@ -45,4 +45,5 @@ public class ProductSyncIntentService extends IntentService {
         setSyncToServer(false);
         Log.d(TAG, "DESTROY!");
     }
+
 }
