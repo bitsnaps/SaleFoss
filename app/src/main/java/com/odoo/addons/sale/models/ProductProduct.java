@@ -19,15 +19,10 @@
  */
 package com.odoo.addons.sale.models;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.odoo.BuildConfig;
 import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -35,7 +30,6 @@ import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
-import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.OArguments;
@@ -105,7 +99,6 @@ public class ProductProduct extends OModel {
 
         try {
             ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
-            ProductProduct productProduct = new ProductProduct(getContext(), getUser());
             OdooFields fields = new OdooFields(new String[]{"id"});
             List<Object> maxDate = new ArrayList<>();
 
@@ -150,138 +143,8 @@ public class ProductProduct extends OModel {
         }
     }
 
-    public void syncProduct(final Context context, final ProductProduct.OnOperationSuccessListener listener) {
-        new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
-            private Boolean faultOrder = false;
-            private int items;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                dialog = new ProgressDialog(context);
-                dialog.setTitle(R.string.title_please_wait);
-                dialog.setMessage(OResource.string(context, R.string.title_loading_product));
-                dialog.setCancelable(true);
-                dialog.show();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                ODomain domain = new ODomain();
-                OArguments args = new OArguments();
-                args.add(new JSONObject());
-
-                try {
-                    Thread.sleep(2000);
-                    ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
-                    ProductProduct productProduct = new ProductProduct(getContext(), getUser());
-                    OdooFields fields = new OdooFields(new String[]{"id"});
-                    List<Object> maxDate = new ArrayList<>();
-
-                    List<ODataRow> dates = productTemplate.getServerDataHelper().searchRecords(fields, domain, 3000);
-//                    String sql = "SELECT id FROM product_template";
-//                    List<ODataRow> records = productTemplate.query(sql);
-                    items = dates.size();
-                    if (productTemplate.getServerIds().size() == dates.size()) {
-                        String sql = "SELECT max(write_date) as maxDate FROM product_template";
-                        List<ODataRow> records = productTemplate.query(sql);
-
-                        for (ODataRow row : records) {
-                            maxDate.add(row.get("maxDate"));
-                        }
-                        ODomain domainDate = new ODomain();
-                        domainDate.add("write_date", ">", maxDate.get(0));
-                        List<Integer> newIds = new ArrayList<>();
-                        fields = new OdooFields(new String[]{"id, write_date"});
-                        dates = productTemplate.getServerDataHelper().searchRecords(fields, domainDate, 150);
-                        for (ODataRow row : dates) {
-                            newIds.add(((Double) row.get("id")).intValue());
-                        }
-                        items = newIds.size();
-                        if (items > 0) {
-                            domain.add("product_tmpl_id", "in", newIds);
-                        }
-                    } else {
-                        domain.add("product_tmpl_id", "not in", productTemplate.getServerIds());
-                    }
-                    Object checkConnect = getServerDataHelper().callMethod("exist_db", args);
-                    if (checkConnect != null) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (items > getServerIds().size())
-                                    dialog.setMessage("Updating: " + ((Integer) (items - getServerIds().size())).toString() + " items");
-                                else
-                                    dialog.setMessage("Updating: " + ((Integer) (items)).toString() + " items");
-
-                            }
-                        });
-                        quickSyncRecords(domain);
-                    }
-                } catch (Exception e) {
-                    faultOrder = true;
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-                dialog.dismiss();
-                if (listener != null) {
-                    if (!faultOrder) {
-                        listener.OnSuccess();
-                    } else {
-                        listener.OnFault();
-                    }
-                }
-
-            }
-        }.execute();
-    }
-
-    public void syncProductNew(final Context context) {
-        new AsyncTask<Void, Void, Void>() {
-            private ProgressDialog dialog;
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-            }
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    Thread.sleep(300);
-                    ODomain domain = new ODomain();
-                    ProductProduct product = new ProductProduct(context, null);
-                    domain.add("id", "not in", product.getServerIds());
-                    product.quickSyncRecords(domain);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
-    }
-
     private void runOnUiThread(Runnable runnable) {
         handler.post(runnable);
-    }
-
-    public interface OnOperationSuccessListener {
-        void OnSuccess();
-
-        void OnFault();
-
-        void OnCancelled();
     }
 
 }

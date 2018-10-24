@@ -50,24 +50,6 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
 
-    ProductProduct.OnOperationSuccessListener confirmProduct = new ProductProduct.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.toast_recs_updated, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            App mContext = (App) getApplicationContext();
-            Toast.makeText(mContext, R.string.label_product_download_fault, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,9 +73,7 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         if (intent.getAction() != null) {
-//            Sales sales = new Sales();
             SaleOrder salesOrders = new SaleOrder(this, null);
-            ProductProduct products = new ProductProduct(this, null);
             App app = (App) this.getApplicationContext();
             if (app.inNetwork()) {
                 if (intent.getAction().equals(ACTION_ORDER_SYNCHRONIZATION)) {
@@ -101,7 +81,10 @@ public class SettingsActivity extends AppCompatActivity {
                     return;
                 }
                 if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
-                    updateProducts(products);
+                    if (!ProductSyncIntentService.getSyncToServer()) {
+                        startService(new Intent(this, ProductSyncIntentService.class));
+                    } else
+                        Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
                     return;
                 }
             } else {
@@ -118,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
 //        if (have_id_zero_records != null) {
         if (true) {
             if (!SaleOrder.getSyncToServer()) {
-                        sales.confirmAllOrders();
+                sales.confirmAllOrders();
 //                sales.confirmAllOrders(have_id_zero_records);
                 Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
             } else
@@ -137,14 +120,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
         threadOfConfirm.start(); // запускаем
-    }
-
-    private void updateProducts(ProductProduct product) {
-//        product.syncProduct(this, confirmProduct);
-        if (!ProductSyncIntentService.getSyncToServer()) {
-            startService(new Intent(this, ProductSyncIntentService.class));
-        } else
-            Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
     }
 
     @Override
