@@ -21,32 +21,26 @@ package com.odoo.addons.sale.models;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Looper;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.ViewDebug;
 import android.widget.Toast;
 
-import com.odoo.App;
 import com.odoo.BuildConfig;
-import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.addons.sale.Sales;
+import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
-import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
@@ -55,16 +49,12 @@ import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooFields;
-import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
-import com.odoo.core.rpc.listeners.IOdooResponse;
 import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.service.ISyncServiceListener;
-import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OResource;
-import com.odoo.datas.OConstants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -487,6 +477,128 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         }
     };
 
+
+    // ----------------------------------------------------------------------------------------------------
+    public void syncSaleOrder() {
+        String dateOrder = null;
+        List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
+        if (maxOrder.size() > 0) {
+            for (ODataRow row : maxOrder) {
+                dateOrder = row.getString("date_order");
+            }
+            quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
+        }
+    }
+
+    public void syncAndBackupConfirm() {
+//        SaleOrderSyncIntentService.setSyncToServer(true);
+        final List<ODataRow> quotation = checkNewQuotations(mContext);
+        if (quotation != null) {
+            for (final ODataRow qUpdate : quotation) {
+                OValues values = new OValues();
+                values.put("state", "draft");
+                values.put("_is_local_only", "sync");
+                update(qUpdate.getInt(OColumn.ROW_ID), values);
+            }
+        }
+
+        Log.d("quickSyncRecords: ", "TRUE");
+        SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
+        try {
+            List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
+            List<Integer> localIds = new ArrayList<>();
+
+            String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
+            List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
+            for (ODataRow row : linesIds) {
+                localIds.add(row.getInt("order_id"));
+                if (selectServerId(row.getInt("order_id")) == 0) {
+                    continue;
+                }
+                serverIds.add(selectServerId(row.getInt("order_id")));
+            }
+            if (serverIds.size() > 0) {
+                quickSyncRecords(new ODomain().add("id", "in", serverIds));
+            } else {
+                List<String> namesOrders = new ArrayList<>();
+                List<Integer> idServerOrders = new ArrayList<>();
+                List<Integer> idLocalOrders = new ArrayList<>();
+                JSONArray serverIdsJSON = new JSONArray(); // if call server
+
+                sql = "SELECT name, id, _id FROM sale_order WHERE id = ? or state = ?";
+                linesIds = query(sql, new String[]{"0", "draft"});
+                for (ODataRow row : linesIds) {
+                    namesOrders.add(row.getString("name"));
+                    if (row.getInt("id") > 0)
+                        idLocalOrders.add(selectServerId(row.getInt(OColumn.ROW_ID)));
+                }
+
+                OdooFields fields = new OdooFields(new String[]{"id"});
+                ODomain domain = new ODomain();
+                domain.add("name", "in", namesOrders);
+                List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+                for (ODataRow row : records) {
+                    idServerOrders.add(((Double) row.get("id")).intValue());
+                }
+                idServerOrders.removeAll(idLocalOrders);
+
+                for (int idRec : idServerOrders) {
+                    serverIdsJSON.put(idRec);
+                }
+
+                if (serverIdsJSON.length() > 0) {
+                    OArguments args = new OArguments();
+                    args.add(serverIdsJSON);
+                    args.add(new JSONObject());
+                    getServerDataHelper().callMethod("delete_order", args);
+                }
+            }
+        } catch (Exception e) {
+            ServerProblem.onSyncTimedOut();
+        }
+        if (quotation != null) {
+            for (ODataRow row : quotation) {
+                if (row.getInt("id") != 0)
+                    quickSyncRecords(new ODomain().add("id", "in", row.getInt("id")));
+            }
+        }
+        lines.quickSyncRecords(new ODomain().add("id", "=", 0));
+
+        String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
+        List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
+        if (quotation != null && linesIds.size() == 0) {
+            Log.d("doWorkflowFull: ", "TRUE");
+            new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+            Log.d("doWorkflowFull: : ", "FALSE");
+//            SaleOrderSyncIntentService.setSyncToServer(false);
+        } else {
+            if (quotation == null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), R.string.toast_no_recs_sync, Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+            if (linesIds.size() != 0) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                                .show();
+                    }
+                });
+            }
+            Log.d("else doWorkflowFull: : ", "FALSE");
+//            SaleOrderSyncIntentService.setSyncToServer(false);
+        }
+    }
+
+    public void confirmOrders() {
+    }
+    // ----------------------------------------------------------------------------------------------------
+
     public void confirmAllOrders() {
         if (!SaleOrder.getSyncToServer()) {
             final List<ODataRow> quotation = checkNewQuotations(mContext);
@@ -754,11 +866,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             }
         });
         thread.start();
-//        try {
-//            thread.join();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private void doOrderFullConfirm(final ODataRow quotation, final ProgressDialog dialog) {
@@ -1149,7 +1256,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     @Override
     public void onConnect(com.odoo.core.rpc.Odoo odoo) {
         Log.d(TAG, "exist_db returned TRUE ");
-//        sync().requestSync(SaleOrder.AUTHORITY);
+        mContext.startService(new Intent(mContext, SaleOrderSyncIntentService.class)
+                .putExtra("syncType", SaleOrderSyncIntentService.SYNC_ONLY));
     }
 
     @Override

@@ -28,8 +28,15 @@ public class OConstants {
 
     public static final String ODOO_COMPANY_NAME = "Odoo";
 
-    public static final int RPC_REQUEST_TIME_OUT = 300000; // 30 Seconds
-    public static final int RPC_REQUEST_RETRIES = 0; // Retries when timeout
+    public static final int RPC_REQUEST_TIME_OUT = 30000; // 30 Seconds
+    public static final int RPC_REQUEST_RETRIES = 1; // Retries when timeout
+
+    /**
+     * Database version. Required to prolongation time request from server
+     */
+
+    public static final int RPC_REQUEST_TIME_OUT_METHOD = 300000; // 30 Seconds
+    public static final int RPC_REQUEST_RETRIES_METHOD = 0; // Retries when timeout
 
     /**
      * Database version. Required to change in increment order

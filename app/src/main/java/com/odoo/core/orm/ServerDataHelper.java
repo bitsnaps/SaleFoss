@@ -131,8 +131,11 @@ public class ServerDataHelper {
             args.add(mOdoo.updateContext(context));
         }
         OdooResult result = mOdoo
-                .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT_METHOD, OConstants.RPC_REQUEST_RETRIES_METHOD)
                 .callMethod(model, method, args, kwargs, context);
+//        OdooResult result = mOdoo
+//                .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+//                .callMethod(model, method, args, kwargs, context);
         if (result.has("result")) {
             return result.get("result");
         }

@@ -22,7 +22,6 @@ package com.odoo;
 import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.app.Activity;
 import android.content.SyncAdapterType;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -30,9 +29,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.services.ProductSyncIntentService;
+import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.orm.ODataRow;
@@ -98,23 +97,25 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void updateOrders(final SaleOrder sales) {
         final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
-            if (!SaleOrder.getSyncToServer()) {
-                sales.confirmAllOrders();
-                Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
-            } else
-                Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
-//            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
-        Thread threadOfConfirm = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                sales.syncReady();
-                try {
-                    Thread.sleep(1000);
-                } catch (Exception e) {
-                }
-            }
-        });
-        threadOfConfirm.start(); // запускаем
+        if (!SaleOrderSyncIntentService.getSyncToServer()) {
+            startService(new Intent(this, SaleOrderSyncIntentService.class)
+                    .putExtra("syncType", SaleOrderSyncIntentService.SYNC_AND_CONFIRM));
+//                sales.confirmAllOrders();
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
+////            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
+//        Thread threadOfConfirm = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                sales.syncReady();
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (Exception e) {
+//                }
+//            }
+//        });
+//        threadOfConfirm.start(); // запускаем
     }
 
     @Override
