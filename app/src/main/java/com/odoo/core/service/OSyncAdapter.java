@@ -339,6 +339,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         for (ODataRow record : records) {
             if (counter < 0)
                 break;
+
             if (validateRelationRecords(model, record)) {
                 /*
                  Need to check server id for record.
@@ -402,7 +403,23 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     break;
                 case OneToMany:
+//                    List<ODataRow> records = model.select(null,
+//                            "(id = ? or id = ?)", new String[]{"0", "false"});
                     List<ODataRow> o2mRecs = row.getO2MRecord(column.getName()).browseEach();
+//                    for (ODataRow record : records) {
+                    if (model.selectServerId(row.getInt(OColumn.ROW_ID)) == 0) {
+                        int id = createOnServer(model, OdooRecordUtils.createRecordValues(model, row));
+                        if (id != OModel.INVALID_ROW_ID) {
+                            OValues values = new OValues();
+                            values.put("id", id);
+                            values.put("_is_dirty", "false");
+                            values.put("_write_date", ODateUtils.getUTCDate());
+                            model.update(row.getInt(OColumn.ROW_ID), values);
+                        } else {
+                            Log.e(TAG, "Unable to create record on server on validate.");
+                        }
+                    }
+//                    }
                     if (!o2mRecs.isEmpty()) {
                         for (ODataRow o2mRec : o2mRecs) {
                             if (o2mRec.getInt("id") == 0) {

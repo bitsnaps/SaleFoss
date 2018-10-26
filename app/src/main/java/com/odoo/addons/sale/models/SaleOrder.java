@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -73,6 +74,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
             ".provider.content.sync.sale_order";
 
     private static boolean isFirstUpdateProduct = false;
+    private static List<ODataRow> listIds = null;
     public List<ODataRow> have_id_zero_records = null;
     private final Handler handler;
     OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
@@ -129,9 +131,16 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         SaleOrder.isFirstUpdateProduct = isThere;
     }
 
-
     public static boolean getSyncToServer() {
         return SaleOrder.isFirstUpdateProduct;
+    }
+
+    private static void setSyncToServerIds(List<ODataRow> isThere) {
+        SaleOrder.listIds = isThere;
+    }
+
+    private static List<ODataRow> getSyncToServerIds() {
+        return SaleOrder.listIds;
     }
 
     private String _s(int res_id) {
@@ -480,13 +489,15 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     // ----------------------------------------------------------------------------------------------------
     public void syncSaleOrder() {
-        String dateOrder = null;
-        List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
-        if (maxOrder.size() > 0) {
-            for (ODataRow row : maxOrder) {
-                dateOrder = row.getString("date_order");
+        if (checkNewQuotations(mContext) == null) {
+            String dateOrder = "";
+            List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
+            if (maxOrder.size() > 0) {
+                for (ODataRow row : maxOrder) {
+                    dateOrder = row.getString("date_order");
+                }
+                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
             }
-            quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
         }
     }
 
@@ -562,15 +573,24 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     quickSyncRecords(new ODomain().add("id", "in", row.getInt("id")));
             }
         }
-        lines.quickSyncRecords(new ODomain().add("id", "=", 0));
+        ODomain domain = new ODomain().add("id", "=", 0)
+                .add("|")
+                .add("id", "=", 0);
+
+//        lines.quickSyncRecords(new ODomain().add("id", "=", 0));
+//        lines.quickSyncRecords(domain);
+        quickSyncRecords(domain);
+
 
         String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
         List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
         if (quotation != null && linesIds.size() == 0) {
+
+            ValidateOrder(quotation);
+
             Log.d("doWorkflowFull: ", "TRUE");
             new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
             Log.d("doWorkflowFull: : ", "FALSE");
-//            SaleOrderSyncIntentService.setSyncToServer(false);
         } else {
             if (quotation == null) {
                 runOnUiThread(new Runnable() {
@@ -591,11 +611,31 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 });
             }
             Log.d("else doWorkflowFull: : ", "FALSE");
-//            SaleOrderSyncIntentService.setSyncToServer(false);
         }
+        if (linesIds.size() != 0)
+            setSyncToServerIds(linesIds);
     }
 
-    public void confirmOrders() {
+    private Boolean ValidateOrder(List<ODataRow> quotation) {
+        SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
+        List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
+        List<Integer> localIds = new ArrayList<>();
+
+        for (ODataRow row : quotation) {
+            localIds.add(row.getInt(OColumn.ROW_ID));
+        }
+        String sql = "SELECT distinct name, id, _id, order_id FROM sale_order_line WHERE order_id IN (" +
+                TextUtils.join(",", localIds) + ")";
+        List<ODataRow> linesIds = lines.query(sql);
+        if (linesIds.size() > 0) {
+            for (ODataRow row : linesIds) {
+                serverIds.add(row.getInt("id"));
+            }
+            if (serverIds.size() > 0) {
+//                quickSyncRecords(new ODomain().add("order_id", "in", serverIds));
+            }
+        }
+        return true;
     }
     // ----------------------------------------------------------------------------------------------------
 
