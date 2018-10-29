@@ -565,7 +565,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 //                }
 //            }
 
-
             quickSyncRecords(new ODomain().add("id", "=", 0));
             ValidateOrder(quotation);
 
@@ -618,9 +617,11 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
         List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
         List<Integer> localIds = new ArrayList<>();
-        if (quotation == null)
+        if (quotation == null) {
             return true;
+        }
         try {
+
             for (ODataRow row : quotation) {
                 localIds.add(row.getInt(OColumn.ROW_ID));
                 if (selectServerId(row.getInt(OColumn.ROW_ID)) == 0)
@@ -644,6 +645,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 for (ODataRow row : records) {
                     idServerOrders.add(((Double) row.get("id")).intValue());
                 }
+
                 idServerOrders.removeAll(idLocalOrders);
                 if (idServerOrders.size() > 0) {
                     JSONArray serverIdsJSON = new JSONArray(); // if call server
@@ -659,6 +661,40 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     }
                 }
             }
+/**
+ *  Check order to double an delete from server if find such.
+ */
+            List<String> namesOrders = new ArrayList<>();
+            List<Integer> idServerOrderIds = new ArrayList<>();
+            JSONArray serverIdsJSON = new JSONArray(); // if call server
+
+            sql = "SELECT name, id FROM sale_order WHERE id in (" +
+                    TextUtils.join(",", serverIds) + ")";
+            linesIds = query(sql);
+            for (ODataRow row : linesIds) {
+                namesOrders.add(row.getString("name"));
+            }
+
+            OdooFields fields = new OdooFields(new String[]{"id"});
+            ODomain domain = new ODomain();
+            domain.add("name", "in", namesOrders);
+            List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+            for (ODataRow row : records) {
+                idServerOrderIds.add(((Double) row.get("id")).intValue());
+            }
+            idServerOrderIds.removeAll(serverIds);
+
+            for (int idRec : idServerOrderIds) {
+                serverIdsJSON.put(idRec);
+            }
+
+            if (serverIdsJSON.length() > 0) {
+                OArguments args = new OArguments();
+                args.add(serverIdsJSON);
+                args.add(new JSONObject());
+                getServerDataHelper().callMethod("delete_order", args);
+            }
+
         } catch (Exception e) {
             Log.d("ValidateOrder", "Bad connect!");
             runOnUiThread(new Runnable() {
@@ -671,8 +707,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
             return false;
         }
-            if (serverIds.size() > 0) {
-                quickSyncRecords(new ODomain().add("id", "in", serverIds));
+        if (serverIds.size() > 0) {
+            quickSyncRecords(new ODomain().add("id", "in", serverIds));
         }
 
         return true;
