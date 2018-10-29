@@ -516,81 +516,76 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         Log.d("quickSyncRecords: ", "TRUE");
         SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
         try {
-            List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
-            List<Integer> localIds = new ArrayList<>();
+//            List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
+//            List<Integer> localIds = new ArrayList<>();
+//
+//            String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
+//            List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
+//            for (ODataRow row : linesIds) {
+//                localIds.add(row.getInt("order_id"));
+//                if (selectServerId(row.getInt("order_id")) == 0) {
+//                    continue;
+//                }
+//                serverIds.add(selectServerId(row.getInt("order_id")));
+//            }
+//            if (serverIds.size() > 0) {
+//                quickSyncRecords(new ODomain().add("id", "in", serverIds));
+//            } else {
+//                List<String> namesOrders = new ArrayList<>();
+//                List<Integer> idServerOrders = new ArrayList<>();
+//                List<Integer> idLocalOrders = new ArrayList<>();
+//                JSONArray serverIdsJSON = new JSONArray(); // if call server
+//
+//                sql = "SELECT name, id, _id FROM sale_order WHERE id = ? or state = ?";
+//                linesIds = query(sql, new String[]{"0", "draft"});
+//                for (ODataRow row : linesIds) {
+//                    namesOrders.add(row.getString("name"));
+//                    if (row.getInt("id") > 0)
+//                        idLocalOrders.add(selectServerId(row.getInt(OColumn.ROW_ID)));
+//                }
+//
+//                OdooFields fields = new OdooFields(new String[]{"id"});
+//                ODomain domain = new ODomain();
+//                domain.add("name", "in", namesOrders);
+//                List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
+//                for (ODataRow row : records) {
+//                    idServerOrders.add(((Double) row.get("id")).intValue());
+//                }
+//                idServerOrders.removeAll(idLocalOrders);
+//
+//                for (int idRec : idServerOrders) {
+//                    serverIdsJSON.put(idRec);
+//                }
+//
+//                if (serverIdsJSON.length() > 0) {
+//                    OArguments args = new OArguments();
+//                    args.add(serverIdsJSON);
+//                    args.add(new JSONObject());
+//                    getServerDataHelper().callMethod("delete_order", args);
+//                }
+//            }
 
-            String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
-            List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
-            for (ODataRow row : linesIds) {
-                localIds.add(row.getInt("order_id"));
-                if (selectServerId(row.getInt("order_id")) == 0) {
-                    continue;
-                }
-                serverIds.add(selectServerId(row.getInt("order_id")));
-            }
-            if (serverIds.size() > 0) {
-                quickSyncRecords(new ODomain().add("id", "in", serverIds));
-            } else {
-                List<String> namesOrders = new ArrayList<>();
-                List<Integer> idServerOrders = new ArrayList<>();
-                List<Integer> idLocalOrders = new ArrayList<>();
-                JSONArray serverIdsJSON = new JSONArray(); // if call server
-
-                sql = "SELECT name, id, _id FROM sale_order WHERE id = ? or state = ?";
-                linesIds = query(sql, new String[]{"0", "draft"});
-                for (ODataRow row : linesIds) {
-                    namesOrders.add(row.getString("name"));
-                    if (row.getInt("id") > 0)
-                        idLocalOrders.add(selectServerId(row.getInt(OColumn.ROW_ID)));
-                }
-
-                OdooFields fields = new OdooFields(new String[]{"id"});
-                ODomain domain = new ODomain();
-                domain.add("name", "in", namesOrders);
-                List<ODataRow> records = getServerDataHelper().searchRecords(fields, domain, 40);
-                for (ODataRow row : records) {
-                    idServerOrders.add(((Double) row.get("id")).intValue());
-                }
-                idServerOrders.removeAll(idLocalOrders);
-
-                for (int idRec : idServerOrders) {
-                    serverIdsJSON.put(idRec);
-                }
-
-                if (serverIdsJSON.length() > 0) {
-                    OArguments args = new OArguments();
-                    args.add(serverIdsJSON);
-                    args.add(new JSONObject());
-                    getServerDataHelper().callMethod("delete_order", args);
-                }
-            }
+            quickSyncRecords(new ODomain().add("id", "=", 0));
+//
         } catch (Exception e) {
-            ServerProblem.onSyncTimedOut();
+            Log.d("Sync:", "Bad connect!");
         }
-        if (quotation != null) {
-            for (ODataRow row : quotation) {
-                if (row.getInt("id") != 0)
-                    quickSyncRecords(new ODomain().add("id", "in", row.getInt("id")));
-            }
-        }
-        ODomain domain = new ODomain().add("id", "=", 0)
-                .add("|")
-                .add("id", "=", 0);
 
-//        lines.quickSyncRecords(new ODomain().add("id", "=", 0));
-//        lines.quickSyncRecords(domain);
-        quickSyncRecords(domain);
+        ValidateOrder(quotation);
 
+/**
 
+ */
         String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
         List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
         if (quotation != null && linesIds.size() == 0) {
 
-            ValidateOrder(quotation);
+            if (ValidateOrder(quotation)) {
+                Log.d("doWorkflowFull: ", "TRUE");
+                new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+                Log.d("doWorkflowFull: : ", "FALSE");
+            }
 
-            Log.d("doWorkflowFull: ", "TRUE");
-            new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
-            Log.d("doWorkflowFull: : ", "FALSE");
         } else {
             if (quotation == null) {
                 runOnUiThread(new Runnable() {
@@ -617,24 +612,67 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     }
 
     private Boolean ValidateOrder(List<ODataRow> quotation) {
+        Object confirmDelete = null;
         SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
         List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
         List<Integer> localIds = new ArrayList<>();
+        try {
+            for (ODataRow row : quotation) {
+                localIds.add(row.getInt(OColumn.ROW_ID));
+                if (selectServerId(row.getInt(OColumn.ROW_ID)) == 0)
+                    continue;
+                serverIds.add(selectServerId(row.getInt(OColumn.ROW_ID)));
+            }
+            List<Integer> idLocalOrders = new ArrayList<>();
+            String sql = "SELECT distinct name, id, _id, order_id FROM sale_order_line WHERE order_id IN (" +
+                    TextUtils.join(",", localIds) + ")";
+            List<ODataRow> linesIds = lines.query(sql);
 
-        for (ODataRow row : quotation) {
-            localIds.add(row.getInt(OColumn.ROW_ID));
-        }
-        String sql = "SELECT distinct name, id, _id, order_id FROM sale_order_line WHERE order_id IN (" +
-                TextUtils.join(",", localIds) + ")";
-        List<ODataRow> linesIds = lines.query(sql);
-        if (linesIds.size() > 0) {
-            for (ODataRow row : linesIds) {
-                serverIds.add(row.getInt("id"));
+            if (linesIds.size() > 0) {
+                for (ODataRow row : linesIds) {
+                    idLocalOrders.add(row.getInt("id"));
+                }
+                List<Integer> idServerOrders = new ArrayList<>();
+                OdooFields fields = new OdooFields(new String[]{"id"});
+                ODomain domain = new ODomain();
+                domain.add("order_id", "in", serverIds);
+                List<ODataRow> records = lines.getServerDataHelper().searchRecords(fields, domain, 40);
+                for (ODataRow row : records) {
+                    idServerOrders.add(((Double) row.get("id")).intValue());
+                }
+                idServerOrders.removeAll(idLocalOrders);
+                if (idServerOrders.size() > 0) {
+                    JSONArray serverIdsJSON = new JSONArray(); // if call server
+                    for (int idRec : idServerOrders) {
+                        serverIdsJSON.put(idRec);
+                    }
+
+                    if (serverIdsJSON.length() > 0) {
+                        OArguments args = new OArguments();
+                        args.add(serverIdsJSON);
+                        args.add(new JSONObject());
+                        confirmDelete = lines.getServerDataHelper().callMethod("delete_order_line", args);
+                    }
+                }
             }
+        } catch (Exception e) {
+            Log.d("Sync:", "Bad connect!");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+
+            return false;
+        }
             if (serverIds.size() > 0) {
-//                quickSyncRecords(new ODomain().add("order_id", "in", serverIds));
-            }
+                quickSyncRecords(new ODomain().add("id", "in", serverIds));
         }
+
+        if (confirmDelete != null && confirmDelete.equals(false))
+            return false;
         return true;
     }
     // ----------------------------------------------------------------------------------------------------
