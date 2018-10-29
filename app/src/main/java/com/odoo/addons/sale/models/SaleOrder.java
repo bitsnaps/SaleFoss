@@ -565,13 +565,15 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 //                }
 //            }
 
+
             quickSyncRecords(new ODomain().add("id", "=", 0));
+            ValidateOrder(quotation);
+
 //
         } catch (Exception e) {
             Log.d("Sync:", "Bad connect!");
         }
 
-        ValidateOrder(quotation);
 
 /**
 
@@ -616,6 +618,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
         List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
         List<Integer> localIds = new ArrayList<>();
+        if (quotation == null)
+            return true;
         try {
             for (ODataRow row : quotation) {
                 localIds.add(row.getInt(OColumn.ROW_ID));
@@ -656,7 +660,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 }
             }
         } catch (Exception e) {
-            Log.d("Sync:", "Bad connect!");
+            Log.d("ValidateOrder", "Bad connect!");
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -671,8 +675,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 quickSyncRecords(new ODomain().add("id", "in", serverIds));
         }
 
-        if (confirmDelete != null && confirmDelete.equals(false))
-            return false;
         return true;
     }
     // ----------------------------------------------------------------------------------------------------
