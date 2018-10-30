@@ -496,7 +496,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 for (ODataRow row : maxOrder) {
                     dateOrder = row.getString("date_order");
                 }
-                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
+                quickSyncRecords(new ODomain().add("write_date", ">", dateOrder));
             }
         }
     }

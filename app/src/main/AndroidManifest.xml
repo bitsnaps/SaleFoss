@@ -183,6 +183,8 @@
             android:name=".addons.sale.services.ProductSyncIntentService"
             android:enabled="true"
             android:exported="true">
+            <!--android:process=":productsync"-->
+
         </service>
 
         <service
