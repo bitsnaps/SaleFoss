@@ -119,13 +119,19 @@
         <item name="1440">1440</item>
     </string-array>
     <string-array name="syncDataLimit">
-        <item name="30">1 month old</item>
-        <item name="60">2 months old</item>
-        <item name="90">3 months old</item>
-        <item name="180">6 months old</item>
-        <item name="360">12 months old</item>
+        <item name="5">5 днів</item>
+        <item name="10">10 днів</item>
+        <item name="15">15 днів</item>
+        <item name="30">1 місяць</item>
+        <item name="60">2 місяця</item>
+        <item name="90">3 місяця</item>
+        <item name="180">6 місяців</item>
+        <item name="360">12 місяців</item>
     </string-array>
     <string-array name="syncDataLimitValues">
+        <item name="5">5</item>
+        <item name="10">10</item>
+        <item name="15">15</item>
         <item name="30">30</item>
         <item name="60">60</item>
         <item name="90">90</item>
