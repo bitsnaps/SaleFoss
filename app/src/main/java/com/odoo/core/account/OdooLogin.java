@@ -45,6 +45,8 @@ import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.datas.OConstants;
 
@@ -407,7 +409,10 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                     Log.i("Load DATA in the DB", "<< DB Odoo loading to your device >>");
                     ODomain domain = new ODomain();
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
+
+//                  Service for product sync
                     startService(new Intent(getApplicationContext(), ProductSyncIntentService.class));
+
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);
                     SaleOrder sale = new SaleOrder(OdooLogin.this, mUser);
                     ResPartner resPartner = new ResPartner(OdooLogin.this, mUser);
@@ -427,13 +432,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         }
                     });
 
-                    List<Integer> newIds = new ArrayList<>();
-                    OdooFields fields = new OdooFields(new String[]{"id"});
-                    List<ODataRow> records = sale.getServerDataHelper().searchRecords(fields, domain, 40);
-                    for (ODataRow row : records) {
-                        newIds.add(((Double) row.get("id")).intValue());
-                    }
-                    domain.add("id", "in", newIds);
+                    OPreferenceManager preferenceManager = new OPreferenceManager(OdooLogin.this);
+                    domain.add("&");
+                    int data_limit = preferenceManager.getInt("sync_data_limit", 2);
+                    domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
+                    domain.add("id", "!=", 0);
                     sale.quickSyncRecords(domain);
 
                     Thread.sleep(1000);

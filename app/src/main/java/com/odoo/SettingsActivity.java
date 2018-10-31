@@ -20,8 +20,6 @@
 package com.odoo;
 
 import android.accounts.Account;
-import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SyncAdapterType;
@@ -30,8 +28,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
-
-import com.odoo.addons.sale.ResultSync;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.addons.sale.services.SaleOrderSyncIntentService;

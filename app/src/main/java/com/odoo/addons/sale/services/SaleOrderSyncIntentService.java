@@ -10,10 +10,13 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.addons.sale.ResultSync;
 import com.odoo.addons.sale.Sales;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.core.account.About;
 
 import java.util.concurrent.TimeUnit;
 
@@ -46,11 +49,11 @@ public class SaleOrderSyncIntentService extends IntentService {
             switch (syncType) {
                 case SYNC_ONLY:
                     Log.d(TAG, "SYNC STARED");
-                    new SaleOrder(getApplication(), null).syncSaleOrder();
+                    new SaleOrder(getApplication(), null ).syncSaleOrder();
                     break;
                 case SYNC_AND_CONFIRM:
                     Log.d(TAG, "SYNC AND CONFIRM STARED");
-                    new SaleOrder(getApplication(), null).syncAndBackupConfirm();
+                    new SaleOrder(getApplication(), null ).syncAndBackupConfirm();
                     sendNotification();
                     break;
             }
@@ -65,14 +68,18 @@ public class SaleOrderSyncIntentService extends IntentService {
 
     void sendNotification() {
         Intent intent = new Intent(this, ResultSync.class);
+
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addParentStack(ResultSync.class);
         stackBuilder.addNextIntent(intent);
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
         NotificationCompat.Builder builderNotif = new NotificationCompat.Builder(this);
         builderNotif.setSmallIcon(R.drawable.ic_action_sale_order);
         intent.putExtra("type", Sales.Type.SaleOrder);
+        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
+//        builderNotif.setContentIntent(pIntent);
         builderNotif.setContentIntent(resultPendingIntent);
         builderNotif.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_foss));
         builderNotif.setContentTitle("Foss Sale");
@@ -80,8 +87,10 @@ public class SaleOrderSyncIntentService extends IntentService {
         builderNotif.setSubText("Tap to view application");
         builderNotif.mNotification.flags |= builderNotif.mNotification.FLAG_AUTO_CANCEL;
         builderNotif.setDefaults(Notification.DEFAULT_SOUND);
+
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.notify(1, builderNotif.build());
+
     }
 
     @Override

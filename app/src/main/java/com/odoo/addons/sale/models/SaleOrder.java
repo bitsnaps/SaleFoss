@@ -53,8 +53,11 @@ import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.service.ISyncServiceListener;
+import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
+import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 
 import org.json.JSONArray;
@@ -492,16 +495,32 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
     // ----------------------------------------------------------------------------------------------------
     public void syncSaleOrder() {
-        if (checkNewQuotations(mContext) == null) {
-            String dateOrder = "";
-            List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
-            if (maxOrder.size() > 0) {
-                for (ODataRow row : maxOrder) {
-                    dateOrder = row.getString("date_order");
-                }
-                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
-            }
+
+        OPreferenceManager preferenceManager = new OPreferenceManager(mContext);
+        ODomain domain = new ODomain();
+//        if (checkNewQuotations(mContext) == null) {
+//            String dateOrder = "";
+//            List<ODataRow> maxOrder = query("SELECT max(_write_date) as date_order FROM sale_order");
+//            if (maxOrder.size() > 0) {
+//                for (ODataRow row : maxOrder) {
+//                    dateOrder = row.getString("date_order");
+//                }
+//                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
+//            }
+//        }
+        List<Integer> serverIds = getServerIds();
+        domain.add("&");
+        if (serverIds.size() > 0) {
+            domain.add("&");
         }
+        int data_limit = preferenceManager.getInt("sync_data_limit", 10);
+        domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
+        domain.add("id", "!=", 0);
+
+        if (serverIds.size() > 0) {
+            domain.add("id", "not in", serverIds);
+        }
+        quickSyncRecords(domain);
     }
 
     public void syncAndBackupConfirm() {
