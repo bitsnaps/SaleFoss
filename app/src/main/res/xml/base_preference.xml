@@ -89,6 +89,18 @@
     <!--</PreferenceCategory>-->
 
     <PreferenceCategory
+        android:key="sync_data_limit_settings"
+        android:title="@string/sync_data_limit">
+        <ListPreference
+            android:defaultValue="60"
+            android:entries="@array/syncDataLimit"
+            android:entryValues="@array/syncDataLimitValues"
+            android:key="sync_data_limit"
+            android:summary="@string/sync_data_limit_note"
+            android:title="@string/sync_data_limit" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="application_about"
         android:title="@string/title_about">
         <Preference

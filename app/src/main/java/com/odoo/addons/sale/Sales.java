@@ -194,7 +194,6 @@ public class Sales extends BaseFragment implements
         mType = Type.valueOf(getArguments().getString(KEY_MENU));
         sale = new SaleOrder(getContext(), null);
         handler = new Handler(getMainLooper());
-
         return inflater.inflate(R.layout.common_listview, container, false);
     }
 
@@ -406,7 +405,6 @@ public class Sales extends BaseFragment implements
                 }
             });
             threadOfConfirm.start(); // запускаем
-
 //            sale.syncReady(getContext(), refreshSale);
 
         } else {
@@ -501,17 +499,17 @@ public class Sales extends BaseFragment implements
                     Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
                 }
                 break;
-            case R.id.menu_so_confirm_sale:
-                if (row.getFloat("amount_total") > 0) {
-                    if (inNetwork()) {
-                        ((SaleOrder) db()).confirmSale(row, confirmSale);
-                    } else {
-                        Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    OAlert.showWarning(getActivity(), getString(R.string.label_no_lines));
-                }
-                break;
+//            case R.id.menu_so_confirm_sale:
+//                if (row.getFloat("amount_total") > 0) {
+//                    if (inNetwork()) {
+//                        ((SaleOrder) db()).confirmSale(row, confirmSale);
+//                    } else {
+//                        Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
+//                    }
+//                } else {
+//                    OAlert.showWarning(getActivity(), getString(R.string.label_no_lines));
+//                }
+//                break;
         }
     }
 

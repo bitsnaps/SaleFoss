@@ -63,20 +63,30 @@
 
         <activity
             android:name=".base.addons.mail.widget.MailDetailDialog"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
             android:name=".base.addons.mail.widget.MailChatterCompose"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
             android:name=".core.account.OdooAccountQuickManage"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait" />
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".core.account.About"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            />
+        <activity
+            android:name=".addons.sale.ResultSync"
+            android:screenOrientation="portrait"
+            android:parentActivityName=".OdooActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".OdooActivity" />
+        </activity>
+
         <activity
             android:name=".core.account.Profile"
             android:screenOrientation="portrait" />
@@ -120,45 +130,45 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/customer_sync_adapter" />
         </service>
-<!--
-        <provider
-            android:name=".addons.calendar.providers.CalendarSyncProvider"
-            android:authorities="${applicationId}.provider.content.sync.calendar_event"
-            android:label="@string/sync_label_calendar"
-            android:multiprocess="true" />
+        <!--
+                <provider
+                    android:name=".addons.calendar.providers.CalendarSyncProvider"
+                    android:authorities="${applicationId}.provider.content.sync.calendar_event"
+                    android:label="@string/sync_label_calendar"
+                    android:multiprocess="true" />
 
-        <service
-            android:name=".addons.calendar.services.CalendarSyncService"
-            android:exported="true"
-            android:process=":sync_agenda">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
+                <service
+                    android:name=".addons.calendar.services.CalendarSyncService"
+                    android:exported="true"
+                    android:process=":sync_agenda">
+                    <intent-filter>
+                        <action android:name="android.content.SyncAdapter" />
+                    </intent-filter>
 
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/calendar_sync_adapter" />
-        </service>
+                    <meta-data
+                        android:name="android.content.SyncAdapter"
+                        android:resource="@xml/calendar_sync_adapter" />
+                </service>
 
-        <provider
-            android:name=".addons.crm.providers.CRMLeadProvider"
-            android:authorities="${applicationId}.provider.content.sync.crm_lead"
-            android:label="@string/sync_label_lead_opportunities"
-            android:multiprocess="true" />
+                <provider
+                    android:name=".addons.crm.providers.CRMLeadProvider"
+                    android:authorities="${applicationId}.provider.content.sync.crm_lead"
+                    android:label="@string/sync_label_lead_opportunities"
+                    android:multiprocess="true" />
 
-        <service
-            android:name=".addons.crm.services.CRMLeadSyncService"
-            android:exported="true"
-            android:process=":sync_leads">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
+                <service
+                    android:name=".addons.crm.services.CRMLeadSyncService"
+                    android:exported="true"
+                    android:process=":sync_leads">
+                    <intent-filter>
+                        <action android:name="android.content.SyncAdapter" />
+                    </intent-filter>
 
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/crm_sync_adapter" />
-        </service>
--->
+                    <meta-data
+                        android:name="android.content.SyncAdapter"
+                        android:resource="@xml/crm_sync_adapter" />
+                </service>
+        -->
 
         <provider
             android:name=".addons.sale.providers.SaleOrderProvider"
@@ -190,23 +200,22 @@
         <service
             android:name=".addons.sale.services.SaleOrderSyncIntentService"
             android:enabled="true"
-            android:exported="true">
-        </service>
+            android:exported="true"></service>
 
         <!--<activity-->
-            <!--android:name=".addons.calendar.EventDetail"-->
-            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--android:name=".addons.calendar.EventDetail"-->
+        <!--android:windowSoftInputMode="adjustPan" />-->
         <!--<activity-->
-            <!--android:name=".addons.crm.CRMDetail"-->
-            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--android:name=".addons.crm.CRMDetail"-->
+        <!--android:windowSoftInputMode="adjustPan" />-->
         <!--<activity-->
-            <!--android:name=".addons.crm.ConvertToOpportunityWizard"-->
-            <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
-            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--android:name=".addons.crm.ConvertToOpportunityWizard"-->
+        <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
+        <!--android:windowSoftInputMode="adjustPan" />-->
         <!--<activity-->
-            <!--android:name=".addons.crm.ConvertToQuotation"-->
-            <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
-            <!--android:windowSoftInputMode="adjustPan" />-->
+        <!--android:name=".addons.crm.ConvertToQuotation"-->
+        <!--android:theme="@style/Theme.AppCompat.Light.Dialog"-->
+        <!--android:windowSoftInputMode="adjustPan" />-->
 
         <activity
             android:name=".addons.sale.SalesDetail"
@@ -215,8 +224,8 @@
 
         <activity
             android:name=".addons.sale.AddProductLineWizard"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

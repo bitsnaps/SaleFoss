@@ -3,6 +3,11 @@
 
     <string name="app_name">Foss Sale</string>
     <string name="label_today">Сегодня</string>
+    <string name="button_ok">Да</string>
+    <string name="sync_data_limit">Период синхронизации</string>
+    <string name="sync_data_limit_note">Определите за какой период данные будут синхронизированы</string>
+    <string name="sync_data_title">Синхронизация</string>
+
     <!-- Sync Labels// -->
     <string name="sync_label_customers">Клиенты</string>
     <string name="sync_label_calendar">Календарь</string>

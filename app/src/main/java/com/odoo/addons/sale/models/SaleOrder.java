@@ -402,7 +402,10 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     SalesOrderLine salesOrderLine = new SalesOrderLine(mContext, null); // getuser
                     SaleOrder salesOrder = new SaleOrder(mContext, null); // getuser
                     domain = new ODomain();
-                    domain.add("id", "=", 0);
+//                    domain.add("id", "=", 0);
+//                    domain.add("&");
+                    domain.add("name", "=", "sal/mob/SO862");
+//                    domain.add("name", "=", quotation.getInt(OColumn.ROW_ID));
                     Log.e(TAG, "<< sale.order.line - syncing now >>");
 
                     runOnUiThread(new Runnable() {
@@ -412,7 +415,8 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                         }
                     });
 
-                    salesOrderLine.quickSyncRecords(domain);
+//                    salesOrderLine.quickSyncRecords(domain);
+                    quickSyncRecords(domain);
 
                     int id = selectServerId(quotation.getInt(OColumn.ROW_ID));
                     if (id == 0) {
@@ -486,7 +490,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         }
     };
 
-
     // ----------------------------------------------------------------------------------------------------
     public void syncSaleOrder() {
         if (checkNewQuotations(mContext) == null) {
@@ -496,7 +499,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 for (ODataRow row : maxOrder) {
                     dateOrder = row.getString("date_order");
                 }
-                quickSyncRecords(new ODomain().add("write_date", ">", dateOrder));
+                quickSyncRecords(new ODomain().add("write_date", ">=", dateOrder));
             }
         }
     }
