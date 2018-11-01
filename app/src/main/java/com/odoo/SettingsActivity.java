@@ -96,7 +96,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (!SaleOrderSyncIntentService.getSyncToServer()) {
             startService(new Intent(this, SaleOrderSyncIntentService.class)
                     .putExtra("syncType", SaleOrderSyncIntentService.SYNC_AND_CONFIRM));
-            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
     }

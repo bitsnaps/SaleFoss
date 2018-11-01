@@ -119,6 +119,9 @@ public class Sales extends BaseFragment implements
         @Override
         public void OnCancelled() {
         }
+        @Override
+        public void OnFault() {
+        }
     };
 
     @Override

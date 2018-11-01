@@ -52,6 +52,7 @@ import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooFields;
 import com.odoo.core.rpc.listeners.IOdooConnectionListener;
 import com.odoo.core.rpc.listeners.OdooError;
+import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
@@ -65,7 +66,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class SaleOrder extends OModel implements IOdooConnectionListener {
+public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncServiceListener{
     public static final String TAG = SaleOrder.class.getSimpleName();
     //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
@@ -75,12 +76,13 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     private static List<ODataRow> listIds = null;
     public List<ODataRow> have_id_zero_records = null;
     private final Handler handler;
+    private Context mContext;
+    private Context idContext = getContext();
+
     OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
     @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
     OColumn invoice_status_title = new OColumn("Invoice Title", OVarchar.class)
             .setLocalColumn();
-    private Context mContext;
-    private Context idContext = getContext();
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setDefaultValue("offline");
     OColumn date_order = new OColumn(_s(R.string.field_label_date_order), ODateTime.class);
     @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
@@ -144,6 +146,42 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
     private String _s(int res_id) {
         return OResource.string(idContext, res_id);
     }
+
+    @Override
+    public void onSyncStarted() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, R.string.toast_process_started, Toast.LENGTH_SHORT).show();
+                }
+            });
+    }
+
+    @Override
+    public void onSyncTimedOut() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+    }
+
+    @Override
+    public void onSyncFailed() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+    }
+
+    public void onSyncFinished() {
+    }
+
 
     @Override
     public ODomain defaultDomain() {
@@ -252,7 +290,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         return " (0)";
     }
 
-
     public void deleteOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
 
@@ -343,6 +380,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
         } catch (Exception e) {
             Log.d("Sync:", "Bad connect!");
+            onSyncFailed();
         }
 /**
 
@@ -354,7 +392,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
 
             if (ValidateOrder(quotation)) {
                 Log.d("doWorkflowFull: ", "TRUE");
-                new SaleOrder(mContext, getUser()).doWorkflowFullConfirmEach(mContext, quotation, null);
+                doWorkflowFullConfirmEach(mContext, quotation, null);
                 Log.d("doWorkflowFull: : ", "FALSE");
             }
 
@@ -369,13 +407,13 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 });
             }
             if (linesIds.size() != 0) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+//                                .show();
+//                    }
+//                });
             }
             Log.d("else doWorkflowFull: : ", "FALSE");
         }
@@ -601,13 +639,14 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                 } catch (Exception e) {
                     e.printStackTrace();
                     SaleOrder.setSyncToServer(false);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
+                    onSyncFailed();
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+//                                    .show();
+//                        }
+//                    });
                     return;
                 }
 
@@ -623,13 +662,14 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
                 } else {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    });
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Toast.makeText(getContext(), R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+//                                    .show();
+//                        }
+//                    });
+
                 }
             }
         }
@@ -668,11 +708,33 @@ public class SaleOrder extends OModel implements IOdooConnectionListener {
         Toast.makeText(getContext(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
     }
 
+    OnOperationSuccessListener syncAllData = new OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(mContext, "Success!!!", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnFault() {
+            Toast.makeText(mContext, "Fault!!!", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+    };
+
     public interface OnOperationSuccessListener {
 
         void OnSuccess();
 
+        void OnFault();
+
         void OnCancelled();
+    }
+
+    class ValidateSyncException extends Exception {
+
     }
 
 }
