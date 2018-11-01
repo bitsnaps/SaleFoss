@@ -7,6 +7,10 @@
     <string name="sync_data_limit">Sync data limit</string>
     <string name="sync_data_limit_note">Define how old data to be synchronized</string>
     <string name="sync_data_title">Sync Result</string>
+    <string name="notif_sync_success">Orders sync sync successful!</string>
+    <string name="notif_sync_tap">Tap to view application</string>
+
+
     <!-- Sync Labels// -->
 
     <string name="sync_label_customers">Customers</string>
@@ -112,9 +116,7 @@
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
     <string name="label_new">New</string>
-
     <string name="field_label_new">New</string>
-
     <string name="field_label_draft_no">Quotation not sync</string>
     <string name="field_label_draft">Quotation</string>
     <string name="field_label_sent">Quotation Sent</string>

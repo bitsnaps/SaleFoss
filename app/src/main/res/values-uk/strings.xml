@@ -7,6 +7,8 @@
     <string name="sync_data_limit">Період синхронізації</string>
     <string name="sync_data_limit_note">Визначте за який період данні будуть синхронізовані</string>
     <string name="sync_data_title">Синхронізація</string>
+    <string name="notif_sync_success">Комерційні пропозиції успішно синхронізовані!</string>
+    <string name="notif_sync_tap">Натисніть щоб перейти до додатку</string>
 
     <!-- Sync Labels// -->
     <string name="sync_label_customers">Клієнти</string>
@@ -33,6 +35,7 @@
     <string name="label_opportunity">Можливість</string>
     <string name="label_load_database_odo">Синхронізація</string>
     <string name="label_sale_orders">Замовлення на продаж</string>
+    <string name="label_not_sync">не синхронізовано</string>
     <string name="label_sync_data">Синхронізація</string>
     <string name="label_phone_calls">Телефоний виклик</string>
     <string name="label_logged_calls">Записані виклики</string>

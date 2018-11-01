@@ -7,6 +7,8 @@
     <string name="sync_data_limit">Период синхронизации</string>
     <string name="sync_data_limit_note">Определите за какой период данные будут синхронизированы</string>
     <string name="sync_data_title">Синхронизация</string>
+    <string name="notif_sync_success">Предложения продаж успешно синхронизированы!</string>
+    <string name="notif_sync_tap">Нажмите чтобы перейти в приложение</string>
 
     <!-- Sync Labels// -->
     <string name="sync_label_customers">Клиенты</string>
@@ -33,6 +35,7 @@
     <string name="label_opportunity">Возможность</string>
     <string name="label_load_database_odo">Синхронизация</string>
     <string name="label_sale_orders">Заказы продаж</string>
+    <string name="label_not_sync">не синхронизировано</string>
     <string name="label_sync_data">Синхронизация</string>
     <string name="label_phone_calls">Телефонные вызовы</string>
     <string name="label_logged_calls">Записанные вызовы</string>
@@ -111,9 +114,7 @@
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
     <string name="label_new">Новый</string>
-
     <string name="field_label_new">Новый</string>
-
     <string name="field_label_draft_no">Предложение локальное</string>
     <string name="field_label_draft">Предложение цен</string>
     <string name="field_label_sent">Заказ отослан</string>
@@ -155,7 +156,7 @@
     <string name="title_no_lines">(Позиции отсутствуют)</string>
     <string name="label_lines">позиции заказа</string>
     <string name="field_label_name">Имя</string>
-    <string name="label_not_sync">(не синхронизировано)</string>
+    <string name="field_label_sync">Синхронизировано"</string>
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата подтверждения"</string>
     <string name="field_label_partner_id">Клиент</string>

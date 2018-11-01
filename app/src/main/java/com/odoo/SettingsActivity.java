@@ -28,12 +28,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
-import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
-import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OAppBarUtils;
@@ -71,11 +69,10 @@ public class SettingsActivity extends AppCompatActivity {
             return;
         }
         if (intent.getAction() != null) {
-            SaleOrder salesOrders = new SaleOrder(this, null);
             App app = (App) this.getApplicationContext();
             if (app.inNetwork()) {
                 if (intent.getAction().equals(ACTION_ORDER_SYNCHRONIZATION)) {
-                    updateOrders(salesOrders);
+                    updateOrders();
                     return;
                 }
                 if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
@@ -94,27 +91,13 @@ public class SettingsActivity extends AppCompatActivity {
             super.startActivity(intent);
     }
 
-    private void updateOrders(final SaleOrder sales) {
-        final List<ODataRow> have_id_zero_records = sales.checkNewQuotations(this);
+    private void updateOrders() {
         if (!SaleOrderSyncIntentService.getSyncToServer()) {
             startService(new Intent(this, SaleOrderSyncIntentService.class)
                     .putExtra("syncType", SaleOrderSyncIntentService.SYNC_AND_CONFIRM));
-//                sales.confirmAllOrders();
             Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
-////            Toast.makeText(getApplicationContext(), R.string.toast_no_new_records, Toast.LENGTH_LONG).show();
-//        Thread threadOfConfirm = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                sales.syncReady();
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (Exception e) {
-//                }
-//            }
-//        });
-//        threadOfConfirm.start(); // запускаем
     }
 
     @Override
@@ -144,8 +127,6 @@ public class SettingsActivity extends AppCompatActivity {
             int sync_interval = mPref.getInt("sync_interval", 1440);
 
             List<String> default_authorities = new ArrayList<>();
-//            default_authorities.add("com.android.calendar");
-//            default_authorities.add("com.android.contacts");
             SyncAdapterType[] list = ContentResolver.getSyncAdapterTypes();
             for (SyncAdapterType lst : list) {
                 if (lst.authority.contains("com.odoo")
@@ -160,8 +141,6 @@ public class SettingsActivity extends AppCompatActivity {
                     SyncUtils.get(this).setSyncPeriodic(authority, sync_interval, 60, 1);
                 }
             }
-//            Toast.makeText(this, OResource.string(this, R.string.toast_setting_saved),
-//                    Toast.LENGTH_LONG).show();
         }
     }
 

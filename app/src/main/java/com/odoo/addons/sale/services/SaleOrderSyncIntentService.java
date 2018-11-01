@@ -11,12 +11,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.odoo.OdooActivity;
+import com.odoo.App;
 import com.odoo.R;
 import com.odoo.addons.sale.ResultSync;
 import com.odoo.addons.sale.Sales;
 import com.odoo.addons.sale.models.SaleOrder;
-import com.odoo.core.account.About;
+import com.odoo.core.utils.OResource;
 
 import java.util.concurrent.TimeUnit;
 
@@ -44,15 +44,16 @@ public class SaleOrderSyncIntentService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "onHandleIntent START!");
         int syncType = intent.getIntExtra("syncType", 0);
-        setSyncToServer(true);
         try {
             switch (syncType) {
                 case SYNC_ONLY:
                     Log.d(TAG, "SYNC STARED");
+                    setSyncToServer(true);
                     new SaleOrder(getApplication(), null ).syncSaleOrder();
                     break;
                 case SYNC_AND_CONFIRM:
                     Log.d(TAG, "SYNC AND CONFIRM STARED");
+                    setSyncToServer(true);
                     new SaleOrder(getApplication(), null ).syncAndBackupConfirm();
                     sendNotification();
                     break;
@@ -66,7 +67,7 @@ public class SaleOrderSyncIntentService extends IntentService {
         Log.d(TAG, "onHandleIntent END!");
     }
 
-    void sendNotification() {
+    public void sendNotification() {
         Intent intent = new Intent(this, ResultSync.class);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -78,19 +79,16 @@ public class SaleOrderSyncIntentService extends IntentService {
         NotificationCompat.Builder builderNotif = new NotificationCompat.Builder(this);
         builderNotif.setSmallIcon(R.drawable.ic_action_sale_order);
         intent.putExtra("type", Sales.Type.SaleOrder);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-//        builderNotif.setContentIntent(pIntent);
         builderNotif.setContentIntent(resultPendingIntent);
         builderNotif.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_foss));
-        builderNotif.setContentTitle("Foss Sale");
-        builderNotif.setContentText("Orders sync sync successful!");
-        builderNotif.setSubText("Tap to view application");
+        builderNotif.setContentTitle(App.APPLICATION_NAME);
+        builderNotif.setContentText(OResource.string(this, R.string.notif_sync_success));
+        builderNotif.setSubText(OResource.string(this, R.string.notif_sync_tap));
         builderNotif.mNotification.flags |= builderNotif.mNotification.FLAG_AUTO_CANCEL;
         builderNotif.setDefaults(Notification.DEFAULT_SOUND);
 
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         nm.notify(1, builderNotif.build());
-
     }
 
     @Override

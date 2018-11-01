@@ -34,14 +34,11 @@ import java.util.List;
 
 import odoo.controls.IOnQuickRecordCreateListener;
 
-//import com.odoo.addons.sale.models.ProductTemplate;
-
 public class AddProductLineWizard extends OdooCompatActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
         OListAdapter.OnSearchChange, IOnQuickRecordCreateListener, AdapterView.OnItemLongClickListener {
 
     private ProductProduct productProduct;
-    //    private ProductTemplate productTemplate;
     private EditText edt_searchable_input;
     private ListView mList = null;
     private OListAdapter mAdapter;
@@ -59,7 +56,6 @@ public class AddProductLineWizard extends OdooCompatActivity implements
         setContentView(R.layout.sale_add_item);
         setResult(RESULT_CANCELED);
         productProduct = new ProductProduct(this, null);
-//        productTemplate = new ProductTemplate(this, null);
         edt_searchable_input = (EditText) findViewById(R.id.edt_searchable_input);
         edt_searchable_input.addTextChangedListener(this);
         findViewById(R.id.done).setOnClickListener(this);
@@ -285,8 +281,8 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                         domain.add("sale_ok", "=", true);
                     }
                 }
-                OdooFields fields = new OdooFields(productProduct.getColumns());
-                //return helper.searchRecords(fields, domain, 10);
+//                OdooFields fields = new OdooFields(productProduct.getColumns());
+//                return helper.searchRecords(fields, domain, 10);
                 return helper.nameSearch(params[0], domain, 10);
             } catch (Exception e) {
                 e.printStackTrace();

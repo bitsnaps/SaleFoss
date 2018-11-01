@@ -67,41 +67,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     public static final String TAG = SalesDetail.class.getSimpleName();
     public static final int REQUEST_ADD_ITEMS = 323;
 
-    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
-            finish();
-        }
-
-        @Override
-        public void OnFault() {
-            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
     private Bundle extra;
-    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
-                    + getString(R.string.label_canceled), Toast.LENGTH_LONG).show();
-            finish();
-        }
-        @Override
-        public void OnFault() {
-            Toast.makeText(SalesDetail.this, R.string.label_quotation_fault, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
     private OForm mForm;
     private ODataRow record;
     private SaleOrder sale;
@@ -110,10 +76,9 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private ExpandableListControl mList;
     private ExpandableListControl.ExpandableListAdapter mAdapter;
     private List<Object> objects = new ArrayList<>();
-    private List<Object> objects_tmp = new ArrayList<>();
     private HashMap<String, Float> lineValues = new HashMap<>();
     private HashMap<String, Integer> lineIds = new HashMap<>();
-    private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt, partnerId;
+    private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt;
     private ODataRow currencyObj;
     private ResPartner partner = null;
     private ProductProduct products = null;
@@ -121,9 +86,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private LinearLayout layoutAddItem = null;
     private Type mType;
     private boolean saveWithProductLines = false;
-    private ProductProduct productProduct;
     private List<Object> localItems = new ArrayList<>();
-    private Sales sales = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -140,8 +103,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         partner = new ResPartner(this, null);
         products = new ProductProduct(this, null);
         lineOrder = new SalesOrderLine(this, null);
-        productProduct = new ProductProduct(this, null);
-        sales = new Sales();
         init();
         initAdapter();
     }
@@ -260,7 +221,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
             menu.findItem(R.id.menu_sale_save).setVisible(true);
-            // Operation on Sale Ordermenu_sale_confirm_sale
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
@@ -288,7 +248,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.menu_sale_save: // Save record Sale.Oder
+            case R.id.menu_sale_save:
                 if (values != null) {
                     record = sale.browse(extra.getInt(OColumn.ROW_ID));
                     if (record == null){
@@ -323,26 +283,12 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                                     values.put("partner_invoice_id", "false");
                                     values.put("partner_shipping_id", "false");
                                     values.put("pricelist_id", "false");
-//                                    values.put("payment_term_id", "false");
                                     values.put("fiscal_position", "false");
                                     saleOrderOperation.execute(values);
                                 }
                         }
                     } else {
                         Toast.makeText(this, R.string.toast_has_lines, Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-            case R.id.menu_sale_confirm_sale:
-                if (record != null) {
-                    if (extra != null && record.getFloat("amount_total") > 0) {
-                        if (app.inNetwork()) {
-//                            sale.confirmSale(record, confirmSale);
-                        } else {
-                            Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                        }
-                    } else {
-                        OAlert.showWarning(this, R.string.label_no_order_line + "");
                     }
                 }
                 break;
@@ -408,7 +354,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 OValues values = params[0];
                 // Creating oneToMany order lines
 
-                if (values.getString("name").equals("/")) { // it means New record will create !!!
+                if (values.getString("name").equals("/")) {
                     String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
                     values.put("name", nameOrder);
                     values.put("state", "draft");
@@ -428,7 +374,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("currency_symbol", currencyObj.getString("name"));
                     values.put("amount_tax", "0");
                     values.put("currency_id", currencyObj.get("_id"));
-//                    values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
@@ -458,12 +403,11 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mDialog.setMessage("Updating " + mSOType);
+                            mDialog.setMessage(mSOType);
                         }
                     });
                     Thread.sleep(500);
                     values.put("amount_tax", "0");
-//                    values.put("order_line_count", " (" + objects.size() + " lines)");
                     values.put("order_line_count", " (" + objects.size() + ")");
                     values.put("amount_untaxed", untaxedAmt.getText().toString().replace(",", "."));
                     values.put("amount_total", total_amt.getText().toString().replace(",", "."));
@@ -575,8 +519,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             try {
                 Thread.sleep(1000);
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
-                ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);

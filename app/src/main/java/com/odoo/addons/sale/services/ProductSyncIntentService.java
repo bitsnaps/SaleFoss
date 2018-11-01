@@ -44,27 +44,6 @@ public class ProductSyncIntentService extends IntentService {
             e.printStackTrace();
         }
         Log.d(TAG, "onHandleIntent END!");
-//        sendNotification();
-    }
-
-    void sendNotification() {
-        NotificationCompat.Builder builderNotif = new NotificationCompat.Builder(this);
-        builderNotif.setSmallIcon(R.drawable.ic_action_sale_order);
-        Intent intent = new Intent(this, OdooActivity.class);
-        intent.putExtra("type", Sales.Type.SaleOrder);
-        PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        builderNotif.setContentIntent(pIntent);
-        builderNotif.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_foss));
-        builderNotif.setContentTitle("Foss Sale");
-        builderNotif.setContentText("Products sync successful!");
-        builderNotif.setSubText("Tap to view application");
-
-        builderNotif.mNotification.flags |= builderNotif.mNotification.FLAG_AUTO_CANCEL;
-        builderNotif.mNotification.flags |= builderNotif.mNotification.DEFAULT_SOUND;
-        builderNotif.mNotification.flags |= builderNotif.mNotification.DEFAULT_VIBRATE;
-
-        nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(1, builderNotif.build());
     }
 
     @Override

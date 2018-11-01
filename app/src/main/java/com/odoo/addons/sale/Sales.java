@@ -104,82 +104,16 @@ public class Sales extends BaseFragment implements
     private AlertDialog dialog;
     private AlertDialog.Builder builder;
     private ExpandableHeightGridView mGrid;
-    private OdooUserLoginSelectorDialog.IUserLoginSelectListener mIUserLoginSelectListener = null;
-
-    OnOperationSuccessListener confirmSale = new OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_confirmed), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-
-    OnOperationSuccessListener refreshSale = new OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    hideRefreshingProgress();
-                    parent().sync().requestSync(SaleOrder.AUTHORITY);
-                }
-            });
-        }
-
-        @Override
-        public void OnFault() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    hideRefreshingProgress();
-                    Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
 
     private void runOnUiThread(Runnable runnable) {
         handler.post(runnable);
 
     }
 
-    OnOperationSuccessListener newCopyQuotation = new OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
-
     OnOperationSuccessListener cancelOrder = new OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), _s(R.string.field_label_draft) + " " + _s(R.string.label_canceled), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -194,6 +128,7 @@ public class Sales extends BaseFragment implements
         mType = Type.valueOf(getArguments().getString(KEY_MENU));
         sale = new SaleOrder(getContext(), null);
         handler = new Handler(getMainLooper());
+
         return inflater.inflate(R.layout.common_listview, container, false);
     }
 
@@ -391,12 +326,9 @@ public class Sales extends BaseFragment implements
     public void onRefresh() {
         if (inNetwork()) {
             setSwipeRefreshing(false);
-//            sale.syncReady();
-
             Thread threadOfConfirm = new Thread(new Runnable() {
                 @Override
                 public void run() {
-//                    sale.syncReady(refreshSale);
                     sale.syncReady();
                     try {
                         Thread.sleep(1000);
@@ -405,8 +337,6 @@ public class Sales extends BaseFragment implements
                 }
             });
             threadOfConfirm.start(); // запускаем
-//            sale.syncReady(getContext(), refreshSale);
-
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
@@ -454,7 +384,6 @@ public class Sales extends BaseFragment implements
     @Override
     public void onItemClick(View view, int position) {
         if (mType == Type.Quotation) {
-//            onDoubleClick(position);
             setPosition(position);
             showSheet((Cursor) mAdapter.getItem(position));
         } else
@@ -492,13 +421,13 @@ public class Sales extends BaseFragment implements
                 }
 
                 break;
-            case R.id.menu_quotation_new:
-                if (inNetwork()) {
-                    ((SaleOrder) db()).newCopyQuotation(row, newCopyQuotation);
-                } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                }
-                break;
+//            case R.id.menu_quotation_new:
+//                if (inNetwork()) {
+//                    ((SaleOrder) db()).newCopyQuotation(row, newCopyQuotation);
+//                } else {
+//                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+//                }
+//                break;
 //            case R.id.menu_so_confirm_sale:
 //                if (row.getFloat("amount_total") > 0) {
 //                    if (inNetwork()) {
@@ -559,8 +488,4 @@ public class Sales extends BaseFragment implements
         SaleOrder
     }
 
-
 }
-
-
-
