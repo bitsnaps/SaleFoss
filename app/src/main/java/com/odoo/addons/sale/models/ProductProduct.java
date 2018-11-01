@@ -35,6 +35,7 @@ import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
@@ -43,12 +44,12 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductProduct extends OModel {
+public class ProductProduct extends OModel implements ISyncServiceListener {
     public static final String TAG = ProductProduct.class.getSimpleName();
 
     private Context idContext = getContext();
     private final Handler handler;
-
+    private static boolean is_show = false;
     OColumn product_tmpl_id = new OColumn(_s(R.string.field_label_product_tmpl_id), ProductTemplate.class,
             OColumn.RelationType.ManyToOne);
     @Odoo.Functional(method = "storeProductName", store = true, depends = {"product_tmpl_id"})
@@ -84,19 +85,63 @@ public class ProductProduct extends OModel {
         return domain;
     }
 
+    @Override
+    public void onSyncStarted() {
+        if (is_show) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.label_product_download_start, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSyncTimedOut() {
+        if (is_show) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onSyncFailed() {
+        if (is_show) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+                            .show();
+                }
+            });
+        }
+    }
+
+    public void onSyncFinished() {
+        if (is_show) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), _s(R.string.label_product_download_end), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     public void syncProduct(boolean isToasts) {
         int items;
         ODomain domain = new ODomain();
         OArguments args = new OArguments();
         args.add(new JSONObject());
-        if (isToasts) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), _s(R.string.label_product_download_start), Toast.LENGTH_LONG).show();
-                }
-            });
-        }
+        is_show = isToasts;
+
         try {
             ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
             OdooFields fields = new OdooFields(new String[]{"id"});
@@ -126,24 +171,10 @@ public class ProductProduct extends OModel {
                 domain.add("product_tmpl_id", "not in", productTemplate.getServerIds());
             }
             quickSyncRecords(domain);
-            if (isToasts) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), _s(R.string.label_product_download_end), Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            if (isToasts) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), _s(R.string.label_product_download_fault), Toast.LENGTH_LONG).show();
-                    }
-                });
-            }
+            onSyncFailed();
         }
     }
 
