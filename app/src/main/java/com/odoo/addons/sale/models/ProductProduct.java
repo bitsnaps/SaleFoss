@@ -84,19 +84,19 @@ public class ProductProduct extends OModel {
         return domain;
     }
 
-    public void syncProduct() {
+    public void syncProduct(boolean isToasts) {
         int items;
         ODomain domain = new ODomain();
         OArguments args = new OArguments();
         args.add(new JSONObject());
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getContext(), _s(R.string.label_product_download_start), Toast.LENGTH_LONG).show();
-            }
-        });
-
+        if (isToasts) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), _s(R.string.label_product_download_start), Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         try {
             ProductTemplate productTemplate = new ProductTemplate(getContext(), getUser());
             OdooFields fields = new OdooFields(new String[]{"id"});
@@ -125,21 +125,25 @@ public class ProductProduct extends OModel {
             } else {
                 domain.add("product_tmpl_id", "not in", productTemplate.getServerIds());
             }
-                quickSyncRecords(domain);
+            quickSyncRecords(domain);
+            if (isToasts) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Toast.makeText(getContext(), _s(R.string.label_product_download_end), Toast.LENGTH_LONG).show();
                     }
                 });
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), _s(R.string.label_product_download_fault), Toast.LENGTH_LONG).show();
-                }
-            });
+            if (isToasts) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), _s(R.string.label_product_download_fault), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
         }
     }
 

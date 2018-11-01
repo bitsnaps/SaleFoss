@@ -411,6 +411,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 //                    ProductProduct prodProd = new ProductProduct(OdooLogin.this, null);
 
 //                  Service for product sync
+                    ProductSyncIntentService.checkToastsActive(false);
                     startService(new Intent(getApplicationContext(), ProductSyncIntentService.class));
 
                     SalesOrderLine salesOrderLine = new SalesOrderLine(OdooLogin.this, mUser);

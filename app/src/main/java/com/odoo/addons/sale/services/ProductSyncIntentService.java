@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ProductSyncIntentService extends IntentService {
     private NotificationManager nm;
+    private static Boolean checkToastsActive = false;
 
     final String TAG = "ProductSync";
     private static boolean isFirstUpdateProduct = false;
@@ -32,13 +33,17 @@ public class ProductSyncIntentService extends IntentService {
         return ProductSyncIntentService.isFirstUpdateProduct;
     }
 
+    static public boolean checkToastsActive(Boolean check) {
+        return checkToastsActive = check;
+    }
+
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "onHandleIntent START!");
         setSyncToServer(true);
         try {
             ProductProduct productProduct = new ProductProduct(getApplicationContext(), null);
-            productProduct.syncProduct();
+            productProduct.syncProduct(checkToastsActive);
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             e.printStackTrace();

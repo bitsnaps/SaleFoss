@@ -77,6 +77,7 @@ public class SettingsActivity extends AppCompatActivity {
                 }
                 if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
                     if (!ProductSyncIntentService.getSyncToServer()) {
+                        ProductSyncIntentService.checkToastsActive(true);
                         startService(new Intent(this, ProductSyncIntentService.class));
                     } else
                         Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
