@@ -7,6 +7,7 @@
     <string name="sync_data_limit">Період синхронізації</string>
     <string name="sync_data_limit_note">Визначте за який період данні будуть синхронізовані</string>
     <string name="sync_data_title">Синхронізація</string>
+    <string name="notif_sync_fault">Не синхронізовано: перезапустіть процес ще раз!</string>
     <string name="notif_sync_success">Комерційні пропозиції успішно синхронізовані!</string>
     <string name="notif_sync_tap">Натисніть щоб перейти до додатку</string>
 

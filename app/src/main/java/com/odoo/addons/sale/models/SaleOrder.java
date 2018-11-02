@@ -31,6 +31,7 @@ import android.widget.Toast;
 
 import com.odoo.BuildConfig;
 import com.odoo.R;
+import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.Sales;
 import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.base.addons.res.ResCompany;
@@ -66,7 +67,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncServiceListener{
+public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncServiceListener {
     public static final String TAG = SaleOrder.class.getSimpleName();
     //    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
@@ -78,6 +79,13 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
     private final Handler handler;
     private Context mContext;
     private Context idContext = getContext();
+
+    public enum Type {
+        NoRecords, SyncFailed, SyncTimedOut, SyncSuccess
+    }
+
+    public static Type mType = Type.NoRecords;
+
 
     OColumn invoice_status = new OColumn("Invoice Status", OVarchar.class).setDefaultValue("no");
     @Odoo.Functional(method = "getInvoiceStatusTitle", store = true, depends = {"invoice_status"})
@@ -135,10 +143,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         return SaleOrder.isFirstUpdateProduct;
     }
 
-    private static void setSyncToServerIds(List<ODataRow> isThere) {
-        SaleOrder.listIds = isThere;
-    }
-
     private static List<ODataRow> getSyncToServerIds() {
         return SaleOrder.listIds;
     }
@@ -149,34 +153,36 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
 
     @Override
     public void onSyncStarted() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, R.string.toast_process_started, Toast.LENGTH_SHORT).show();
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(mContext, R.string.toast_process_started, Toast.LENGTH_SHORT).show();
+//                }
+//            });
     }
 
     @Override
     public void onSyncTimedOut() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
-                            .show();
-                }
-            });
+        this.mType = Type.SyncTimedOut;
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(mContext, R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
+//                            .show();
+//                }
+//            });
     }
 
     @Override
     public void onSyncFailed() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
-                            .show();
-                }
-            });
+        this.mType = Type.SyncFailed;
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(mContext, R.string.toast_problem_on_server_odoo, Toast.LENGTH_LONG)
+//                            .show();
+//                }
+//            });
     }
 
     public void onSyncFinished() {
@@ -361,8 +367,12 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         quickSyncRecords(domain);
     }
 
-    public void syncAndBackupConfirm() {
+    public Type syncAndBackupConfirm() {
         final List<ODataRow> quotation = checkNewQuotations(mContext);
+/**
+ Move to Sale Order dir
+ */
+        this.mType = Type.NoRecords;
         if (quotation != null) {
             for (final ODataRow qUpdate : quotation) {
                 OValues values = new OValues();
@@ -370,21 +380,39 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
                 values.put("_is_local_only", "sync");
                 update(qUpdate.getInt(OColumn.ROW_ID), values);
             }
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getContext(), R.string.toast_no_recs_sync, Toast.LENGTH_SHORT)
+                            .show();
+                }
+            });
+            return Type.NoRecords;
         }
-
+/**
+ Sync all Orders
+ */
         Log.d("quickSyncRecords: ", "TRUE");
         try {
-
             quickSyncRecords(new ODomain().add("id", "=", 0));
+/**
+ Orders Validate
+ */
             ValidateOrder(quotation);
 
         } catch (Exception e) {
             Log.d("Sync:", "Bad connect!");
-            onSyncFailed();
+            return Type.SyncTimedOut;
         }
 /**
-
+ Orders Confirming block
  */
+        if (mType == Type.SyncTimedOut)
+            return Type.SyncTimedOut;
+        if (mType == Type.SyncFailed)
+            return Type.SyncFailed;
+
         SalesOrderLine lines = new SalesOrderLine(mContext, getUser());
         String sql = "SELECT distinct order_id FROM sale_order_line WHERE id = ? and _is_active = ?";
         List<ODataRow> linesIds = lines.query(sql, new String[]{"0", "true"});
@@ -395,30 +423,12 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
                 doWorkflowFullConfirmEach(mContext, quotation, null);
                 Log.d("doWorkflowFull: : ", "FALSE");
             }
-
-        } else {
-            if (quotation == null) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(getContext(), R.string.toast_no_recs_sync, Toast.LENGTH_LONG)
-                                .show();
-                    }
-                });
-            }
-            if (linesIds.size() != 0) {
-//                runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        Toast.makeText(getContext(), R.string.toast_problem_with_sync, Toast.LENGTH_LONG)
-//                                .show();
-//                    }
-//                });
-            }
-            Log.d("else doWorkflowFull: : ", "FALSE");
         }
-        if (linesIds.size() != 0)
-            setSyncToServerIds(linesIds);
+/**
+ End Sync module
+ */
+        Log.d("else doWorkflowFull: : ", "FALSE");
+        return mType;
     }
 
     private Boolean ValidateOrder(List<ODataRow> quotation) {
@@ -427,10 +437,9 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         List<Integer> serverIds = new ArrayList<>(); // if QuickSyncRecord
         List<Integer> localIds = new ArrayList<>();
         if (quotation == null) {
-            return true;
+            return false;
         }
         try {
-
             for (ODataRow row : quotation) {
                 localIds.add(row.getInt(OColumn.ROW_ID));
                 if (selectServerId(row.getInt(OColumn.ROW_ID)) == 0)
@@ -513,7 +522,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
                             .show();
                 }
             });
-
+            SaleOrder.mType = Type.SyncFailed;
             return false;
         }
         if (serverIds.size() > 0) {
@@ -661,6 +670,7 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
                     }
                     values.put("_is_dirty", "false");
                     update(qUpdate.getInt(OColumn.ROW_ID), values);
+                    this.mType = Type.SyncSuccess;
                 } else {
 //                    runOnUiThread(new Runnable() {
 //                        @Override
@@ -708,21 +718,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         Toast.makeText(getContext(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
     }
 
-    OnOperationSuccessListener syncAllData = new OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(mContext, "Success!!!", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnFault() {
-            Toast.makeText(mContext, "Fault!!!", Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-        }
-    };
 
     public interface OnOperationSuccessListener {
 
@@ -731,10 +726,6 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         void OnFault();
 
         void OnCancelled();
-    }
-
-    class ValidateSyncException extends Exception {
-
     }
 
 }

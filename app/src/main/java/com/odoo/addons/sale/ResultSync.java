@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.odoo.R;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.utils.OAppBarUtils;
 
 public class ResultSync extends AppCompatActivity {
@@ -17,8 +18,14 @@ public class ResultSync extends AppCompatActivity {
         setTitle(R.string.sync_data_title);
         TextView messageSuccess;
         messageSuccess = (TextView) findViewById(R.id.textView2);
-        messageSuccess.setText(R.string.notif_sync_success);
-        messageSuccess.setTextColor(getResources().getColor(R.color.android_green_dark));
         messageSuccess.setTextSize(24);
+
+        if (SaleOrder.mType.equals(SaleOrder.Type.SyncSuccess)) {
+            messageSuccess.setTextColor(getResources().getColor(R.color.android_green_dark));
+            messageSuccess.setText(R.string.notif_sync_success);
+        } else {
+            messageSuccess.setTextColor(getResources().getColor(R.color.android_red));
+            messageSuccess.setText(R.string.toast_problem_with_sync);
+        }
     }
 }

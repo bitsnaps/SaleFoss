@@ -7,6 +7,7 @@
     <string name="sync_data_limit">Период синхронизации</string>
     <string name="sync_data_limit_note">Определите за какой период данные будут синхронизированы</string>
     <string name="sync_data_title">Синхронизация</string>
+    <string name="notif_sync_fault">Не синхронизировано: перезапустите процесс еще раз!</string>
     <string name="notif_sync_success">Предложения продаж успешно синхронизированы!</string>
     <string name="notif_sync_tap">Нажмите чтобы перейти в приложение</string>
 

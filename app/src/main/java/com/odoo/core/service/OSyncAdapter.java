@@ -423,9 +423,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     if (!o2mRecs.isEmpty()) {
                         for (ODataRow o2mRec : o2mRecs) {
                             if (o2mRec.getInt("id") == 0) {
-                                int new_id = relModel.getServerDataHelper().createOnServer(
-                                        OdooRecordUtils.createRecordValues(relModel, o2mRec));
-                                updateRecordServerId(relModel, o2mRec.getInt(OColumn.ROW_ID), new_id);
+                                try {
+                                    int new_id = relModel.getServerDataHelper().createOnServer(
+                                            OdooRecordUtils.createRecordValues(relModel, o2mRec));
+                                    updateRecordServerId(relModel, o2mRec.getInt(OColumn.ROW_ID), new_id);
+                                } catch (Exception e){
+                                    e.getStackTrace(); // try catch added myself
+                                    return false;
+                                }
                             }
                         }
                     }

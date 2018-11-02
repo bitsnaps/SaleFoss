@@ -49,13 +49,16 @@ public class SaleOrderSyncIntentService extends IntentService {
                 case SYNC_ONLY:
                     Log.d(TAG, "SYNC STARED");
                     setSyncToServer(true);
-                    new SaleOrder(getApplication(), null ).syncSaleOrder();
+                    new SaleOrder(getApplication(), null).syncSaleOrder();
                     break;
                 case SYNC_AND_CONFIRM:
                     Log.d(TAG, "SYNC AND CONFIRM STARED");
                     setSyncToServer(true);
-                    new SaleOrder(getApplication(), null ).syncAndBackupConfirm();
-                    sendNotification();
+                    SaleOrder sale = new SaleOrder(getApplication(), null);
+                    SaleOrder.Type mType = sale.syncAndBackupConfirm();
+                    if (mType == SaleOrder.Type.SyncSuccess | mType == SaleOrder.Type.SyncTimedOut){
+                        sendNotification();
+                    }
                     break;
             }
 
@@ -82,8 +85,16 @@ public class SaleOrderSyncIntentService extends IntentService {
         builderNotif.setContentIntent(resultPendingIntent);
         builderNotif.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_foss));
         builderNotif.setContentTitle(App.APPLICATION_NAME);
-        builderNotif.setContentText(OResource.string(this, R.string.notif_sync_success));
-        builderNotif.setSubText(OResource.string(this, R.string.notif_sync_tap));
+
+        if (SaleOrder.mType.equals(SaleOrder.Type.SyncSuccess)) {
+            builderNotif.setContentText(OResource.string(this, R.string.notif_sync_success));
+            builderNotif.setSubText(OResource.string(this, R.string.notif_sync_tap));
+        } else {
+            builderNotif.setContentText(OResource.string(this, R.string.notif_sync_fault));
+            builderNotif.setSubText(OResource.string(this, R.string.notif_sync_tap));
+        }
+
+
         builderNotif.mNotification.flags |= builderNotif.mNotification.FLAG_AUTO_CANCEL;
         builderNotif.setDefaults(Notification.DEFAULT_SOUND);
 

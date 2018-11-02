@@ -28,6 +28,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
+
 import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.core.account.About;
@@ -78,6 +79,8 @@ public class SettingsActivity extends AppCompatActivity {
                 if (intent.getAction().equals(ACTION_PRODUCT_SYNCHRONIZATION)) {
                     if (!ProductSyncIntentService.getSyncToServer()) {
                         ProductSyncIntentService.checkToastsActive(true);
+                        Toast.makeText(getApplicationContext(), R.string.label_product_download_start, Toast.LENGTH_SHORT)
+                                .show();
                         startService(new Intent(this, ProductSyncIntentService.class));
                     } else
                         Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
@@ -96,6 +99,7 @@ public class SettingsActivity extends AppCompatActivity {
         if (!SaleOrderSyncIntentService.getSyncToServer()) {
             startService(new Intent(this, SaleOrderSyncIntentService.class)
                     .putExtra("syncType", SaleOrderSyncIntentService.SYNC_AND_CONFIRM));
+            Toast.makeText(getApplicationContext(), R.string.toast_process_started, Toast.LENGTH_SHORT).show();
         } else
             Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_SHORT).show();
     }

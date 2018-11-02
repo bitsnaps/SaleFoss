@@ -39,7 +39,7 @@ public class ProductSyncIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.d(TAG, "onHandleIntent START!");
+        Log.d(TAG, "Product onHandleIntent START!");
         setSyncToServer(true);
         try {
             ProductProduct productProduct = new ProductProduct(getApplicationContext(), null);
@@ -48,7 +48,7 @@ public class ProductSyncIntentService extends IntentService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "onHandleIntent END!");
+        Log.d(TAG, "Product onHandleIntent END!");
     }
 
     @Override

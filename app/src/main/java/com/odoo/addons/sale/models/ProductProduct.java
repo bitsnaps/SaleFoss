@@ -87,15 +87,15 @@ public class ProductProduct extends OModel implements ISyncServiceListener {
 
     @Override
     public void onSyncStarted() {
-        if (is_show) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(getContext(), R.string.label_product_download_start, Toast.LENGTH_SHORT)
-                            .show();
-                }
-            });
-        }
+//        if (is_show) {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Toast.makeText(getContext(), R.string.label_product_download_start, Toast.LENGTH_SHORT)
+//                            .show();
+//                }
+//            });
+//        }
     }
 
     @Override

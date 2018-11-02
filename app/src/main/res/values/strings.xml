@@ -8,6 +8,7 @@
     <string name="sync_data_limit_note">Define how old data to be synchronized</string>
     <string name="sync_data_title">Sync Result</string>
     <string name="notif_sync_success">Orders sync sync successful!</string>
+    <string name="notif_sync_fault">Sync is Failed: Restart sync one more!</string>
     <string name="notif_sync_tap">Tap to view application</string>
 
     <!-- Sync Labels// -->
