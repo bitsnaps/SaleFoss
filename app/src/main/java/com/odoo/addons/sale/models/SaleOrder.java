@@ -534,32 +534,33 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
     // ----------------------------------------------------------------------------------------------------
 
     // New name fo Sale order Table
-    public String newNameSaleOrder(String pream) {
+    public String newNameSaleOrder(String pream, String postfix) {
         String nameOrder = "";
         String prefix = pream;
 
         SaleOrder sale = new SaleOrder(mContext, null);
         List<ODataRow> rows = sale.select(new String[]{"name"}, "name LIKE ?",
-                new String[]{prefix + "%"});
+                new String[]{prefix + "%" + postfix});
         int i = 0;
         int[] numbersNames = new int[rows.size()];
         for (ODataRow row : rows) {
             nameOrder = row.getString("name");
-            numbersNames[i] = Integer.parseInt(nameOrder.substring(nameOrder.indexOf(prefix) + prefix.length()));
+            String nameWitoutPrefix = nameOrder.substring(nameOrder.indexOf(prefix) + prefix.length());
+            numbersNames[i] = Integer.parseInt(nameWitoutPrefix.substring(0, nameWitoutPrefix.indexOf(postfix)));
             i++;
         }
         if (nameOrder != "") {
             Arrays.sort(numbersNames);
             nameOrder = Integer.toString(numbersNames[numbersNames.length - 1] + 1);
             if (nameOrder.length() == 1) {
-                nameOrder = pream + "00" + nameOrder;
+                nameOrder = pream + "00" + nameOrder + postfix;
             } else if (nameOrder.length() == 2) {
-                nameOrder = pream + "0" + nameOrder;
+                nameOrder = pream + "0" + nameOrder + postfix;
             } else if (nameOrder.length() >= 3) {
-                nameOrder = pream + nameOrder;
+                nameOrder = pream + nameOrder + postfix;
             }
         } else {
-            nameOrder = pream + "001";
+            nameOrder = pream + "001" + postfix;
         }
         return nameOrder;
     }

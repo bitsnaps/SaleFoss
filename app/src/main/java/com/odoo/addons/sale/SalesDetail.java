@@ -355,7 +355,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 // Creating oneToMany order lines
 
                 if (values.getString("name").equals("/")) {
-                    String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
+//                    String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
+                    String nameOrder = sale.newNameSaleOrder("SO", "-" + sale.getUser().getUserId().toString());
                     values.put("name", nameOrder);
                     values.put("state", "draft");
                     values.put("_is_local_only", "no");
