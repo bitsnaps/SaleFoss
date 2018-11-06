@@ -196,7 +196,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         String test_url = createServerURL(edtSelfHosted.getText().toString());
                         Log.v(TAG, "Testing URL :" + test_url);
                         try {
-                            Odoo.createInstance(OdooLogin.this, test_url).setOnConnect(OdooLogin.this);
+                            Odoo.createInstance(OdooLogin.this, test_url)
+                                    .setOnConnect(OdooLogin.this);
                         } catch (OdooVersionException e) {
                             e.printStackTrace();
                         }
