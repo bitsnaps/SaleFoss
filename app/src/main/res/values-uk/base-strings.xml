@@ -3,7 +3,8 @@
     <string name="label_accounts_settings">Odoo</string>
     <string name="label_login">Логин</string>
     <string name="label_accept_login">Прийняти та Увійти в обліковий запис</string>
-    <string name="label_your_self_hosted_url">Введіть URL сервера</string>
+    <!--<string name="label_your_self_hosted_url">Введіть URL сервера</string>-->
+    <string name="label_your_self_hosted_url">http://(your domain).erp.foss.ua</string>
     <string name="label_username_or_email">Им\'я користувача або email</string>
     <string name="label_password">Пароль</string>
     <string name="label_forgot_password">Забули пароль ?</string>

@@ -112,7 +112,8 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         edtPassword = (EditText) findViewById(R.id.edtPassword);
 
         if (BuildConfig.DEBUG) {
-            edtSelfHosted.setText("https://odoo.foss.ua");
+            edtSelfHosted.setText("");
+//            edtSelfHosted.setText("https://odoo.foss.ua");
 //            edtSelfHosted.setText("http://192.168.1.2:8069/");
 //            edtSelfHosted.setText("http://10.10.16.18:8069/");
             edtUsername.setText("");
@@ -193,7 +194,12 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         findViewById(R.id.serverURLCheckProgress).setVisibility(View.VISIBLE);
                         findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
                         findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
-                        String test_url = createServerURL(edtSelfHosted.getText().toString());
+                        String test_url;
+                        if (validateFossURL(edtSelfHosted.getText().toString())) {
+                            test_url = createServerURL(edtSelfHosted.getText().toString());
+                        } else
+                            test_url = "http://bad.";
+
                         Log.v(TAG, "Testing URL :" + test_url);
                         try {
                             Odoo.createInstance(OdooLogin.this, test_url)
@@ -209,6 +215,13 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
     private boolean validateURL(String url) {
         return (url.contains("."));
+    }
+
+    private boolean validateFossURL(String url) {
+        if (url.contains("http://") && url.contains(".erp.foss.ua"))
+            return (url.contains("."));
+        else
+            return false;
     }
 
     private String createServerURL(String server_url) {
