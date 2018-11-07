@@ -171,24 +171,28 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
     // here are writing lines of oder_line !!!
     private void initAdapter() {
+        int product_id = 0;
         mList = (ExpandableListControl) findViewById(R.id.expListOrderLine);
         mList.setVisibility(View.VISIBLE);
         if (extra != null && record != null) {
-            List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
-            for (ODataRow line : lines) {
-                int product_id = products.selectServerId(line.getInt("product_id"));
-                ODataRow row = products.browse(new String[]{"default_code"},
-                        line.getInt("product_id"));
-                line.put("default_code", row.getString("default_code"));
-                localItems.add(line);
-
-                if (product_id != 0) {
-                    lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
-                    lineIds.put(product_id + "", line.getInt("id"));
-                }
-            }
+           try {
+               List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
+               for (ODataRow line : lines) {
+                   product_id = products.selectServerId(line.getInt("product_id"));
+                   ODataRow row = products.browse(new String[]{"default_code"},
+                           line.getInt("product_id"));
+                   line.put("default_code", row.getString("default_code"));
+                   localItems.add(line);
+                   if (product_id != 0) {
+                       lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
+                       lineIds.put(product_id + "", line.getInt("id"));
+                   }
+               }
 //            objects.addAll(localItems);
-            objects.addAll(lines);
+               objects.addAll(lines);
+           } catch (Exception e){
+               e.getStackTrace();
+           }
         }
 
         mAdapter = mList.getAdapter(R.layout.sale_order_line_item, objects,
@@ -356,7 +360,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 
                 if (values.getString("name").equals("/")) {
 //                    String nameOrder = sale.newNameSaleOrder(sale.getUser().getUsername() + "/mob/SO");
-                    String nameOrder = sale.newNameSaleOrder("SO", "-" + sale.getUser().getUserId().toString());
+                    String nameOrder = sale.newNameSaleOrder("SO", "/" + sale.getUser().getUserId().toString());
                     values.put("name", nameOrder);
                     values.put("state", "draft");
                     values.put("_is_local_only", "no");
