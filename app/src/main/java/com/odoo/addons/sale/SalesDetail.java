@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -192,6 +193,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                objects.addAll(lines);
            } catch (Exception e){
                e.getStackTrace();
+               Log.d(TAG, "EXCEPTION: Order of old Product Tables!");
            }
         }
 

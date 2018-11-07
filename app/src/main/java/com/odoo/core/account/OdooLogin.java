@@ -181,6 +181,11 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             @Override
             public void run() {
                 if (mSelfHostedURL && v.getId() == R.id.edtSelfHostedURL && !hasFocus) {
+
+                    if (!validateFossURL(edtSelfHosted.getText().toString()) && edtSelfHosted.getText().toString()!="") {
+                        String fullURL = "http://" + edtSelfHosted.getText() + ".erp.foss.ua";
+                        edtSelfHosted.setText(fullURL);
+                    }
                     if (!TextUtils.isEmpty(edtSelfHosted.getText())
                             && validateURL(edtSelfHosted.getText().toString())) {
                         edtSelfHosted.setError(null);
@@ -199,8 +204,9 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                             test_url = createServerURL(edtSelfHosted.getText().toString());
                         } else
                             test_url = "http://bad.";
-
+//                        test_url = createServerURL(edtSelfHosted.getText().toString());
                         Log.v(TAG, "Testing URL :" + test_url);
+
                         try {
                             Odoo.createInstance(OdooLogin.this, test_url)
                                     .setOnConnect(OdooLogin.this);

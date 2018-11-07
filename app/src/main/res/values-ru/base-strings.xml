@@ -4,7 +4,7 @@
     <string name="label_login">Логин</string>
     <string name="label_accept_login">Принять &amp; Войти в учетную запись</string>
     <!--<string name="label_your_self_hosted_url">Введите URL сервера</string>-->
-    <string name="label_your_self_hosted_url">http://[Ваш домен].erp.foss.ua</string>
+    <string name="label_your_self_hosted_url">Введите свой домен или полный URL адрес</string>
     <string name="label_username_or_email">Имя пользователя или email</string>
     <string name="label_password">Пароль</string>
     <string name="label_forgot_password">Забыли пароль ?</string>
