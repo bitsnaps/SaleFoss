@@ -12,14 +12,14 @@
         android:id="@+id/productQty"
         android:layout_width="wrap_content"
         android:layout_height="32dp"
+        android:layout_marginRight="@dimen/default_16dp"
         android:background="@drawable/circle_mask_secondary"
         android:fontFamily="@string/font_condensed"
         android:gravity="center"
-        android:text="52"
         android:padding="5dp"
-        android:layout_marginRight="@dimen/default_16dp"
-        android:textColor="@android:color/white"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:text="52"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/productName"
@@ -35,6 +35,18 @@
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <TextView
+        android:id="@+id/productPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="@drawable/has_data_week_day"
+        android:fontFamily="@string/font_condensed"
+        android:gravity="center"
+        android:text="1112.44"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/remove_qty"
         android:layout_width="wrap_content"
@@ -42,11 +54,11 @@
         android:layout_gravity="center_vertical"
         android:background="?android:attr/selectableItemBackground"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:visibility="gone"
         android:paddingTop="@dimen/default_8dp"
+        android:paddingRight="16dp"
         android:paddingBottom="@dimen/default_8dp"
         android:src="@drawable/ic_action_content_remove_circle"
-        android:tint="@color/android_red_dark" />
+        android:tint="@color/android_red_dark"
+        android:visibility="visible" />
 
 </LinearLayout>

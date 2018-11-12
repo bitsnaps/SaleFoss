@@ -48,6 +48,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
     private LiveSearch mLiveDataLoader = null;
     private OColumn mCol = null;
     private HashMap<String, Float> lineValues = new HashMap<>();
+    private HashMap<String, Float> lineValuesPrice = new HashMap<>();
     private Boolean mLongClicked = false;
 
     @Override
@@ -67,6 +68,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             for (String key : extra.keySet()) {
                 lineValues.put(key, extra.getFloat(key));
             }
+
             for (Object local : productProduct.select()) {
                 ODataRow product = (ODataRow) local;
                 if (product.get("sale_ok").equals("false"))
@@ -115,6 +117,40 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             });
             OControls.setVisible(v, R.id.productQty);
             OControls.setText(v, R.id.productQty, qty + " ");
+
+            Float price = (lineValuesPrice.containsKey(row.getString("id")) &&
+                    lineValuesPrice.get(row.getString("id")) > 0) ? lineValuesPrice.get(row.getString("id")) : 0;
+            if (price <= 0) {
+                OControls.setVisible(v, R.id.productPrice);
+                OControls.setText(v, R.id.productPrice, row.getFloat("lst_price") + " ");
+            } else {
+                OControls.setVisible(v, R.id.productPrice);
+                OControls.setText(v, R.id.productPrice, price + " ");
+            }
+            v.findViewById(R.id.productPrice).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final Float unitPrice = row.getFloat("lst_price");
+                    OAlert.inputDialog(v.getContext(), "Unit price", new OAlert.OnUserInputListener() {
+                        @Override
+                        public void onViewCreated(EditText inputView) {
+                            inputView.setInputType(InputType.TYPE_CLASS_NUMBER
+                                    | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                            inputView.setText(unitPrice + "");
+                        }
+
+                        @Override
+                        public void onUserInputted(Object value) {
+                            float userData = Float.parseFloat(value.toString());
+                            lineValuesPrice.put(row.getString("id"), userData);
+                            mAdapter.notifiyDataChange(objects);
+                        }
+                    });
+
+                }
+            });
+
+
         }
         String defaultCode = row.getString("default_code");
         if (defaultCode.equals("false"))
@@ -185,6 +221,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 mAdapter.notifiyDataChange(objects);
             }
         });
+
     }
 
     @Override
@@ -228,14 +265,26 @@ public class AddProductLineWizard extends OdooCompatActivity implements
     @Override
     public void onClick(View v) {
         Bundle data = new Bundle();
+        Bundle dataPrice = new Bundle();
         Intent intent = new Intent();
+        float[][] arrayQttPrice = new float[lineValues.size()][2];
         switch (v.getId()) {
             case R.id.done:
-
+                int i = 0;
                 for (String key : lineValues.keySet()) {
-                    data.putFloat(key, lineValues.get(key));
+                    arrayQttPrice[i][0] = (float) 0.0;
+                    arrayQttPrice[i][1] = (float) 0.0;
+//                    data.putFloat(key, lineValues.get(key));
+                    arrayQttPrice[i][0] = lineValues.get(key);
+                    if (!lineValuesPrice.containsKey(key))
+                        arrayQttPrice[i][1] = (float) 0.0;
+                    else
+                        arrayQttPrice[i][1] = lineValuesPrice.get(key);
+                    data.putFloatArray(key, arrayQttPrice[i]);
+                    i++;
                 }
                 intent.putExtras(data);
+//                intent.putExtras(dataPrice);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;

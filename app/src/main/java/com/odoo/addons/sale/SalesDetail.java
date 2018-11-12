@@ -29,6 +29,7 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -45,6 +46,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooCompatActivity;
+import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
@@ -59,6 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.controls.ExpandableListControl;
+import odoo.controls.ExpandableListOperationListener;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
@@ -78,6 +81,8 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     private ExpandableListControl.ExpandableListAdapter mAdapter;
     private List<Object> objects = new ArrayList<>();
     private HashMap<String, Float> lineValues = new HashMap<>();
+    private HashMap<String, Float> lineValuesPrice = new HashMap<>();
+
     private HashMap<String, Integer> lineIds = new HashMap<>();
     private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt;
     private ODataRow currencyObj;
@@ -173,28 +178,30 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     // here are writing lines of oder_line !!!
     private void initAdapter() {
         int product_id = 0;
+
         mList = (ExpandableListControl) findViewById(R.id.expListOrderLine);
         mList.setVisibility(View.VISIBLE);
+
         if (extra != null && record != null) {
-           try {
-               List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
-               for (ODataRow line : lines) {
-                   product_id = products.selectServerId(line.getInt("product_id"));
-                   ODataRow row = products.browse(new String[]{"default_code"},
-                           line.getInt("product_id"));
-                   line.put("default_code", row.getString("default_code"));
-                   localItems.add(line);
-                   if (product_id != 0) {
-                       lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
-                       lineIds.put(product_id + "", line.getInt("id"));
-                   }
-               }
+            try {
+                List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
+                for (ODataRow line : lines) {
+                    product_id = products.selectServerId(line.getInt("product_id"));
+                    ODataRow row = products.browse(new String[]{"default_code"},
+                            line.getInt("product_id"));
+                    line.put("default_code", row.getString("default_code"));
+                    localItems.add(line);
+                    if (product_id != 0) {
+                        lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
+                        lineIds.put(product_id + "", line.getInt("id"));
+                    }
+                }
 //            objects.addAll(localItems);
-               objects.addAll(lines);
-           } catch (Exception e){
-               e.getStackTrace();
-               Log.d(TAG, "EXCEPTION: Order of old Product Tables!");
-           }
+                objects.addAll(lines);
+            } catch (Exception e) {
+                e.getStackTrace();
+                Log.d(TAG, "EXCEPTION: Order of old Product Tables!");
+            }
         }
 
         mAdapter = mList.getAdapter(R.layout.sale_order_line_item, objects,
@@ -202,7 +209,6 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     @Override
                     public View getView(int position, View mView, ViewGroup parent) {
                         ODataRow row = (ODataRow) mAdapter.getItem(position);
-
                         String defaultCode = row.getString("default_code");
                         if (!defaultCode.equals("false")) {
                             OControls.setText(mView, R.id.edtNumber, "[" + defaultCode + "] ");
@@ -214,6 +220,11 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                         OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
                         OControls.setText(mView, R.id.edtProductPrice, String.format("%.2f", row.getFloat("price_unit")));
                         OControls.setText(mView, R.id.edtSubTotal, String.format("%.2f", row.getFloat("price_subtotal")));
+                        mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            }
+                        });
                         return mView;
                     }
                 });
@@ -257,12 +268,12 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             case R.id.menu_sale_save:
                 if (values != null) {
                     record = sale.browse(extra.getInt(OColumn.ROW_ID));
-                    if (record == null){
+                    if (record == null) {
                         if (!values.contains("partner_id")) {
                             values.put("partner_name", "false");
                             values.put("partner_id", "false");
                         }
-                    } else{
+                    } else {
                         values.put("partner_name", record.get("partner_name").toString());
                         values.put("partner_id", record.getInt("partner_id").toString());
                     }
@@ -280,7 +291,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                                     "default_customer = ?",
                                     new String[]{"true"}
                             );
-                            if (rows.size() <= 0){
+                            if (rows.size() <= 0) {
                                 Toast.makeText(this, R.string.toast_has_partner, Toast.LENGTH_LONG).show();
                             } else
                                 for (ODataRow row : rows) {
@@ -322,17 +333,29 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        float[] arrayQttPrice = new float[2];
+
         if (resultCode == Activity.RESULT_OK)
             saveWithProductLines = true;
 
         if (requestCode == REQUEST_ADD_ITEMS && resultCode == Activity.RESULT_OK) {
             lineValues.clear();
+            lineValuesPrice.clear();
+
+//            for (String key : data.getExtras().keySet()) {
+//                if (data.getExtras().getFloat(key) > 0)
+//                    lineValues.put(key, data.getExtras().getFloat(key));
+//            }
             for (String key : data.getExtras().keySet()) {
-                if (data.getExtras().getFloat(key) > 0)
-                    lineValues.put(key, data.getExtras().getFloat(key));
+                if (data.getExtras().getFloatArray(key).length > 0) {
+                    arrayQttPrice = data.getExtras().getFloatArray(key);
+                    lineValues.put(key, arrayQttPrice[0] );
+                    lineValuesPrice.put(key, arrayQttPrice[1]);
+                }
             }
+
             OnProductChange onProductChange = new OnProductChange();
-            onProductChange.execute(lineValues);
+            onProductChange.execute(lineValues, lineValuesPrice);
         }
     }
 
@@ -529,6 +552,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);
+                    Float price = params[1].get(key);
                     HashMap<String, Object> context = new HashMap<>();
                     context.put("quantity", qty);
 
@@ -538,10 +562,20 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("name", product.get("name_template")); // it is // mine
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
-                    values.put("price_unit", product.getFloat("lst_price"));
+
+                    if(price <= (float) 0.0){
+                        values.put("price_unit", product.getFloat("lst_price"));
+                    } else{
+                        values.put("price_unit", price);
+                    }
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    values.put("price_subtotal", product.getFloat("lst_price") * qty);
+                    if(price <= (float) 0.0) {
+                        values.put("price_subtotal", product.getFloat("lst_price") * qty);
+                    } else {
+                        values.put("price_subtotal", price * qty);
+                    }
+
                     values.put("default_code", product.get("default_code"));
 
                     JSONArray tax_id = new JSONArray();
