@@ -121,6 +121,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
 
             Float price = (lineValuesPrice.containsKey(row.getString("id")) &&
                     lineValuesPrice.get(row.getString("id")) > 0) ? lineValuesPrice.get(row.getString("id")) : 0;
+
             if (price <= 0) {
                 OControls.setVisible(v, R.id.productPrice);
                 OControls.setText(v, R.id.productPrice, row.getFloat("lst_price") + " ");
