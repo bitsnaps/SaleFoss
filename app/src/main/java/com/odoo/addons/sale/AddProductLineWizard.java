@@ -105,6 +105,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
         if (qty <= 0) {
             OControls.setGone(v, R.id.productQty);
             OControls.setGone(v, R.id.remove_qty);
+            OControls.setGone(v, R.id.productPrice);
         } else {
             OControls.setVisible(v, R.id.remove_qty);
             v.findViewById(R.id.remove_qty).setOnClickListener(new View.OnClickListener() {
@@ -265,26 +266,25 @@ public class AddProductLineWizard extends OdooCompatActivity implements
     @Override
     public void onClick(View v) {
         Bundle data = new Bundle();
-        Bundle dataPrice = new Bundle();
         Intent intent = new Intent();
         float[][] arrayQttPrice = new float[lineValues.size()][2];
         switch (v.getId()) {
             case R.id.done:
                 int i = 0;
                 for (String key : lineValues.keySet()) {
-                    arrayQttPrice[i][0] = (float) 0.0;
-                    arrayQttPrice[i][1] = (float) 0.0;
+                    arrayQttPrice[i][0] = 0;
+                    arrayQttPrice[i][1] = 0;
 //                    data.putFloat(key, lineValues.get(key));
                     arrayQttPrice[i][0] = lineValues.get(key);
                     if (!lineValuesPrice.containsKey(key))
-                        arrayQttPrice[i][1] = (float) 0.0;
+                        arrayQttPrice[i][1] = -1;
                     else
                         arrayQttPrice[i][1] = lineValuesPrice.get(key);
                     data.putFloatArray(key, arrayQttPrice[i]);
+//                    data.putFloat(key, lineValues.get(key));
                     i++;
                 }
                 intent.putExtras(data);
-//                intent.putExtras(dataPrice);
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
@@ -346,7 +346,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             mList.setVisibility(View.VISIBLE);
             if (result != null && result.size() > 0) {
                 objects.clear();
-                objects.addAll(localItems);
+//                objects.addAll(localItems);
                 objects.addAll(result);
                 mAdapter.notifiyDataChange(objects);
             }

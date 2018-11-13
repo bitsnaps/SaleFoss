@@ -346,16 +346,25 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
 //                if (data.getExtras().getFloat(key) > 0)
 //                    lineValues.put(key, data.getExtras().getFloat(key));
 //            }
+
             for (String key : data.getExtras().keySet()) {
                 if (data.getExtras().getFloatArray(key).length > 0) {
                     arrayQttPrice = data.getExtras().getFloatArray(key);
-                    lineValues.put(key, arrayQttPrice[0] );
-                    lineValuesPrice.put(key, arrayQttPrice[1]);
+                    if (arrayQttPrice[0] > 0){
+                        lineValues.put(key, arrayQttPrice[0]);
+                        lineValuesPrice.put(key, arrayQttPrice[1]);
+
+                    }
+//                    if (!lineValues.containsValue((float)0.0)) {
+//                        lineValues.put(key, arrayQttPrice[0]);
+//                        lineValuesPrice.put(key, arrayQttPrice[1]);
+//                    }
                 }
             }
 
             OnProductChange onProductChange = new OnProductChange();
             onProductChange.execute(lineValues, lineValuesPrice);
+//            onProductChange.execute(lineValues);
         }
     }
 
@@ -563,14 +572,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
 
-                    if(price <= (float) 0.0){
+                    if(price < (float) 0.0){
                         values.put("price_unit", product.getFloat("lst_price"));
                     } else{
                         values.put("price_unit", price);
                     }
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    if(price <= (float) 0.0) {
+                    if(price < (float) 0.0) {
                         values.put("price_subtotal", product.getFloat("lst_price") * qty);
                     } else {
                         values.put("price_subtotal", price * qty);
