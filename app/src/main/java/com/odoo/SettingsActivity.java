@@ -29,8 +29,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.odoo.addons.customers.Customers;
+import com.odoo.addons.customers.services.CustomerSyncIntentService;
+import com.odoo.addons.customers.services.CustomerSyncService;
 import com.odoo.addons.sale.services.ProductSyncIntentService;
 import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.account.About;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.support.OUser;
@@ -46,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity {
     public static final String ACTION_ABOUT = "com.odoo.ACTION_ABOUT";
     public static final String ACTION_ORDER_SYNCHRONIZATION = "com.odoo.ACTION_ORDER_SYNCHRONIZATION";
     public static final String ACTION_PRODUCT_SYNCHRONIZATION = "com.odoo.ACTION_PRODUCT_SYNCHRONIZATION";
+    public static final String ACTION_PARTNER_SYNCHRONIZATION = "com.odoo.ACTION_PARTNER_SYNCHRONIZATION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,16 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
                     return;
                 }
+                if (intent.getAction().equals(ACTION_PARTNER_SYNCHRONIZATION)) {
+                    if (!CustomerSyncIntentService.getSyncToServer()) {
+                        Toast.makeText(getApplicationContext(), R.string.label_customers_download_start, Toast.LENGTH_SHORT)
+                                .show();
+                        startService(new Intent(this, CustomerSyncIntentService.class));
+                    } else
+                        Toast.makeText(getApplicationContext(), R.string.toast_process_started_already, Toast.LENGTH_LONG).show();
+                    return;
+                }
+
             } else {
                 checkConnection = false;
                 Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();

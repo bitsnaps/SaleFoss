@@ -77,7 +77,6 @@
     <string name="label_our_apps">Наші програми</string>
     <string name="label_attach_a_file"> + Приєднати файл</string>
     <string name="label_be_patient_we_are_configuring_account_update">Будьте терплячі, ми оновлюємо ваш обліковий запис</string>
-
     <!-- Toasts -->
     <string name="developer_2_tap">Need 2 tap for developer mode</string>
     <string name="developer_5_tap">Developer mode activated</string>
@@ -142,6 +141,8 @@
     <string name="summary_about_foss_mobile">ФОСС-Он-Лайн</string>
     <string name="synchronization_database">Синхронізувати дані Замовлень</string>
     <string name="synchronization_products">Оновити інформацію про Товари</string>
+    <string name="synchronization_partners">Оновити інформацію про Клієнтів</string>
+
     <!-- About Company Fragment Strings -->
     <string name="about_Company_line1">Авторські права © 2018-СЬОГОДНІ ФОСС-Он-Лайн. Всі права захищені.</string>
     <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>

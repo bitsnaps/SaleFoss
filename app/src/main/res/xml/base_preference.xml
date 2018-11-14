@@ -14,6 +14,11 @@
             android:title="@string/synchronization_products">
             <intent android:action="com.odoo.ACTION_PRODUCT_SYNCHRONIZATION" />
         </Preference>
+        <Preference
+            android:icon="@drawable/ic_action_users"
+            android:title="@string/synchronization_partners">
+            <intent android:action="com.odoo.ACTION_PARTNER_SYNCHRONIZATION" />
+        </Preference>
     </PreferenceCategory>
 
 

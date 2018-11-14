@@ -148,16 +148,18 @@
     <string name="label_no_lines">Вы не можете подтвердить продажу пока Позиция заказа не заполнена</string>
     <string name="label_quotation_confirmed">Предложение Заказа подтверждено!</string>
     <string name="label_quotation_fault">Предложение заказа не подтверждено, проверьте соединение с сервером!</string>
+    <string name="label_customers_download_start">Запущена синхронизация Клиентов с сервера!</string>
     <string name="label_product_download_end">Продукты были загружены успешно!</string>
     <string name="label_product_download_start">Запущена синхронизация товаров с сервера!</string>
-
     <string name="label_product_download_fault">Продукты были загружены неудачно, проверьте соединение с сервером!</string>
+    <string name="label_customers_fault">Клиенты не синхронизированы, проверьте соединение с сервером!</string>
     <string name="label_updated">обновлено</string>
     <string name="label_created">создано</string>
     <string name="title_no_lines">(Позиции отсутствуют)</string>
     <string name="label_lines">позиции заказа</string>
     <string name="field_label_name">Имя</string>
     <string name="field_label_sync">Синхронизировано"</string>
+
     <!--Model sale.order-->
     <string name="field_label_date_order">"Дата подтверждения"</string>
     <string name="field_label_partner_id">Клиент</string>

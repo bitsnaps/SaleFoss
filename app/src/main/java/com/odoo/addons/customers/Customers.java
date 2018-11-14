@@ -21,6 +21,7 @@ package com.odoo.addons.customers;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -41,6 +42,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
+import com.odoo.addons.customers.services.CustomerSyncIntentService;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -69,7 +71,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public static final String KEY = Customers.class.getSimpleName();
     public static final String KEY_FILTER_REQUEST = "key_filter_request";
     public static final String KEY_CUSTOMER_ID = "key_customer_id";
-//    public static final String KEY_FILTER_TYPE = CRMLeads.KEY_MENU;
+    //    public static final String KEY_FILTER_TYPE = CRMLeads.KEY_MENU;
     private View mView;
     private String mCurFilter = null;
     private ListView mPartnersList = null;
@@ -95,14 +97,14 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         @Override
         public void OnFault() {
             hideRefreshingProgress();
-            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();            hideRefreshingProgress();
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
+            hideRefreshingProgress();
         }
 
         @Override
         public void OnCancelled() {
         }
     };
-
 
 
     @Override
@@ -356,8 +358,21 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-                resPartner.syncReady(getContext(),refreshPartners );
-                setSwipeRefreshing(true);
+            setSwipeRefreshing(true);
+
+            Thread threadOfConfirm = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    resPartner.syncReady();
+                    try {
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                    }
+                }
+            });
+            threadOfConfirm.start(); // запускаем
+            hideRefreshingProgress();
+
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)

@@ -194,13 +194,19 @@
             android:enabled="true"
             android:exported="true">
             <!--android:process=":productsync"-->
-
         </service>
 
         <service
             android:name=".addons.sale.services.SaleOrderSyncIntentService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true">
+        </service>
+
+        <service
+            android:name=".addons.customers.services.CustomerSyncIntentService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
 
         <!--<activity-->
         <!--android:name=".addons.calendar.EventDetail"-->

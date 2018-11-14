@@ -133,7 +133,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 @Override
                 public void onClick(View v) {
                     final Float unitPrice = row.getFloat("lst_price");
-                    OAlert.inputDialog(v.getContext(), "Unit price", new OAlert.OnUserInputListener() {
+                    OAlert.inputDialog(v.getContext(), OResource.string(v.getContext(), R.string.label_unit_price), new OAlert.OnUserInputListener() {
                         @Override
                         public void onViewCreated(EditText inputView) {
                             inputView.setInputType(InputType.TYPE_CLASS_NUMBER
@@ -208,7 +208,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
         mLongClicked = false;
         final Float count = ((lineValues.containsKey(row.getString("id")))
                 ? lineValues.get(row.getString("id")) : 0);
-        OAlert.inputDialog(this, "Quantity", new OAlert.OnUserInputListener() {
+        OAlert.inputDialog(this, OResource.string(this, R.string.label_quantity), new OAlert.OnUserInputListener() {
             @Override
             public void onViewCreated(EditText inputView) {
                 inputView.setInputType(InputType.TYPE_CLASS_NUMBER

@@ -20,14 +20,16 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.odoo.R;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
+import com.odoo.addons.customers.services.CustomerSyncIntentService;
 import com.odoo.BuildConfig;
-import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -37,8 +39,10 @@ import com.odoo.core.orm.fields.types.OBlob;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.handler.OdooVersionException;
 import com.odoo.core.rpc.helper.OArguments;
-import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.listeners.IOdooConnectionListener;
+import com.odoo.core.rpc.listeners.OdooError;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
@@ -47,10 +51,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResPartner extends OModel {
+public class ResPartner extends OModel implements IOdooConnectionListener {
     public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
             ".provider.content.sync.res_partner";
     private Context idContext = getContext();
+    private Context mContext;
     OColumn name = new OColumn(_s(R.string.field_label_name), OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn(_s(R.string.field_label_is_company), OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn(_s(R.string.field_label_image_small), OBlob.class).setDefaultValue(false);
@@ -86,6 +91,7 @@ public class ResPartner extends OModel {
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);
+        mContext = context;
         setHasMailChatter(true);
     }
 
@@ -144,6 +150,20 @@ public class ResPartner extends OModel {
         // Execute upgrade script
     }
 
+    public void syncReady(){
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    com.odoo.core.rpc.Odoo.createInstance(getContext(), getUser().getHost()).setOnConnect(ResPartner.this);
+                } catch (OdooVersionException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+
     public void syncReady(final Context context, final ResPartner.OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private Boolean faultOrder = false;
@@ -181,6 +201,19 @@ public class ResPartner extends OModel {
 
             }
         }.execute();
+    }
+
+    @Override
+    public void onConnect(com.odoo.core.rpc.Odoo odoo) {
+        Log.d(TAG, "exist_db returned TRUE ");
+        mContext.startService(new Intent(mContext, CustomerSyncIntentService.class));
+    }
+
+    @Override
+    public void onError(OdooError error) {
+        Log.d(TAG, "exist_db returned FALSE ");
+        Toast.makeText(getContext(), _s(R.string.label_customers_fault), Toast.LENGTH_LONG).show();
+
     }
 
     public interface OnOperationSuccessListener {
