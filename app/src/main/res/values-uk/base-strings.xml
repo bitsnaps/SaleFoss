@@ -51,7 +51,7 @@
     <string name="label_send">Послати</string>
     <!-- package warning -->
     <!-- Drawer -->
-    <string name="label_drawer_account_add_account">Додаты обліковий Запис</string>
+    <string name="label_drawer_account_add_account">Додати Обліковий Запис</string>
     <string name="label_drawer_account_manage_accounts">Керувати Обліковими Записами</string>
     <!-- Common Labels -->
     <string name="title_application_settings">"Налаштування"</string>

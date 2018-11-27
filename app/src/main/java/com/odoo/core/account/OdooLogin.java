@@ -183,7 +183,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                 if (mSelfHostedURL && v.getId() == R.id.edtSelfHostedURL && !hasFocus) {
 
                     if (!validateFossURL(edtSelfHosted.getText().toString()) && edtSelfHosted.getText().toString()!="") {
-                        String fullURL = "http://" + edtSelfHosted.getText() + ".erp.foss.ua";
+                        String fullURL = "https://" + edtSelfHosted.getText() + ".erp.foss.ua";
                         edtSelfHosted.setText(fullURL);
                     }
                     if (!TextUtils.isEmpty(edtSelfHosted.getText())
@@ -224,7 +224,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
     }
 
     private boolean validateFossURL(String url) {
-        if (url.contains("http://") && url.contains(".erp.foss.ua"))
+        if (url.contains("https://") && url.contains(".erp.foss.ua"))
             return (url.contains("."));
         else
             return false;
