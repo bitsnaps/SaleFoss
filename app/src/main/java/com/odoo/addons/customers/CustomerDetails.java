@@ -101,7 +101,8 @@ public class CustomerDetails extends OdooCompatActivity
     }
 
     private void setMode(Boolean edit) {
-        findViewById(R.id.captureImage).setVisibility(edit ? View.VISIBLE : View.GONE);
+//        findViewById(R.id.captureImage).setVisibility(edit ? View.VISIBLE : View.GONE);
+        findViewById(R.id.captureImage).setVisibility(View.GONE);
         if (mMenu != null) {
             mMenu.findItem(R.id.menu_customer_detail_more).setVisible(!edit);
             mMenu.findItem(R.id.menu_customer_edit).setVisible(!edit);
@@ -120,13 +121,15 @@ public class CustomerDetails extends OdooCompatActivity
             findViewById(R.id.customer_view_layout).setVisibility(View.GONE);
             findViewById(R.id.customer_edit_layout).setVisibility(View.VISIBLE);
             OField is_company = (OField) findViewById(R.id.is_company_edit);
+            is_company.setVisibility(View.GONE);
             OField default_customer = (OField) findViewById(R.id.is_default);
-
+            default_customer.setVisibility(View.VISIBLE);
             is_company.setOnValueChangeListener(this);
         } else {
             mForm = (OForm) findViewById(R.id.customerForm);
             findViewById(R.id.customer_edit_layout).setVisibility(View.GONE);
             findViewById(R.id.customer_view_layout).setVisibility(View.VISIBLE);
+
         }
         setColor(color);
     }

@@ -22,10 +22,12 @@
         <menu>
             <item
                 android:id="@+id/menu_customer_share"
-                android:title="@string/label_share" />
+                android:title="@string/label_share"
+                android:visible="false" />
             <item
                 android:id="@+id/menu_customer_import"
-                android:title="@string/label_import_contact" />
+                android:title="@string/label_import_contact"
+                android:visible="false" />
         </menu>
     </item>
 </menu>

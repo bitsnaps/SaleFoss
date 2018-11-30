@@ -55,13 +55,14 @@
 
             <TextView
                 android:id="@+id/email"
-                android:textAppearance="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:fontFamily="@string/font_normal"
-                android:textColor="@color/body_text_3"
-                android:layout_width="match_parent"
                 android:singleLine="true"
-                android:layout_height="wrap_content"></TextView>
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textColor="@color/body_text_3"
+                android:visibility="gone"></TextView>
 
         </LinearLayout>
     </LinearLayout>
