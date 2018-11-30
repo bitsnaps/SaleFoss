@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -79,6 +80,9 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private boolean syncRequested = false;
     private ResPartner resPartner;
     private String userName = null;
+    private int textColorBlack = Color.BLACK;
+    private int textColorBlue = 0xFF661EB3;
+
 
     public enum Type {
         Leads, Opportunities, Customer, Supplier, Company
@@ -150,6 +154,11 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 ? "" : row.getString("company_name"));
         OControls.setText(view, R.id.email, (row.getString("email").equals("false") ? " "
                 : row.getString("email")));
+        if (row.getBoolean("default_customer")) {
+            OControls.setTextColor(view, R.id.name, textColorBlue);
+        } else {
+            OControls.setTextColor(view, R.id.name, textColorBlack);
+        }
     }
 
     @Override
