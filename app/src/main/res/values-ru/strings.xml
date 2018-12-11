@@ -4,8 +4,8 @@
     <string name="app_name">Foss Sale</string>
     <string name="label_today">Сегодня</string>
     <string name="button_ok">Да</string>
-    <string name="sync_data_limit">Период синхронизации</string>
-    <string name="sync_data_limit_note">Определите за какой период данные будут синхронизированы</string>
+    <string name="sync_data_limit">Хранить данные за период</string>
+    <string name="sync_data_limit_note">Какой период сохранения Предложений на продажу</string>
     <string name="sync_data_title">Синхронизация</string>
     <string name="notif_sync_fault">Не синхронизировано: перезапустите процесс еще раз!</string>
     <string name="notif_sync_success">Предложения продаж успешно синхронизированы!</string>

@@ -113,7 +113,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 public void onClick(View v) {
                     Float lineQty = lineValues.get(row.getString("id"));
                     lineValues.put(row.getString("id"), lineQty - 1);
-                    mAdapter.notifiyDataChange(objects);
+                    mAdapter.notifiyDataChange(objects, localItems);
                 }
             });
             OControls.setVisible(v, R.id.productQty);
@@ -145,7 +145,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                         public void onUserInputted(Object value) {
                             float userData = Float.parseFloat(value.toString());
                             lineValuesPrice.put(row.getString("id"), userData);
-                            mAdapter.notifiyDataChange(objects);
+                            mAdapter.notifiyDataChange(objects, localItems);
                         }
                     });
 
@@ -220,7 +220,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             public void onUserInputted(Object value) {
                 float userData = Float.parseFloat(value.toString());
                 lineValues.put(row.getString("id"), userData);
-                mAdapter.notifiyDataChange(objects);
+                mAdapter.notifiyDataChange(objects, localItems);
             }
         });
 
@@ -232,7 +232,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
             Float count = ((lineValues.containsKey(row.getString("id")))
                     ? lineValues.get(row.getString("id")) : 0);
             lineValues.put(row.getString("id"), ++count);
-            mAdapter.notifiyDataChange(objects);
+            mAdapter.notifiyDataChange(objects, localItems);
         } else {
             onLongClicked(row);
         }
@@ -241,7 +241,6 @@ public class AddProductLineWizard extends OdooCompatActivity implements
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count,
                                   int after) {
-
     }
 
     @Override
@@ -261,7 +260,6 @@ public class AddProductLineWizard extends OdooCompatActivity implements
 
     @Override
     public void afterTextChanged(Editable s) {
-
     }
 
     @Override
@@ -297,16 +295,14 @@ public class AddProductLineWizard extends OdooCompatActivity implements
 
     @Override
     public void onSearchChange(List<Object> newRecords) {
-        if (newRecords.size() <= 2) {
-            if (mLiveDataLoader != null)
-                mLiveDataLoader.cancel(true);
-            if (edt_searchable_input.getText().length() >= 2) {
-
+//        if (newRecords.size() <= 2) {
+//            if (mLiveDataLoader != null)
+//                mLiveDataLoader.cancel(true);
+//            if (edt_searchable_input.getText().length() >= 2) {
 //                mLiveDataLoader = new LiveSearch();
-//                mLiveDataLoader.execute(edt_searchable_input.getText()
-//                        .toString());
-            }
-        }
+//                mLiveDataLoader.execute(edt_searchable_input.getText().toString());
+//            }
+//        }
     }
 
 
@@ -349,7 +345,7 @@ public class AddProductLineWizard extends OdooCompatActivity implements
                 objects.clear();
 //                objects.addAll(localItems);
                 objects.addAll(result);
-                mAdapter.notifiyDataChange(objects);
+                mAdapter.notifiyDataChange(objects, localItems);
             }
         }
 

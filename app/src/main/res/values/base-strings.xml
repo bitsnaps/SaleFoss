@@ -119,9 +119,10 @@
         <item name="1440">1440</item>
     </string-array>
     <string-array name="syncDataLimit">
+        <item name="1">1 day old</item>
         <item name="5">5 days old</item>
         <item name="10">10 days old</item>
-        <item name="15">15 day old</item>
+        <item name="15">15 days old</item>
         <item name="30">1 month old</item>
         <item name="60">2 months old</item>
         <item name="90">3 months old</item>

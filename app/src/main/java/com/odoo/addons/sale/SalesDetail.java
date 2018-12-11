@@ -140,39 +140,42 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             record = sale.browse(extra.getInt(OColumn.ROW_ID));
             if (record == null) {
                 finish();
-            }
-            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
-                OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
-                onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
-            }
-            if (mType == Type.Quotation) {
-                actionBar.setTitle(R.string.label_quotation); //label_quotation - Original
-                txvType.setText(R.string.label_quotation);
-                mForm.setEditable(true); // eleminate if need to edit line
-                mForm.findViewById(R.id.partner_for_details).setVisibility(View.GONE);
-
-                layoutAddItem.setVisibility(View.VISIBLE); // eleminate if need to edit line
-                if (record.getString("state").equals("cancel"))
-                    layoutAddItem.setVisibility(View.GONE);
-//                    actionBar.setTitle(R.string.label_quotation); //Original there was nothing
             } else {
-                layoutAddItem.setVisibility(View.GONE);
-                actionBar.setTitle(R.string.label_sale_orders);
-                txvType.setText(R.string.label_sale_orders);
-                mForm.setEditable(false);
+//
+                if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
+                    OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
+                    onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
+                }
+                if (mType == Type.Quotation) {
+                    actionBar.setTitle(R.string.label_quotation); //label_quotation - Original
+                    txvType.setText(R.string.label_quotation);
+                    mForm.setEditable(true); // eleminate if need to edit line
+                    mForm.findViewById(R.id.partner_for_details).setVisibility(View.GONE);
+
+                    layoutAddItem.setVisibility(View.VISIBLE); // eleminate if need to edit line
+                    if (record.getString("state").equals("cancel"))
+                        layoutAddItem.setVisibility(View.GONE);
+//                    actionBar.setTitle(R.string.label_quotation); //Original there was nothing
+                } else {
+                    layoutAddItem.setVisibility(View.GONE);
+                    actionBar.setTitle(R.string.label_sale_orders);
+                    txvType.setText(R.string.label_sale_orders);
+                    mForm.setEditable(false);
+                }
+                currencySymbol = record.getM2ORecord("currency_id").browse().getString("symbol");
+                untaxedAmt.setText(String.format("%.2f", record.getFloat("amount_untaxed")));
+                taxesAmt.setText(String.format("%.2f", record.getFloat("amount_tax")));
+                total_amt.setText(String.format("%.2f", record.getFloat("amount_total")));
+
+                mForm.initForm(record); //  Original - Call inin for Form - here is erro and axception for first launch
+
+
+                mSOType = txvType.getText().toString();
+                currency1.setText(currencySymbol);
+                currency2.setText(currencySymbol);
+                currency3.setText(currencySymbol);
             }
-            currencySymbol = record.getM2ORecord("currency_id").browse().getString("symbol");
-            untaxedAmt.setText(String.format("%.2f", record.getFloat("amount_untaxed")));
-            taxesAmt.setText(String.format("%.2f", record.getFloat("amount_tax")));
-            total_amt.setText(String.format("%.2f", record.getFloat("amount_total")));
-
-            mForm.initForm(record); //  Original - Call inin for Form - here is erro and axception for first launch
-
         }
-        mSOType = txvType.getText().toString();
-        currency1.setText(currencySymbol);
-        currency2.setText(currencySymbol);
-        currency3.setText(currencySymbol);
     }
 
     // here are writing lines of oder_line !!!
@@ -350,7 +353,7 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
             for (String key : data.getExtras().keySet()) {
                 if (data.getExtras().getFloatArray(key).length > 0) {
                     arrayQttPrice = data.getExtras().getFloatArray(key);
-                    if (arrayQttPrice[0] > 0){
+                    if (arrayQttPrice[0] > 0) {
                         lineValues.put(key, arrayQttPrice[0]);
                         lineValuesPrice.put(key, arrayQttPrice[1]);
 
@@ -572,14 +575,14 @@ public class SalesDetail extends OdooCompatActivity implements View.OnClickListe
                     values.put("product_uom_qty", qty);
                     values.put("product_uom", false);
 
-                    if(price < (float) 0.0){
+                    if (price < (float) 0.0) {
                         values.put("price_unit", product.getFloat("lst_price"));
-                    } else{
+                    } else {
                         values.put("price_unit", price);
                     }
                     values.put("product_uos_qty", qty);
                     values.put("product_uos", false);
-                    if(price < (float) 0.0) {
+                    if (price < (float) 0.0) {
                         values.put("price_subtotal", product.getFloat("lst_price") * qty);
                     } else {
                         values.put("price_subtotal", price * qty);

@@ -47,6 +47,7 @@ import com.odoo.App;
 import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.addons.sale.services.SaleOrderSyncIntentService;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -109,6 +110,23 @@ public class Sales extends BaseFragment implements
         handler.post(runnable);
 
     }
+
+
+    public SaleOrderSyncIntentService.OnSuccessListener serviceSync = new SaleOrderSyncIntentService.OnSuccessListener(){
+        @Override
+        public void OnSuccess() {
+            onStatusChange(false);
+        }
+
+        @Override
+        public void OnCancelled() {
+        }
+
+        @Override
+        public void OnFault() {
+        }
+
+    };
 
     OnOperationSuccessListener cancelOrder = new OnOperationSuccessListener() {
         @Override
@@ -288,6 +306,7 @@ public class Sales extends BaseFragment implements
                     setSwipeRefreshing(false);
                     onRefresh();
 
+
                 } else {
                     hideRefreshingProgress();
                     Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
@@ -340,6 +359,7 @@ public class Sales extends BaseFragment implements
                 }
             });
             threadOfConfirm.start(); // запускаем
+            onStatusChange(false);
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();

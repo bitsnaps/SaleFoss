@@ -98,7 +98,7 @@
         android:title="@string/sync_data_limit">
 
         <ListPreference
-            android:defaultValue="5"
+            android:defaultValue="1"
             android:entries="@array/syncDataLimit"
             android:entryValues="@array/syncDataLimitValues"
             android:key="sync_data_limit"

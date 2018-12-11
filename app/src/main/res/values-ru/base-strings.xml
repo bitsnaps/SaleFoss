@@ -120,6 +120,7 @@
         <item name="1440">1440</item>
     </string-array>
     <string-array name="syncDataLimit">
+        <item name="1">1 день</item>
         <item name="5">5 дней</item>
         <item name="10">10 дней</item>
         <item name="15">15 дней</item>

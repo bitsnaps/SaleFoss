@@ -186,6 +186,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         String fullURL = "https://" + edtSelfHosted.getText() + ".erp.foss.ua";
                         edtSelfHosted.setText(fullURL);
                     }
+
                     if (!TextUtils.isEmpty(edtSelfHosted.getText())
                             && validateURL(edtSelfHosted.getText().toString())) {
                         edtSelfHosted.setError(null);
@@ -455,7 +456,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
 
                     OPreferenceManager preferenceManager = new OPreferenceManager(OdooLogin.this);
                     domain.add("&");
-                    int data_limit = preferenceManager.getInt("sync_data_limit", 2);
+                    int data_limit = preferenceManager.getInt("sync_data_limit", 1);
                     domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
                     domain.add("id", "!=", 0);
                     sale.quickSyncRecords(domain);

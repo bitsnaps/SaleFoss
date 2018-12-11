@@ -22,6 +22,7 @@ package com.odoo.addons.sale.models;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -719,6 +720,32 @@ public class SaleOrder extends OModel implements IOdooConnectionListener, ISyncS
         Toast.makeText(getContext(), _s(R.string.label_quotation_fault), Toast.LENGTH_LONG).show();
     }
 
+    public void deletePeriodOrders() {
+        OPreferenceManager preferenceManager = new OPreferenceManager(mContext);
+        SaleOrder order = new SaleOrder(getContext(), null);
+        SQLiteDatabase db = getWritableDatabase();
+        int data_limit = preferenceManager.getInt("sync_data_limit", 2);
+        List<Integer> serverIds = new ArrayList<>();
+        List<Integer> orderLineIds = new ArrayList<>();
+
+        try {
+            String sql = "SELECT id, _id FROM sale_order WHERE create_date >= '"
+                    + ODateUtils.getDateBefore(data_limit) + "'";
+            List<ODataRow> orderIds = order.query(sql);
+            for (ODataRow row : orderIds) {
+                serverIds.add(row.getInt("id"));
+                orderLineIds.add(row.getInt(OColumn.ROW_ID));
+            }
+            String deleteOrderLineSql = "DELETE FROM sale_order_line" + " WHERE order_id " + "NOT IN (" +
+                    TextUtils.join(",", orderLineIds) + ")";
+            db.execSQL(deleteOrderLineSql);
+            String deleteSql = "DELETE FROM sale_order" + " WHERE id " + "NOT IN (" +
+                    TextUtils.join(",", serverIds) + ")";
+            db.execSQL(deleteSql);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public interface OnOperationSuccessListener {
 

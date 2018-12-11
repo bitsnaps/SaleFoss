@@ -76,6 +76,15 @@ public class OListAdapter extends ArrayAdapter<Object> {
         notifyDataSetChanged();
     }
 
+    public void notifiyDataChange(List<Object> choicedObjects, List<Object> allObjects) {
+        Log.d(TAG, "OListAdapter->notifiyDataChange()");
+        mAllObjects.clear();
+        mObjects.clear();
+        mAllObjects.addAll(allObjects);
+        mObjects.addAll(choicedObjects);
+        notifyDataSetChanged();
+    }
+
     class RowFilter extends Filter {
 
         @Override

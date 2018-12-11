@@ -1,6 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
     signingConfigs {
     }
     compileSdkVersion 26
@@ -8,14 +14,16 @@ android {
     defaultConfig {
         useLibrary 'org.apache.http.legacy'
         manifestPlaceholders = [applicationName: "Foss Sale"]
-        applicationId "com.odoo.crm"
+        applicationId "com.foss.erp"
         targetSdkVersion 26
-        versionCode 8
-        versionName '3.1.0'
+        versionCode 9
+        versionName '4.0'
         minSdkVersion 19
     }
     buildTypes {
         debug {
+            debuggable true
+//            debuggable false
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -23,6 +31,8 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
+//            minifyEnabled false
+//            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

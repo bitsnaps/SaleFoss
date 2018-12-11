@@ -1,5 +1,6 @@
 package com.odoo.addons.sale.services;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.view.View;
 
 import com.odoo.App;
 import com.odoo.R;
@@ -50,6 +52,7 @@ public class SaleOrderSyncIntentService extends IntentService {
                     Log.d(TAG, "SYNC STARED");
                     setSyncToServer(true);
                     new SaleOrder(getApplication(), null).syncSaleOrder();
+                    new SaleOrder(getApplication(), null).deletePeriodOrders();
                     break;
                 case SYNC_AND_CONFIRM:
                     Log.d(TAG, "SYNC AND CONFIRM STARED");
@@ -107,6 +110,16 @@ public class SaleOrderSyncIntentService extends IntentService {
         super.onDestroy();
         setSyncToServer(false);
         Log.d(TAG, "DESTROY!");
+//        new Sales().serviceSync.OnSuccess();
+    }
+
+    public interface OnSuccessListener {
+
+        void OnSuccess();
+
+        void OnFault();
+
+        void OnCancelled();
     }
 
 }

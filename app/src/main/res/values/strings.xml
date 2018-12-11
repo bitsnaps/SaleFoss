@@ -4,8 +4,8 @@
     <string name="app_name">Foss Sale</string>
     <string name="label_today">Today</string>
     <string name="button_ok">Ok</string>
-    <string name="sync_data_limit">Sync data limit</string>
-    <string name="sync_data_limit_note">Define how old data to be synchronized</string>
+    <string name="sync_data_limit">Keep the data for period</string>
+    <string name="sync_data_limit_note">What\'s the period for keeping Sale Orders</string>
     <string name="sync_data_title">Sync Result</string>
     <string name="notif_sync_success">Orders sync sync successful!</string>
     <string name="notif_sync_fault">Sync is Failed: Restart sync one more!</string>
