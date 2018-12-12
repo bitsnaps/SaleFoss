@@ -115,7 +115,6 @@ public class Sales extends BaseFragment implements
     public SaleOrderSyncIntentService.OnSuccessListener serviceSync = new SaleOrderSyncIntentService.OnSuccessListener(){
         @Override
         public void OnSuccess() {
-            onStatusChange(false);
         }
 
         @Override
@@ -359,7 +358,6 @@ public class Sales extends BaseFragment implements
                 }
             });
             threadOfConfirm.start(); // запускаем
-            onStatusChange(false);
         } else {
             hideRefreshingProgress();
             Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();

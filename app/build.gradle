@@ -16,23 +16,20 @@ android {
         manifestPlaceholders = [applicationName: "Foss Sale"]
         applicationId "com.foss.erp"
         targetSdkVersion 26
-        versionCode 9
-        versionName '4.0'
+        versionCode 10
+        versionName '4.1'
         minSdkVersion 19
     }
     buildTypes {
         debug {
             debuggable true
-//            debuggable false
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         release {
-            minifyEnabled true
-            shrinkResources true
-//            minifyEnabled false
-//            shrinkResources false
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
