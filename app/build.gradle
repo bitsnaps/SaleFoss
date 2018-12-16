@@ -10,7 +10,7 @@ android {
     signingConfigs {
     }
     compileSdkVersion 26
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         useLibrary 'org.apache.http.legacy'
         manifestPlaceholders = [applicationName: "Foss Sale"]
