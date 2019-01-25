@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: artifacts:calendar-lib:unspecified@jar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/calendar-lib.aar/8c63cd54facdc5d573480075fa3886be/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/calendar-lib.aar/8c63cd54facdc5d573480075fa3886be/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
