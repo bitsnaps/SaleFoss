@@ -1,12 +1,12 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.2'
     defaultConfig {
 
         minSdkVersion 19
-        targetSdkVersion 26
+        targetSdkVersion 28
     }
     buildTypes {
         release {
@@ -20,4 +20,14 @@ android {
 
 dependencies {
     implementation 'com.android.support:support-v4:25.1.0'
+}
+subprojects {
+    project.configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.android.support'
+                    && !details.requested.name.contains('multidex') ) {
+                details.useVersion "28.0.2"
+            }
+        }
+    }
 }
