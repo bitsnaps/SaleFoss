@@ -13,9 +13,9 @@
         android:background="@color/theme_primary"
         android:minHeight="?attr/actionBarSize"
         app:titleMarginStart="@dimen/default_16dp"
-        android:paddingRight="@dimen/default_16dp"
+        app:paddingEnd="@dimen/default_16dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-        app:theme="@style/ToolBarTheme" />
+        android:theme="@style/ToolBarTheme" />
 
     <LinearLayout
         android:layout_width="match_parent"

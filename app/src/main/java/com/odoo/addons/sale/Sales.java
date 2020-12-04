@@ -64,6 +64,7 @@ import com.odoo.core.utils.controls.OBottomSheet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class Sales extends BaseFragment implements
@@ -132,8 +133,12 @@ public class Sales extends BaseFragment implements
         OControls.setText(view, R.id.name, row.getString("name"));
         String format = (db().getUser().getOdooVersion().getVersionNumber() <= 7)
                 ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
-        String date = ODateUtils.convertToDefault(row.getString("date_order"),
-                format, "MMMM, dd");
+        String date = "";
+        try {
+            date = ODateUtils.convertToDefault(row.getString("date_order"),
+                    format, "MMMM, dd");
+        } catch (Exception ex){
+        }
         OControls.setText(view, R.id.date_order, date);
         OControls.setText(view, R.id.state, row.getString("state_title"));
 

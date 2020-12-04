@@ -14,9 +14,9 @@
         android:minHeight="?attr/actionBarSize"
         app:titleMarginStart="@dimen/default_16dp"
         android:paddingTop="@dimen/statusBarHeight"
-        android:paddingRight="@dimen/default_8dp"
+        app:paddingEnd="@dimen/default_8dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-        app:theme="@style/ToolBarTheme" />
+        android:theme="@style/ToolBarTheme" />
 
     <ScrollView
         android:layout_width="match_parent"
